@@ -3,6 +3,7 @@ package kernel
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"go-skeleton/cmd/handlers/cli"
 	"go-skeleton/cmd/handlers/http"
 	"go-skeleton/pkg"
 	"time"
@@ -49,15 +50,27 @@ func (k *kernel) Boot() {
 			PersistentPostRun: k.startServer,
 		},
 	)
+
+	cliCmd := &cobra.Command{
+		Use:   "cli",
+		Short: "",
+		Long:  ``,
+	}
+	k.startCli(cliCmd)
+	k.rootCmd.AddCommand(cliCmd)
 }
 
 func (k *kernel) RootCmd(cmd *cobra.Command, args []string) {
-	pkg.Logger.Info(fmt.Sprintf("Gladys Version %v", pkg.Config.Version))
+	pkg.Logger.Info(fmt.Sprintf("Go Skeleton Version %v", pkg.Config.Version))
 	pkg.Logger.Info("Use --help to check witch commands are available")
 }
 
 func (k *kernel) startServer(cmd *cobra.Command, args []string) {
 	http.NewServer(pkg.Config.Environment).Start(":1323")
+}
+
+func (k *kernel) startCli(cmd *cobra.Command) {
+	cli.NewCli(pkg.Config.Environment).RegisterCommands(cmd)
 }
 
 func (k *kernel) BootServer(cmd *cobra.Command, args []string) {

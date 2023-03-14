@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
@@ -24,4 +25,26 @@ func NewCli(Environment string) *Cli {
 	}
 }
 
-func (c *Cli) RegisterCommands(cmd *cobra.Command) {}
+func (c *Cli) RegisterCommands(cmd *cobra.Command) {
+
+	cmd.AddCommand(
+		&cobra.Command{
+			Use:    "create-domain",
+			Short:  "Create a new domain service",
+			Run:    c.BootCli,
+			PreRun: c.CreateDomain,
+		},
+	)
+
+}
+
+func (c *Cli) CreateDomain(cmd *cobra.Command, args []string) {
+
+}
+
+func (c *Cli) BootCli(cmd *cobra.Command, args []string) {
+	for index, dep := range pkg.CliDependencies {
+		dep.Boot()
+		c.logger.Info(fmt.Sprintf("[cli.cli] Booting %s", index))
+	}
+}

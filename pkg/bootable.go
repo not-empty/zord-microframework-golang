@@ -21,4 +21,12 @@ var KernelDependencies = map[string]Bootable{
 	"logger": Logger,
 }
 
-var ServerDependencies = map[string]Bootable{}
+var ServerDependencies = map[string]Bootable{
+	"config": Config,
+	"logger": Logger,
+}
+
+var CliDependencies = map[string]Bootable{
+	"config": Config,
+	"logger": Logger,
+}

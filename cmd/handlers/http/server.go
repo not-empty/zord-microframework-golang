@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/labstack/echo/v4"
+	"go-skeleton/application/services/dummy/GET"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/logger"
@@ -31,7 +32,21 @@ func (hs *Server) Start(port string) {
 	server.HideBanner = true
 	server.HidePort = true
 
+	server.GET("/v1/dummy/:dummy_id", hs.HandleDummy)
 	hs.Shutdown(server.Start(port))
+
+}
+
+func (hs *Server) HandleDummy(context echo.Context) error {
+	s := dummy.NewService(hs.logger)
+	s.Execute(
+		dummy.NewRequest(context.Param("dummy_id")),
+	)
+	response, err := s.GetResponse()
+	if err != nil {
+		return context.JSON(err.Status, err)
+	}
+	return context.JSON(response.Status, response)
 }
 
 func (hs *Server) Shutdown(err error) {

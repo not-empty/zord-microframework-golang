@@ -78,5 +78,6 @@ func (k *kernel) BootServer(cmd *cobra.Command, args []string) {
 		dep.Boot()
 		pkg.Logger.Info(fmt.Sprintf("[kernel.Kernel] Booting %s", index))
 	}
+
 	pkg.Logger.Info("[kernel.Kernel] Done!")
 }

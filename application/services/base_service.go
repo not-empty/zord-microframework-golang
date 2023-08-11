@@ -12,10 +12,6 @@ type Logger interface {
 	Critical(Error error, Context ...string)
 }
 
-type Repository interface {
-	Create(any)
-}
-
 type Error struct {
 	Status  int    `json:"-"`
 	Message string `json:"-"`

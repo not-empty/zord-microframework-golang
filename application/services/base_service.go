@@ -1,6 +1,8 @@
 package services
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type Logger interface {
 	Debug(Message string, Context ...string)
@@ -8,6 +10,10 @@ type Logger interface {
 	Warning(Message string, Context ...string)
 	Error(Error error, Context ...string)
 	Critical(Error error, Context ...string)
+}
+
+type Repository interface {
+	Create(any)
 }
 
 type Error struct {

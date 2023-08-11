@@ -22,20 +22,20 @@ func NewService(log services.Logger, repository *dummy.Repository) *Service {
 }
 
 func (s *Service) Execute(request Request) {
-	s.Logger.Debug("Hello Im Dummy Server!")
+	s.Logger.Debug("Creating new dummy")
 	if err := request.Validate(); err != nil {
 		s.BadRequest(request, err)
 		return
 	}
-	s.produceResponseRule()
+	s.produceResponseRule(request.Dummy)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule() {
-	s.Logger.Debug("ProduceResponseRule")
+func (s *Service) produceResponseRule(dummy dummy.Dummy) {
+	s.repository.Get(&dummy)
 	if s.Error == nil {
 		s.response = &Response{
 			Status:  http.StatusOK,

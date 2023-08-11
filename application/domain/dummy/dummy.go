@@ -1,5 +1,6 @@
-package domain
+package dummy
 
 type Dummy struct {
-	DummyId string
+	DummyId   string
+	DummyName string
 }

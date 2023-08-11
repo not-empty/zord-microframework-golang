@@ -1,11 +1,13 @@
 package http
 
 import (
-	"github.com/labstack/echo/v4"
-	"go-skeleton/application/services/dummy/GET"
+	"fmt"
+	"go-skeleton/cmd/handlers/http/routes"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/logger"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Server struct {
@@ -31,22 +33,14 @@ func (hs *Server) Start(port string) {
 
 	server.HideBanner = true
 	server.HidePort = true
+	routes := routes.GetAllRoutes(hs.logger, hs.Environment)
 
-	server.GET("/v1/dummy/:dummy_id", hs.HandleDummy)
+	for index, route := range routes {
+		route.DeclareRoutes(server)
+		pkg.Logger.Info(fmt.Sprintf("[server.route] Declared %s", index))
+	}
 	hs.Shutdown(server.Start(port))
 
-}
-
-func (hs *Server) HandleDummy(context echo.Context) error {
-	s := dummy.NewService(hs.logger)
-	s.Execute(
-		dummy.NewRequest(context.Param("dummy_id")),
-	)
-	response, err := s.GetResponse()
-	if err != nil {
-		return context.JSON(err.Status, err)
-	}
-	return context.JSON(response.Status, response)
 }
 
 func (hs *Server) Shutdown(err error) {

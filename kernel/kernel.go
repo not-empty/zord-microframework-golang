@@ -2,11 +2,12 @@ package kernel
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"go-skeleton/cmd/handlers/cli"
 	"go-skeleton/cmd/handlers/http"
 	"go-skeleton/pkg"
 	"time"
+
+	"github.com/spf13/cobra"
 )
 
 type kernel struct {
@@ -35,11 +36,7 @@ func (k *kernel) Boot() {
 	}
 
 	pkg.Logger.Info("[kernel.Kernel] Booting application!")
-	timezoneLocation, err := time.LoadLocation("America/Sao_Paulo")
-	if err != nil {
-		pkg.Logger.Critical(err, "[kernel.Kernel] Unable to identify timezone")
-	}
-	time.Local = timezoneLocation
+	time.Local = time.FixedZone("America/Sao_Paulo", 0)
 
 	k.rootCmd.AddCommand(
 		&cobra.Command{

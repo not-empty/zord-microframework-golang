@@ -1,6 +1,7 @@
 package dummy
 
 import (
+	"fmt"
 	"go-skeleton/application/domain/dummy"
 	"go-skeleton/application/services"
 	"net/http"
@@ -9,10 +10,10 @@ import (
 type Service struct {
 	services.BaseService
 	response   *Response
-	repository *dummy.Repository
+	repository services.Repository[dummy.Dummy]
 }
 
-func NewService(log services.Logger, repository *dummy.Repository) *Service {
+func NewService(log services.Logger, repository services.Repository[dummy.Dummy]) *Service {
 	return &Service{
 		BaseService: services.BaseService{
 			Logger: log,
@@ -27,19 +28,20 @@ func (s *Service) Execute(request Request) {
 		s.BadRequest(request, err)
 		return
 	}
-	s.produceResponseRule()
+	s.produceResponseRule(request.Dummy.DummyId)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule() {
+func (s *Service) produceResponseRule(id string) {
 	s.Logger.Debug("ProduceResponseRule")
+	teste := s.repository.Get(id)
 	if s.Error == nil {
 		s.response = &Response{
 			Status:  http.StatusOK,
-			Message: "OK",
+			Message: fmt.Sprint(teste),
 		}
 	}
 }

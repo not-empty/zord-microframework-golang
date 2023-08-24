@@ -1,27 +1,29 @@
 package routes
 
 import (
-	dummyRepository "go-skeleton/application/domain/dummy"
+	"go-skeleton/application/domain/dummy"
 	dummyCreate "go-skeleton/application/services/dummy/CREATE"
 	dummyGet "go-skeleton/application/services/dummy/GET"
 	"go-skeleton/pkg/logger"
+	"go-skeleton/pkg/repositories"
 
 	"github.com/labstack/echo/v4"
 )
 
 type DummyRoutes struct {
-	Environment string
-	repository  *dummyRepository.Repository
+	Environment     string
+	DummyRepository *repositories.BaseRepository[dummy.Dummy]
 
 	// config *config.Config
 	logger *logger.Logger
 }
 
 func NewDummyRoutes(logger *logger.Logger, Environment string) *DummyRoutes {
+	repository := &repositories.BaseRepository[dummy.Dummy]{}
 	return &DummyRoutes{
-		logger:      logger,
-		repository:  &dummyRepository.Repository{},
-		Environment: Environment,
+		logger:          logger,
+		Environment:     Environment,
+		DummyRepository: repository,
 	}
 }
 
@@ -31,7 +33,7 @@ func (hs *DummyRoutes) DeclareRoutes(server *echo.Echo) {
 }
 
 func (hs *DummyRoutes) HandleGetDummy(context echo.Context) error {
-	s := dummyGet.NewService(hs.logger, hs.repository)
+	s := dummyGet.NewService(hs.logger, hs.DummyRepository)
 	s.Execute(
 		dummyGet.NewRequest(context.Param("dummy_id")),
 	)
@@ -43,7 +45,7 @@ func (hs *DummyRoutes) HandleGetDummy(context echo.Context) error {
 }
 
 func (hs *DummyRoutes) HandleCreateDummy(context echo.Context) error {
-	s := dummyCreate.NewService(hs.logger, hs.repository)
+	s := dummyCreate.NewService(hs.logger, hs.DummyRepository)
 	s.Execute(
 		dummyCreate.NewRequest(),
 	)

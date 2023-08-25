@@ -3,7 +3,9 @@ package routes
 import (
 	"go-skeleton/application/domain/dummy"
 	dummyCreate "go-skeleton/application/services/dummy/CREATE"
+	dummyEdit "go-skeleton/application/services/dummy/EDIT"
 	dummyGet "go-skeleton/application/services/dummy/GET"
+	dummyList "go-skeleton/application/services/dummy/LIST"
 	"go-skeleton/pkg/logger"
 	"go-skeleton/pkg/repositories"
 
@@ -28,8 +30,10 @@ func NewDummyRoutes(logger *logger.Logger, Environment string) *DummyRoutes {
 }
 
 func (hs *DummyRoutes) DeclareRoutes(server *echo.Echo) {
+	server.GET("/v1/dummy", hs.HandleListDummy)
 	server.GET("/v1/dummy/:dummy_id", hs.HandleGetDummy)
 	server.POST("/v1/dummy", hs.HandleCreateDummy)
+	server.PUT("/v1/dummy/:dummy_id", hs.HandleEditDummy)
 }
 
 func (hs *DummyRoutes) HandleGetDummy(context echo.Context) error {
@@ -48,6 +52,30 @@ func (hs *DummyRoutes) HandleCreateDummy(context echo.Context) error {
 	s := dummyCreate.NewService(hs.logger, hs.DummyRepository)
 	s.Execute(
 		dummyCreate.NewRequest(),
+	)
+	response, err := s.GetResponse()
+	if err != nil {
+		return context.JSON(err.Status, err)
+	}
+	return context.JSON(response.Status, response)
+}
+
+func (hs *DummyRoutes) HandleEditDummy(context echo.Context) error {
+	s := dummyEdit.NewService(hs.logger, hs.DummyRepository)
+	s.Execute(
+		dummyEdit.NewRequest(context.ParamValues()[0]),
+	)
+	response, err := s.GetResponse()
+	if err != nil {
+		return context.JSON(err.Status, err)
+	}
+	return context.JSON(response.Status, response)
+}
+
+func (hs *DummyRoutes) HandleListDummy(context echo.Context) error {
+	s := dummyList.NewService(hs.logger, hs.DummyRepository)
+	s.Execute(
+		dummyList.NewRequest(),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

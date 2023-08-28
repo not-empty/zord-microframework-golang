@@ -37,7 +37,7 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 
 func (s *Service) produceResponseRule(id string) {
 	s.Logger.Debug("ProduceResponseRule")
-	teste, _ := s.repository.Get(id)
+	teste := s.repository.Delete(id)
 	if s.Error == nil {
 		s.response = &Response{
 			Status:  http.StatusOK,

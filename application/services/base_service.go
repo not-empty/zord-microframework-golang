@@ -13,10 +13,11 @@ type Logger interface {
 }
 
 type Repository[T any] interface {
-	Get(string) T
+	Get(string) (*T, error)
 	Create(*T) bool
 	List() []T
 	Edit(*T) bool
+	Delete(string) bool
 }
 
 type Error struct {

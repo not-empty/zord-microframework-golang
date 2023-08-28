@@ -3,6 +3,7 @@ package routes
 import (
 	"go-skeleton/application/domain/dummy"
 	dummyCreate "go-skeleton/application/services/dummy/CREATE"
+	dummyDelete "go-skeleton/application/services/dummy/DELETE"
 	dummyEdit "go-skeleton/application/services/dummy/EDIT"
 	dummyGet "go-skeleton/application/services/dummy/GET"
 	dummyList "go-skeleton/application/services/dummy/LIST"
@@ -76,6 +77,18 @@ func (hs *DummyRoutes) HandleListDummy(context echo.Context) error {
 	s := dummyList.NewService(hs.logger, hs.DummyRepository)
 	s.Execute(
 		dummyList.NewRequest(),
+	)
+	response, err := s.GetResponse()
+	if err != nil {
+		return context.JSON(err.Status, err)
+	}
+	return context.JSON(response.Status, response)
+}
+
+func (hs *DummyRoutes) HandleDeleteDummy(context echo.Context) error {
+	s := dummyDelete.NewService(hs.logger, hs.DummyRepository)
+	s.Execute(
+		dummyDelete.NewRequest(context.Param("dummy_id")),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

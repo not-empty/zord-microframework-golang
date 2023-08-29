@@ -5,6 +5,7 @@ import (
 	"go-skeleton/cmd/handlers/http/routes"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
+	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/logger"
 
 	"github.com/labstack/echo/v4"
@@ -15,16 +16,19 @@ type Server struct {
 
 	config *config.Config
 	logger *logger.Logger
+	mysql  *database.MySql
 }
 
 func NewServer(Environment string) *Server {
-	c := pkg.KernelDependencies["config"]
-	l := pkg.KernelDependencies["logger"]
+	c := pkg.ServerDependencies["config"]
+	l := pkg.ServerDependencies["logger"]
+	m := pkg.ServerDependencies["mysql"]
 
 	return &Server{
 		Environment: Environment,
 		config:      c.(*config.Config),
 		logger:      l.(*logger.Logger),
+		mysql:       m.(*database.MySql),
 	}
 }
 
@@ -33,7 +37,7 @@ func (hs *Server) Start(port string) {
 
 	server.HideBanner = true
 	server.HidePort = true
-	routes := routes.GetAllRoutes(hs.logger, hs.Environment)
+	routes := routes.GetAllRoutes(hs.logger, hs.Environment, hs.mysql)
 
 	for index, route := range routes {
 		route.DeclareRoutes(server)

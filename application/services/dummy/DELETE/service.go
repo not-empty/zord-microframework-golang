@@ -10,10 +10,10 @@ import (
 type Service struct {
 	services.BaseService
 	response   *Response
-	repository services.Repository[dummy.Dummy]
+	repository dummy.Repository
 }
 
-func NewService(log services.Logger, repository services.Repository[dummy.Dummy]) *Service {
+func NewService(log services.Logger, repository dummy.Repository) *Service {
 	return &Service{
 		BaseService: services.BaseService{
 			Logger: log,

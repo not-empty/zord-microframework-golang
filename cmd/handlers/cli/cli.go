@@ -2,26 +2,32 @@ package cli
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
+	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/logger"
+	"go-skeleton/tools/migrator"
+
+	"github.com/spf13/cobra"
 )
 
 type Cli struct {
 	Environment string
 	config      *config.Config
 	logger      *logger.Logger
+	mysql       *database.MySql
 }
 
 func NewCli(Environment string) *Cli {
-	c := pkg.KernelDependencies["config"]
-	l := pkg.KernelDependencies["logger"]
+	c := pkg.CliDependencies["config"]
+	l := pkg.CliDependencies["logger"]
+	m := pkg.CliDependencies["mysql"]
 
 	return &Cli{
 		Environment: Environment,
 		config:      c.(*config.Config),
 		logger:      l.(*logger.Logger),
+		mysql:       m.(*database.MySql),
 	}
 }
 
@@ -34,12 +40,23 @@ func (c *Cli) RegisterCommands(cmd *cobra.Command) {
 			Run:    c.BootCli,
 			PreRun: c.CreateDomain,
 		},
+		&cobra.Command{
+			Use:    "migrate",
+			Short:  "Migrate Gorm Database",
+			Run:    c.Migrate,
+			PreRun: c.BootCli,
+		},
 	)
 
 }
 
 func (c *Cli) CreateDomain(cmd *cobra.Command, args []string) {
 
+}
+
+func (c *Cli) Migrate(cmd *cobra.Command, args []string) {
+	migratorInstace := migrator.NewMigrator(c.mysql)
+	migratorInstace.MigrateAllDomains()
 }
 
 func (c *Cli) BootCli(cmd *cobra.Command, args []string) {

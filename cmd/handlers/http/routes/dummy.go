@@ -1,28 +1,30 @@
 package routes
 
 import (
-	"go-skeleton/application/domain/dummy"
 	dummyCreate "go-skeleton/application/services/dummy/CREATE"
 	dummyDelete "go-skeleton/application/services/dummy/DELETE"
 	dummyEdit "go-skeleton/application/services/dummy/EDIT"
 	dummyGet "go-skeleton/application/services/dummy/GET"
 	dummyList "go-skeleton/application/services/dummy/LIST"
+	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/logger"
-	"go-skeleton/pkg/repositories"
+	dummyRepository "go-skeleton/pkg/repositories/dummy"
 
 	"github.com/labstack/echo/v4"
 )
 
 type DummyRoutes struct {
 	Environment     string
-	DummyRepository *repositories.BaseRepository[dummy.Dummy]
+	DummyRepository *dummyRepository.DummyRepository
 
 	// config *config.Config
 	logger *logger.Logger
 }
 
-func NewDummyRoutes(logger *logger.Logger, Environment string) *DummyRoutes {
-	repository := &repositories.BaseRepository[dummy.Dummy]{}
+func NewDummyRoutes(logger *logger.Logger, Environment string, mysql *database.MySql) *DummyRoutes {
+	repository := &dummyRepository.DummyRepository{
+		Mysql: mysql,
+	}
 	return &DummyRoutes{
 		logger:          logger,
 		Environment:     Environment,

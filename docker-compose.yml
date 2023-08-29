@@ -9,7 +9,19 @@ services:
     env_file:
       - .env
     ports:
-      - 8080:8080
+      - 1323:1323
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: skeleton
+    ports:
+        - "3306:3306"
+    volumes:
+        - ./storage/mysql:/var/lib/mysql
 
 networks:
     default:

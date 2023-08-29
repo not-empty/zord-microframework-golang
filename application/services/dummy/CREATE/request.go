@@ -13,7 +13,8 @@ type Request struct {
 func NewRequest() Request {
 	return Request{
 		Dummy: domain.Dummy{
-			DummyId: "",
+			DummyId:   "testando",
+			DummyName: "",
 		},
 	}
 }

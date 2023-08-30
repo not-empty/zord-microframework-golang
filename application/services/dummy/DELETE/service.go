@@ -35,13 +35,13 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(dummyData dummy.Dummy) {
+func (s *Service) produceResponseRule(d dummy.Dummy) {
 	s.Logger.Debug("ProduceResponseRule")
-	teste := s.repository.Delete(&dummyData)
+	dummy := s.repository.Delete(&d)
 	if s.Error == nil {
 		s.response = &Response{
 			Status:  http.StatusOK,
-			Message: fmt.Sprint(teste),
+			Message: fmt.Sprint(dummy),
 		}
 	}
 }

@@ -3,20 +3,19 @@ package dummy
 import (
 	"errors"
 	domain "go-skeleton/application/domain/dummy"
-	"io"
 )
 
 type Request struct {
 	Dummy   domain.Dummy
-	Body    io.ReadCloser
 	Dummyid string
 }
 
-func NewRequest(body io.ReadCloser, dummyId string) Request {
-	return Request{
-		Body:    body,
-		Dummyid: dummyId,
+func NewRequest(dummy domain.Dummy, dummyId string) Request {
+	req := Request{
+		Dummy: dummy,
 	}
+	req.Dummy.DummyId = dummyId
+	return req
 }
 
 func (r *Request) Validate() error {

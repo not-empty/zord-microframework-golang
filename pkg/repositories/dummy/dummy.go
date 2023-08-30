@@ -19,8 +19,8 @@ func (repo *DummyRepository) Get(id string) (dummy.Dummy, error) {
 	return Data, nil
 }
 
-func (repo *DummyRepository) Create(data *dummy.Dummy) bool {
-	repo.Mysql.Db.Create(data)
+func (repo *DummyRepository) Create(d *dummy.Dummy) bool {
+	repo.Mysql.Db.Create(d)
 	return true
 }
 
@@ -30,12 +30,12 @@ func (repo *DummyRepository) List() []dummy.Dummy {
 	return data
 }
 
-func (repo *DummyRepository) Edit(data *dummy.Dummy) bool {
-	repo.Mysql.Db.Updates(data)
+func (repo *DummyRepository) Edit(d *dummy.Dummy) bool {
+	repo.Mysql.Db.Updates(d)
 	return true
 }
 
-func (repo *DummyRepository) Delete(data *dummy.Dummy) bool {
-	repo.Mysql.Db.Delete(data)
+func (repo *DummyRepository) Delete(d *dummy.Dummy) bool {
+	repo.Mysql.Db.Delete(d)
 	return true
 }

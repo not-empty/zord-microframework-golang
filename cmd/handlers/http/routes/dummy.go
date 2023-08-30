@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"encoding/json"
+	"go-skeleton/application/domain/dummy"
 	dummyCreate "go-skeleton/application/services/dummy/CREATE"
 	dummyDelete "go-skeleton/application/services/dummy/DELETE"
 	dummyEdit "go-skeleton/application/services/dummy/EDIT"
@@ -9,6 +11,7 @@ import (
 	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/logger"
 	dummyRepository "go-skeleton/pkg/repositories/dummy"
+	"io"
 
 	"github.com/labstack/echo/v4"
 )
@@ -55,8 +58,19 @@ func (hs *DummyRoutes) HandleGetDummy(context echo.Context) error {
 func (hs *DummyRoutes) HandleCreateDummy(context echo.Context) error {
 	s := dummyCreate.NewService(hs.logger, hs.DummyRepository)
 
+	dummy := dummy.Dummy{}
+	body, errors := io.ReadAll(context.Request().Body)
+	if errors != nil {
+		return context.JSON(422, errors)
+	}
+
+	errors = json.Unmarshal(body, &dummy)
+	if errors != nil {
+		return context.JSON(422, errors)
+	}
+
 	s.Execute(
-		dummyCreate.NewRequest(context.Request().Body),
+		dummyCreate.NewRequest(dummy),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -67,9 +81,22 @@ func (hs *DummyRoutes) HandleCreateDummy(context echo.Context) error {
 
 func (hs *DummyRoutes) HandleEditDummy(context echo.Context) error {
 	s := dummyEdit.NewService(hs.logger, hs.DummyRepository)
+
+	dummy := dummy.Dummy{}
+	body, errors := io.ReadAll(context.Request().Body)
+	if errors != nil {
+		return context.JSON(422, errors)
+	}
+
+	errors = json.Unmarshal(body, &dummy)
+	if errors != nil {
+		return context.JSON(422, errors)
+	}
+
 	s.Execute(
-		dummyEdit.NewRequest(context.Request().Body, context.Param("dummy_id")),
+		dummyEdit.NewRequest(dummy, context.Param("dummy_id")),
 	)
+
 	response, err := s.GetResponse()
 	if err != nil {
 		return context.JSON(err.Status, err)

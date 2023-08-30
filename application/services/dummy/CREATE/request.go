@@ -3,18 +3,16 @@ package dummy
 import (
 	"errors"
 	domain "go-skeleton/application/domain/dummy"
-	"io"
 )
 
 type Request struct {
 	Dummy domain.Dummy
-	Body  io.ReadCloser
 	Err   error
 }
 
-func NewRequest(Body io.ReadCloser) Request {
+func NewRequest(dummy domain.Dummy) Request {
 	return Request{
-		Body: Body,
+		Dummy: dummy,
 	}
 }
 

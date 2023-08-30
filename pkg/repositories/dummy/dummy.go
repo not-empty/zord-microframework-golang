@@ -35,8 +35,7 @@ func (repo *DummyRepository) Edit(data *dummy.Dummy) bool {
 	return true
 }
 
-func (repo *DummyRepository) Delete(id string) bool {
-	var Data dummy.Dummy
-	repo.Mysql.Db.Delete(&Data, id)
+func (repo *DummyRepository) Delete(data *dummy.Dummy) bool {
+	repo.Mysql.Db.Delete(data)
 	return true
 }

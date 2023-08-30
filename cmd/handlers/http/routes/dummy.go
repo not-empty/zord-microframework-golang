@@ -37,6 +37,7 @@ func (hs *DummyRoutes) DeclareRoutes(server *echo.Echo) {
 	server.GET("/v1/dummy/:dummy_id", hs.HandleGetDummy)
 	server.POST("/v1/dummy", hs.HandleCreateDummy)
 	server.PUT("/v1/dummy/:dummy_id", hs.HandleEditDummy)
+	server.DELETE("/v1/dummy/:dummy_id", hs.HandleDeleteDummy)
 }
 
 func (hs *DummyRoutes) HandleGetDummy(context echo.Context) error {
@@ -53,8 +54,9 @@ func (hs *DummyRoutes) HandleGetDummy(context echo.Context) error {
 
 func (hs *DummyRoutes) HandleCreateDummy(context echo.Context) error {
 	s := dummyCreate.NewService(hs.logger, hs.DummyRepository)
+
 	s.Execute(
-		dummyCreate.NewRequest(),
+		dummyCreate.NewRequest(context.Request().Body),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -66,7 +68,7 @@ func (hs *DummyRoutes) HandleCreateDummy(context echo.Context) error {
 func (hs *DummyRoutes) HandleEditDummy(context echo.Context) error {
 	s := dummyEdit.NewService(hs.logger, hs.DummyRepository)
 	s.Execute(
-		dummyEdit.NewRequest(context.ParamValues()[0]),
+		dummyEdit.NewRequest(context.Request().Body, context.Param("dummy_id")),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

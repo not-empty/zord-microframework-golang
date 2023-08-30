@@ -1,9 +1,11 @@
 package dummy
 
 import (
+	"encoding/json"
 	"fmt"
 	"go-skeleton/application/domain/dummy"
 	"go-skeleton/application/services"
+	"io"
 	"net/http"
 )
 
@@ -24,10 +26,24 @@ func NewService(log services.Logger, repository dummy.Repository) *Service {
 
 func (s *Service) Execute(request Request) {
 	s.Logger.Debug("Creating new dummy")
+
+	body, err := io.ReadAll(request.Body)
+	if err != nil {
+		s.BadRequest(request, err)
+		return
+	}
+
+	err = json.Unmarshal(body, &request.Dummy)
+	if err != nil {
+		s.BadRequest(request, err)
+		return
+	}
+
 	if err := request.Validate(); err != nil {
 		s.BadRequest(request, err)
 		return
 	}
+
 	s.produceResponseRule(request.Dummy)
 }
 

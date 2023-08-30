@@ -1,9 +1,11 @@
 package dummy
 
 import (
+	"encoding/json"
 	"fmt"
 	"go-skeleton/application/domain/dummy"
 	"go-skeleton/application/services"
+	"io"
 	"net/http"
 )
 
@@ -28,6 +30,20 @@ func (s *Service) Execute(request Request) {
 		s.BadRequest(request, err)
 		return
 	}
+
+	body, err := io.ReadAll(request.Body)
+	if err != nil {
+		s.BadRequest(request, err)
+		return
+	}
+
+	err = json.Unmarshal(body, &request.Dummy)
+	if err != nil {
+		s.BadRequest(request, err)
+		return
+	}
+	request.Dummy.DummyId = request.Dummyid
+
 	s.produceResponseRule(&request.Dummy)
 }
 

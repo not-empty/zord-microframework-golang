@@ -10,5 +10,5 @@ type Repository interface {
 	Create(data *Dummy) bool
 	List() []Dummy
 	Edit(data *Dummy) bool
-	Delete(id string) bool
+	Delete(id *Dummy) bool
 }

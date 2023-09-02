@@ -1,6 +1,8 @@
 package services
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type Logger interface {
 	Debug(Message string, Context ...string)

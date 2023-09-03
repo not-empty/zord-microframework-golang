@@ -1,0 +1,14 @@
+package {{domain}}
+
+type {{domainCap}} struct {
+	{{domainCap}}Id   string `gorm:"primarykey"`
+	{{domainCap}}Name string
+}
+
+type Repository interface {
+	Get(id string) ({{domainCap}}, error)
+	Create(data *{{domainCap}}) bool
+	List() []{{domainCap}}
+	Edit(data *{{domainCap}}) bool
+	Delete(id *{{domainCap}}) bool
+}

@@ -6,7 +6,9 @@ import (
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/logger"
+	"go-skeleton/tools/generator"
 	"go-skeleton/tools/migrator"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -51,7 +53,11 @@ func (c *Cli) RegisterCommands(cmd *cobra.Command) {
 }
 
 func (c *Cli) CreateDomain(cmd *cobra.Command, args []string) {
-
+	if len(os.Args) < 4 {
+		c.logger.Critical(fmt.Errorf("Empty args"))
+	}
+	domain := args[0]
+	generator.CreateDomain(domain)
 }
 
 func (c *Cli) Migrate(cmd *cobra.Command, args []string) {

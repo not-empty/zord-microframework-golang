@@ -1,0 +1,32 @@
+package {{domain}}
+
+import (
+	domain "go-skeleton/application/domain/{{domain}}"
+)
+
+type Request struct {
+	{{domainCap}} domain.{{domainCap}}
+	Err   error
+}
+
+func NewRequest({{domain}} domain.{{domainCap}}) Request {
+	return Request{
+		{{domainCap}}: {{domain}},
+	}
+}
+
+func (r *Request) Validate() error {
+	if err := r.{{domain}}CreateRule(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *Request) {{domain}}CreateRule() error {
+
+	// Add validation...
+	// if r.{{domainCap}}.{{domainCap}}Name == "" {
+	//	 return errors.New("invalid_argument")
+	// }
+	return nil
+}

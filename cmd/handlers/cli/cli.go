@@ -52,7 +52,7 @@ func (c *Cli) RegisterCommands(cmd *cobra.Command) {
 }
 
 func (c *Cli) CreateDomain(cmd *cobra.Command, args []string) {
-	generatorInstance := generator.NewGenerator()
+	generatorInstance := generator.NewGenerator(c.logger)
 	generatorInstance.CreateDomain(args[0])
 }
 

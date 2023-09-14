@@ -1,0 +1,41 @@
+package {{domain}}Repository
+
+import (
+	"go-skeleton/application/domain/{{domain}}"
+	"go-skeleton/pkg/database"
+)
+
+type {{domainCap}}Repository struct {
+	Mysql *database.MySql
+}
+
+func NewBaseRepository() *{{domainCap}}Repository {
+	return &{{domainCap}}Repository{}
+}
+
+func (repo *{{domainCap}}Repository) Get(id string) ({{domain}}.{{domainCap}}, error) {
+	var Data {{domain}}.{{domainCap}}
+	repo.Mysql.Db.Find(&Data, id)
+	return Data, nil
+}
+
+func (repo *{{domainCap}}Repository) Create(d *{{domain}}.{{domainCap}}) bool {
+	repo.Mysql.Db.Create(d)
+	return true
+}
+
+func (repo *{{domainCap}}Repository) List() []{{domain}}.{{domainCap}} {
+	var data []{{domain}}.{{domainCap}}
+	repo.Mysql.Db.Find(&data).Limit(100)
+	return data
+}
+
+func (repo *{{domainCap}}Repository) Edit(d *{{domain}}.{{domainCap}}) bool {
+	repo.Mysql.Db.Updates(d)
+	return true
+}
+
+func (repo *{{domainCap}}Repository) Delete(d *{{domain}}.{{domainCap}}) bool {
+	repo.Mysql.Db.Delete(d)
+	return true
+}

@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"fmt"
 	"go-skeleton/application/services"
 	"io/fs"
 	"os"
@@ -18,7 +19,7 @@ func NewGenerator(l services.Logger) *Generator {
 	}
 }
 
-func (g *Generator) CreateDomain(domain string) {
+func (g *Generator) CreateDomain(domain string) error {
 	domainCap := strings.Title(domain)
 	domainDir := "application/domain/" + domain
 
@@ -28,7 +29,7 @@ func (g *Generator) CreateDomain(domain string) {
 
 	filepath.Walk("tools/generator/stubs/domain", func(path string, info fs.FileInfo, err error) error {
 		if info.IsDir() {
-			return err
+			return nil
 		}
 		g.createFile(domain, domainCap, path, domainDir)
 		return nil
@@ -78,12 +79,47 @@ func (g *Generator) CreateDomain(domain string) {
 		g.createFile(domain, domainCap, path, repositoriesDir)
 		return nil
 	})
+
+	routesDir := "cmd/handlers/http/routes"
+	g.createFile(domain, domainCap, "tools/generator/stubs/routes/__{{domain}}.go.stub", routesDir)
+
+	declarableDir := routesDir + "/declarable.go"
+
+	data, err := os.ReadFile(declarableDir)
+	if err != nil {
+		g.Logger.Error(err)
+	}
+
+	if strings.Contains(string(data), domain) {
+		return nil
+	}
+
+	routesInstanceTemplate := fmt.Sprintf(
+		"%sListRoutes := New%sRoutes(logger, Environment, MySql)\n	//{{codeGen1}}",
+		domain,
+		domainCap,
+	)
+	declarableTemplate := fmt.Sprintf(
+		"\"%s\": %sListRoutes,\n		//{{codeGen2}}",
+		domain,
+		domain,
+	)
+
+	newFileData := strings.Replace(string(data), "//{{codeGen1}}", routesInstanceTemplate, 1)
+	newFileData = strings.Replace(newFileData, "//{{codeGen2}}", declarableTemplate, 1)
+
+	g.Logger.Info("ADD ROUTES: " + declarableDir)
+	err = os.WriteFile(declarableDir, []byte(newFileData), 0755)
+	if err != nil {
+		g.Logger.Error(err)
+	}
+	return nil
 }
 
 func (g *Generator) createFile(domain string, domainCap string, from string, to string) {
 	stubData, err := os.ReadFile(from)
 	if err != nil {
-		panic(err)
+		g.Logger.Error(err)
 	}
 
 	domainContent := strings.ReplaceAll(string(stubData), "{{domain}}", domain)
@@ -95,7 +131,7 @@ func (g *Generator) createFile(domain string, domainCap string, from string, to 
 
 	err = os.WriteFile(to+"/"+fileName, []byte(domainContent), 0755)
 	if err != nil {
-		panic(err)
+		g.Logger.Error(err)
 	}
 	g.Logger.Info("CREATE FILE: " + to + "/" + fileName)
 }

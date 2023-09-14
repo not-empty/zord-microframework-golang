@@ -9,6 +9,19 @@ import (
 	"strings"
 )
 
+var (
+	domainTo         = "application/domain/"
+	domainFrom       = "tools/generator/stubs/domain/"
+	servicesTo       = "application/services/"
+	servicesFrom     = "tools/generator/stubs/services/"
+	repositoriesTo   = "pkg/repositories/"
+	repositoriesFrom = "tools/generator/stubs/repositories/"
+	routesTo         = "cmd/handlers/http/routes"
+	routesFrom       = "tools/generator/stubs/routes/__{{domain}}.go.stub"
+	declarableDir    = routesTo + "/declarable.go"
+	migratorTo       = "tools/migrator/migrate.go"
+)
+
 type Generator struct {
 	Logger services.Logger
 }
@@ -21,13 +34,13 @@ func NewGenerator(l services.Logger) *Generator {
 
 func (g *Generator) CreateDomain(domain string) error {
 	domainCap := strings.Title(domain)
-	domainDir := "application/domain/" + domain
+	domainDir := domainTo + domain
 
 	if _, err := os.Stat(domainDir); os.IsNotExist(err) {
 		os.Mkdir(domainDir, 0755)
 	}
 
-	filepath.Walk("tools/generator/stubs/domain", func(path string, info fs.FileInfo, err error) error {
+	filepath.Walk(domainFrom, func(path string, info fs.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
@@ -35,12 +48,12 @@ func (g *Generator) CreateDomain(domain string) error {
 		return nil
 	})
 
-	servicesDir := "application/services/" + domain
+	servicesDir := servicesTo + domain
 	if _, err := os.Stat(servicesDir); os.IsNotExist(err) {
 		os.Mkdir(servicesDir, 0755)
 	}
 
-	filepath.Walk("tools/generator/stubs/services", func(path string, info fs.FileInfo, err error) error {
+	filepath.Walk(servicesFrom, func(path string, info fs.FileInfo, err error) error {
 		if info.IsDir() {
 			if len(strings.Split(path, "__")) == 1 {
 				return nil
@@ -57,12 +70,12 @@ func (g *Generator) CreateDomain(domain string) error {
 		return nil
 	})
 
-	repositoriesDir := "pkg/repositories/" + domain
+	repositoriesDir := repositoriesTo + domain
 	if _, err := os.Stat(repositoriesDir); os.IsNotExist(err) {
 		os.Mkdir(repositoriesDir, 0755)
 	}
 
-	filepath.Walk("tools/generator/stubs/repositories", func(path string, info fs.FileInfo, err error) error {
+	filepath.Walk(repositoriesFrom, func(path string, info fs.FileInfo, err error) error {
 		if info.IsDir() {
 			if len(strings.Split(path, "__")) == 1 {
 				return nil
@@ -80,10 +93,7 @@ func (g *Generator) CreateDomain(domain string) error {
 		return nil
 	})
 
-	routesDir := "cmd/handlers/http/routes"
-	g.createFile(domain, domainCap, "tools/generator/stubs/routes/__{{domain}}.go.stub", routesDir)
-
-	declarableDir := routesDir + "/declarable.go"
+	g.createFile(domain, domainCap, routesFrom, routesTo)
 
 	data, err := os.ReadFile(declarableDir)
 	if err != nil {
@@ -113,6 +123,79 @@ func (g *Generator) CreateDomain(domain string) error {
 	if err != nil {
 		g.Logger.Error(err)
 	}
+
+	importTemplate := fmt.Sprintf("\"go-skeleton/application/domain/%s\"\n	//{{codeGen1}}", domain)
+	createTableTemplate := fmt.Sprintf("m.db.Db.Migrator().CreateTable(&%s.%s{})\n	//{{codeGen2}}", domain, domainCap)
+
+	migratorData, err := os.ReadFile(migratorTo)
+	if err != nil {
+		g.Logger.Error(err)
+	}
+
+	if strings.Contains(string(migratorData), domain) {
+		return nil
+	}
+
+	newMigFileData := strings.Replace(string(migratorData), "//{{codeGen1}}", importTemplate, 1)
+	newMigFileData = strings.Replace(newMigFileData, "//{{codeGen2}}", createTableTemplate, 1)
+
+	g.Logger.Info("ADD MIGRATOR: " + migratorTo)
+	err = os.WriteFile(migratorTo, []byte(newMigFileData), 0755)
+	if err != nil {
+		g.Logger.Error(err)
+	}
+
+	return nil
+}
+
+func (g *Generator) DestroyDomain(domain string) error {
+	migData, err := os.ReadFile(migratorTo)
+	if err != nil {
+		g.Logger.Error(err)
+	}
+
+	lines1 := strings.Split(string(migData), "\n")
+	for i, l := range lines1 {
+		if strings.Contains(string(l), domain) {
+			lines1 = append(lines1[:i], lines1[i+1:]...)
+		}
+	}
+
+	err = os.WriteFile(migratorTo, []byte(strings.Join(lines1, "\n")), 0755)
+	if err != nil {
+		g.Logger.Error(err)
+	}
+
+	data, err := os.ReadFile(declarableDir)
+	if err != nil {
+		g.Logger.Error(err)
+	}
+
+	lines2 := strings.Split(string(data), "\n")
+	for i, l := range lines2 {
+		if strings.Contains(string(l), domain) {
+			lines2 = append(lines2[:i], lines2[i+1:]...)
+		}
+	}
+
+	err = os.WriteFile(declarableDir, []byte(strings.Join(lines2, "\n")), 0755)
+	if err != nil {
+		g.Logger.Error(err)
+	}
+
+	destroyPaths := []string{
+		routesTo + "/" + domain + ".go",
+		repositoriesTo + domain,
+		servicesTo + domain,
+		domainTo + domain,
+	}
+
+	for _, p := range destroyPaths {
+		if err = os.RemoveAll(p); err != nil {
+			g.Logger.Error(err)
+		}
+	}
+
 	return nil
 }
 

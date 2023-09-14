@@ -42,6 +42,12 @@ func (c *Cli) RegisterCommands(cmd *cobra.Command) {
 			PreRun: c.CreateDomain,
 		},
 		&cobra.Command{
+			Use:    "destroy-domain",
+			Short:  "Destroy a domain service",
+			Run:    c.BootCli,
+			PreRun: c.DestroyDomain,
+		},
+		&cobra.Command{
 			Use:    "migrate",
 			Short:  "Migrate Gorm Database",
 			Run:    c.Migrate,
@@ -54,6 +60,11 @@ func (c *Cli) RegisterCommands(cmd *cobra.Command) {
 func (c *Cli) CreateDomain(cmd *cobra.Command, args []string) {
 	generatorInstance := generator.NewGenerator(c.logger)
 	generatorInstance.CreateDomain(args[0])
+}
+
+func (c *Cli) DestroyDomain(cmd *cobra.Command, args []string) {
+	generatorInstance := generator.NewGenerator(c.logger)
+	generatorInstance.DestroyDomain(args[0])
 }
 
 func (c *Cli) Migrate(cmd *cobra.Command, args []string) {

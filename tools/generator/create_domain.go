@@ -7,19 +7,18 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 var (
-	domainTo         = "application/domain/"
-	domainFrom       = "tools/generator/stubs/domain/"
-	servicesTo       = "application/services/"
-	servicesFrom     = "tools/generator/stubs/services/"
-	repositoriesTo   = "pkg/repositories/"
-	repositoriesFrom = "tools/generator/stubs/repositories/"
-	routesTo         = "cmd/handlers/http/routes"
-	routesFrom       = "tools/generator/stubs/routes/__{{domain}}.go.stub"
-	declarableDir    = routesTo + "/declarable.go"
-	migratorTo       = "tools/migrator/migrate.go"
+	domainTo       = "application/domain/"
+	servicesTo     = "application/services/"
+	repositoriesTo = "pkg/repositories/"
+	routesTo       = "cmd/handlers/http/routes"
+	declarableDir  = routesTo + "/declarable.go"
+	migratorTo     = "tools/migrator/migrate.go"
 )
 
 type Generator struct {
@@ -33,74 +32,55 @@ func NewGenerator(l services.Logger) *Generator {
 }
 
 func (g *Generator) CreateDomain(domain string) error {
-	domainCap := strings.Title(domain)
-	domainDir := domainTo + domain
+	domainCap := g.pascalCase(domain)
 
-	if _, err := os.Stat(domainDir); os.IsNotExist(err) {
-		os.Mkdir(domainDir, 0755)
+	targetPaths := map[string]string{
+		"domain":       domainTo + domain,
+		"services":     servicesTo + domain,
+		"repositories": repositoriesTo + domain,
+		"routes":       routesTo,
 	}
+	g.createFolders(targetPaths)
 
-	filepath.Walk(domainFrom, func(path string, info fs.FileInfo, err error) error {
+	stubs := "tools/generator/stubs/"
+
+	filepath.Walk(stubs, func(path string, info fs.FileInfo, err error) error {
 		if info.IsDir() {
+			folders := strings.Split(path, "/__")
+			if len(folders) > 1 {
+				fullPath := g.getFullFolderPath(targetPaths, folders[0], folders[1], "/stubs/")
+				if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+					os.Mkdir(fullPath, 0755)
+				}
+				g.Logger.Info("CREATE FOLDER: " + fullPath)
+			}
 			return nil
 		}
-		g.createFile(domain, domainCap, path, domainDir)
+		fullFilePath := g.getFullFilePath(targetPaths, path, "/stubs/")
+		fullFilePath = g.replacer(
+			fullFilePath,
+			map[string]string{
+				"{{domain}}": domain,
+				".stub":      "",
+				"__":         "",
+			},
+		)
+		g.Logger.Info(fullFilePath)
+		g.createFile(
+			domain,
+			domainCap,
+			path,
+			fullFilePath,
+			map[string]string{
+				"{{domain}}":    domain,
+				"{{domainCap}}": domainCap,
+			},
+		)
 		return nil
 	})
 
-	servicesDir := servicesTo + domain
-	if _, err := os.Stat(servicesDir); os.IsNotExist(err) {
-		os.Mkdir(servicesDir, 0755)
-	}
-
-	filepath.Walk(servicesFrom, func(path string, info fs.FileInfo, err error) error {
-		if info.IsDir() {
-			if len(strings.Split(path, "__")) == 1 {
-				return nil
-			}
-			folderPath := "/" + strings.Split(path, "__")[1]
-			folderPath = servicesDir + folderPath
-
-			if _, err := os.Stat(folderPath); os.IsNotExist(err) {
-				os.Mkdir(folderPath, 0755)
-			}
-			return err
-		}
-		g.createFile(domain, domainCap, path, servicesDir)
-		return nil
-	})
-
-	repositoriesDir := repositoriesTo + domain
-	if _, err := os.Stat(repositoriesDir); os.IsNotExist(err) {
-		os.Mkdir(repositoriesDir, 0755)
-	}
-
-	filepath.Walk(repositoriesFrom, func(path string, info fs.FileInfo, err error) error {
-		if info.IsDir() {
-			if len(strings.Split(path, "__")) == 1 {
-				return nil
-			}
-			folderPath := "/" + strings.Split(path, "__")[1]
-			folderPath = strings.ReplaceAll(folderPath, "{{domain}}", domain)
-			folderPath = repositoriesDir + folderPath
-
-			if _, err := os.Stat(folderPath); os.IsNotExist(err) {
-				os.Mkdir(folderPath, 0755)
-			}
-			return err
-		}
-		g.createFile(domain, domainCap, path, repositoriesDir)
-		return nil
-	})
-
-	g.createFile(domain, domainCap, routesFrom, routesTo)
-
-	data, err := os.ReadFile(declarableDir)
-	if err != nil {
-		g.Logger.Error(err)
-	}
-
-	if strings.Contains(string(data), domain) {
+	oldDecData := g.getFileData(declarableDir)
+	if strings.Contains(oldDecData, domain) {
 		return nil
 	}
 
@@ -109,79 +89,73 @@ func (g *Generator) CreateDomain(domain string) error {
 		domain,
 		domainCap,
 	)
+
 	declarableTemplate := fmt.Sprintf(
 		"\"%s\": %sListRoutes,\n		//{{codeGen2}}",
 		domain,
 		domain,
 	)
 
-	newFileData := strings.Replace(string(data), "//{{codeGen1}}", routesInstanceTemplate, 1)
-	newFileData = strings.Replace(newFileData, "//{{codeGen2}}", declarableTemplate, 1)
+	newData := g.replacer(
+		oldDecData,
+		map[string]string{
+			"//{{codeGen1}}": routesInstanceTemplate,
+			"//{{codeGen2}}": declarableTemplate,
+		},
+	)
 
 	g.Logger.Info("ADD ROUTES: " + declarableDir)
-	err = os.WriteFile(declarableDir, []byte(newFileData), 0755)
+	err := os.WriteFile(declarableDir, []byte(newData), 0755)
 	if err != nil {
 		g.Logger.Error(err)
+		return err
+	}
+
+	oldMigData := g.getFileData(migratorTo)
+	if strings.Contains(string(oldMigData), domain) {
+		return nil
 	}
 
 	importTemplate := fmt.Sprintf("\"go-skeleton/application/domain/%s\"\n	//{{codeGen1}}", domain)
 	createTableTemplate := fmt.Sprintf("m.db.Db.Migrator().CreateTable(&%s.%s{})\n	//{{codeGen2}}", domain, domainCap)
 
-	migratorData, err := os.ReadFile(migratorTo)
-	if err != nil {
-		g.Logger.Error(err)
-	}
-
-	if strings.Contains(string(migratorData), domain) {
-		return nil
-	}
-
-	newMigFileData := strings.Replace(string(migratorData), "//{{codeGen1}}", importTemplate, 1)
-	newMigFileData = strings.Replace(newMigFileData, "//{{codeGen2}}", createTableTemplate, 1)
+	newMigData := g.replacer(
+		oldMigData,
+		map[string]string{
+			"//{{codeGen1}}": importTemplate,
+			"//{{codeGen2}}": createTableTemplate,
+		},
+	)
 
 	g.Logger.Info("ADD MIGRATOR: " + migratorTo)
-	err = os.WriteFile(migratorTo, []byte(newMigFileData), 0755)
+	err = os.WriteFile(migratorTo, []byte(newMigData), 0755)
 	if err != nil {
 		g.Logger.Error(err)
+		return err
 	}
 
 	return nil
 }
 
+func (g *Generator) removeFileLine(path string, search string) error {
+	data := g.getFileData(path)
+	lines := strings.Split(string(data), "\n")
+	for i, l := range lines {
+		if strings.Contains(string(l), search) {
+			lines = append(lines[:i], lines[i+1:]...)
+		}
+	}
+	err := os.WriteFile(path, []byte(strings.Join(lines, "\n")), 0755)
+	if err != nil {
+		g.Logger.Error(err)
+		return err
+	}
+	return nil
+}
+
 func (g *Generator) DestroyDomain(domain string) error {
-	migData, err := os.ReadFile(migratorTo)
-	if err != nil {
-		g.Logger.Error(err)
-	}
-
-	lines1 := strings.Split(string(migData), "\n")
-	for i, l := range lines1 {
-		if strings.Contains(string(l), domain) {
-			lines1 = append(lines1[:i], lines1[i+1:]...)
-		}
-	}
-
-	err = os.WriteFile(migratorTo, []byte(strings.Join(lines1, "\n")), 0755)
-	if err != nil {
-		g.Logger.Error(err)
-	}
-
-	data, err := os.ReadFile(declarableDir)
-	if err != nil {
-		g.Logger.Error(err)
-	}
-
-	lines2 := strings.Split(string(data), "\n")
-	for i, l := range lines2 {
-		if strings.Contains(string(l), domain) {
-			lines2 = append(lines2[:i], lines2[i+1:]...)
-		}
-	}
-
-	err = os.WriteFile(declarableDir, []byte(strings.Join(lines2, "\n")), 0755)
-	if err != nil {
-		g.Logger.Error(err)
-	}
+	g.removeFileLine(migratorTo, domain)
+	g.removeFileLine(declarableDir, domain)
 
 	destroyPaths := []string{
 		routesTo + "/" + domain + ".go",
@@ -191,30 +165,72 @@ func (g *Generator) DestroyDomain(domain string) error {
 	}
 
 	for _, p := range destroyPaths {
-		if err = os.RemoveAll(p); err != nil {
+		if err := os.RemoveAll(p); err != nil {
 			g.Logger.Error(err)
+			return err
 		}
 	}
 
 	return nil
 }
 
-func (g *Generator) createFile(domain string, domainCap string, from string, to string) {
-	stubData, err := os.ReadFile(from)
+func (g *Generator) pascalCase(str string) string {
+	strCap := strings.ReplaceAll(str, "_", " ")
+	strCap = cases.Title(
+		language.English,
+	).String(
+		strCap,
+	)
+	return strings.ReplaceAll(strCap, " ", "")
+}
+
+func (g *Generator) getFileData(path string) string {
+	data, err := os.ReadFile(path)
 	if err != nil {
 		g.Logger.Error(err)
 	}
+	return string(data)
+}
 
-	domainContent := strings.ReplaceAll(string(stubData), "{{domain}}", domain)
-	domainContent = strings.ReplaceAll(string(domainContent), "{{domainCap}}", domainCap)
+func (g *Generator) replacer(str string, replaces map[string]string) string {
+	strReplaced := str
+	for old, new := range replaces {
+		strReplaced = strings.ReplaceAll(strReplaced, old, new)
+	}
+	return strReplaced
+}
 
-	fileName := strings.Split(from, "__")[1]
-	fileName = strings.ReplaceAll(fileName, "{{domain}}", domain)
-	fileName = strings.ReplaceAll(fileName, ".stub", "")
+func (g *Generator) createFile(domain string, domainCap string, from string, to string, replacers map[string]string) error {
+	data := g.getFileData(from)
+	domainContent := g.replacer(data, replacers)
 
-	err = os.WriteFile(to+"/"+fileName, []byte(domainContent), 0755)
+	err := os.WriteFile(to, []byte(domainContent), 0755)
 	if err != nil {
 		g.Logger.Error(err)
+		return err
 	}
-	g.Logger.Info("CREATE FILE: " + to + "/" + fileName)
+	g.Logger.Info("CREATE FILE: " + to)
+	return nil
+}
+
+func (g *Generator) createFolders(folders map[string]string) {
+	for _, path := range folders {
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			os.Mkdir(path, 0755)
+		}
+	}
+}
+
+func (g *Generator) getFullFolderPath(targetPaths map[string]string, base string, folder string, root string) string {
+	rootLv := strings.Split(base, root)[1]
+	pathTo := targetPaths[rootLv]
+	fullPath := fmt.Sprintf("%s/%s", pathTo, folder)
+	return fullPath
+}
+
+func (g *Generator) getFullFilePath(targetPath map[string]string, path string, root string) string {
+	dir := strings.Split(strings.Split(path, root)[1], "/")[0]
+	target := targetPath[dir]
+	file := strings.Split(path, "/"+dir+"/")[1]
+	return fmt.Sprintf("%s/%s", target, file)
 }

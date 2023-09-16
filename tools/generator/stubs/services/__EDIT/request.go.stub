@@ -1,0 +1,33 @@
+package {{domain}}
+
+import (
+	"errors"
+	domain "go-skeleton/application/domain/{{domain}}"
+)
+
+type Request struct {
+	{{domainCap}}   domain.{{domainCap}}
+	{{domainCap}}id string
+}
+
+func NewRequest({{domain}} domain.{{domainCap}}, {{domain}}Id string) Request {
+	req := Request{
+		{{domainCap}}: {{domain}},
+	}
+	req.{{domainCap}}.{{domainCap}}Id = {{domain}}Id
+	return req
+}
+
+func (r *Request) Validate() error {
+	if err := r.{{domain}}IdRule(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *Request) {{domain}}IdRule() error {
+	if r.{{domainCap}}.{{domainCap}}Id == `""` {
+		return errors.New("invalid_argument")
+	}
+	return nil
+}

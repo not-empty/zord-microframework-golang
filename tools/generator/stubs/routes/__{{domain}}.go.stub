@@ -1,0 +1,129 @@
+package routes
+
+import (
+	"encoding/json"
+	"go-skeleton/application/domain/{{domain}}"
+	{{domain}}Create "go-skeleton/application/services/{{domain}}/CREATE"
+	{{domain}}Delete "go-skeleton/application/services/{{domain}}/DELETE"
+	{{domain}}Edit "go-skeleton/application/services/{{domain}}/EDIT"
+	{{domain}}Get "go-skeleton/application/services/{{domain}}/GET"
+	{{domain}}List "go-skeleton/application/services/{{domain}}/LIST"
+	"go-skeleton/pkg/database"
+	"go-skeleton/pkg/logger"
+	{{domain}}Repository "go-skeleton/pkg/repositories/{{domain}}"
+	"io"
+
+	"github.com/labstack/echo/v4"
+)
+
+type {{domainCap}}Routes struct {
+	Environment     string
+	{{domainCap}}Repository *{{domain}}Repository.{{domainCap}}Repository
+
+	// config *config.Config
+	logger *logger.Logger
+}
+
+func New{{domainCap}}Routes(logger *logger.Logger, Environment string, mysql *database.MySql) *{{domainCap}}Routes {
+	repository := &{{domain}}Repository.{{domainCap}}Repository{
+		Mysql: mysql,
+	}
+	return &{{domainCap}}Routes{
+		logger:          logger,
+		Environment:     Environment,
+		{{domainCap}}Repository: repository,
+	}
+}
+
+func (hs *{{domainCap}}Routes) DeclareRoutes(server *echo.Echo) {
+	server.GET("/v1/{{domain}}", hs.HandleList{{domainCap}})
+	server.GET("/v1/{{domain}}/:{{domain}}_id", hs.HandleGet{{domainCap}})
+	server.POST("/v1/{{domain}}", hs.HandleCreate{{domainCap}})
+	server.PUT("/v1/{{domain}}/:{{domain}}_id", hs.HandleEdit{{domainCap}})
+	server.DELETE("/v1/{{domain}}/:{{domain}}_id", hs.HandleDelete{{domainCap}})
+}
+
+func (hs *{{domainCap}}Routes) HandleGet{{domainCap}}(context echo.Context) error {
+	s := {{domain}}Get.NewService(hs.logger, hs.{{domainCap}}Repository)
+	s.Execute(
+		{{domain}}Get.NewRequest(context.Param("{{domain}}_id")),
+	)
+	response, err := s.GetResponse()
+	if err != nil {
+		return context.JSON(err.Status, err)
+	}
+	return context.JSON(response.Status, response)
+}
+
+func (hs *{{domainCap}}Routes) HandleCreate{{domainCap}}(context echo.Context) error {
+	s := {{domain}}Create.NewService(hs.logger, hs.{{domainCap}}Repository)
+
+	{{domain}} := {{domain}}.{{domainCap}}{}
+	body, errors := io.ReadAll(context.Request().Body)
+	if errors != nil {
+		return context.JSON(422, errors)
+	}
+
+	errors = json.Unmarshal(body, &{{domain}})
+	if errors != nil {
+		return context.JSON(422, errors)
+	}
+
+	s.Execute(
+		{{domain}}Create.NewRequest({{domain}}),
+	)
+	response, err := s.GetResponse()
+	if err != nil {
+		return context.JSON(err.Status, err)
+	}
+	return context.JSON(response.Status, response)
+}
+
+func (hs *{{domainCap}}Routes) HandleEdit{{domainCap}}(context echo.Context) error {
+	s := {{domain}}Edit.NewService(hs.logger, hs.{{domainCap}}Repository)
+
+	{{domain}} := {{domain}}.{{domainCap}}{}
+	body, errors := io.ReadAll(context.Request().Body)
+	if errors != nil {
+		return context.JSON(422, errors)
+	}
+
+	errors = json.Unmarshal(body, &{{domain}})
+	if errors != nil {
+		return context.JSON(422, errors)
+	}
+
+	s.Execute(
+		{{domain}}Edit.NewRequest({{domain}}, context.Param("{{domain}}_id")),
+	)
+
+	response, err := s.GetResponse()
+	if err != nil {
+		return context.JSON(err.Status, err)
+	}
+	return context.JSON(response.Status, response)
+}
+
+func (hs *{{domainCap}}Routes) HandleList{{domainCap}}(context echo.Context) error {
+	s := {{domain}}List.NewService(hs.logger, hs.{{domainCap}}Repository)
+	s.Execute(
+		{{domain}}List.NewRequest(),
+	)
+	response, err := s.GetResponse()
+	if err != nil {
+		return context.JSON(err.Status, err)
+	}
+	return context.JSON(response.Status, response)
+}
+
+func (hs *{{domainCap}}Routes) HandleDelete{{domainCap}}(context echo.Context) error {
+	s := {{domain}}Delete.NewService(hs.logger, hs.{{domainCap}}Repository)
+	s.Execute(
+		{{domain}}Delete.NewRequest(context.Param("{{domain}}_id")),
+	)
+	response, err := s.GetResponse()
+	if err != nil {
+		return context.JSON(err.Status, err)
+	}
+	return context.JSON(response.Status, response)
+}

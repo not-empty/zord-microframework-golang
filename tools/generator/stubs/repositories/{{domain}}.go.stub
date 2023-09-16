@@ -3,8 +3,6 @@ package {{domain}}Repository
 import (
 	"go-skeleton/application/domain/{{domain}}"
 	"go-skeleton/pkg/database"
-
-	"github.com/oklog/ulid/v2"
 )
 
 type {{domainCap}}Repository struct {
@@ -22,7 +20,6 @@ func (repo *{{domainCap}}Repository) Get(id string) ({{domain}}.{{domainCap}}, e
 }
 
 func (repo *{{domainCap}}Repository) Create(d *{{domain}}.{{domainCap}}) bool {
-	d.{{domainCap}}Id = ulid.Make().String()
 	repo.Mysql.Db.Create(d)
 	return true
 }

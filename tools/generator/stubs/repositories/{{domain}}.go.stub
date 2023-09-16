@@ -3,6 +3,8 @@ package {{domain}}Repository
 import (
 	"go-skeleton/application/domain/{{domain}}"
 	"go-skeleton/pkg/database"
+
+	"github.com/oklog/ulid/v2"
 )
 
 type {{domainCap}}Repository struct {
@@ -15,18 +17,19 @@ func NewBaseRepository() *{{domainCap}}Repository {
 
 func (repo *{{domainCap}}Repository) Get(id string) ({{domain}}.{{domainCap}}, error) {
 	var Data {{domain}}.{{domainCap}}
-	repo.Mysql.Db.Find(&Data, id)
+		repo.Mysql.Db.First(&Data, "{{domain}}_id = ?", id)
 	return Data, nil
 }
 
 func (repo *{{domainCap}}Repository) Create(d *{{domain}}.{{domainCap}}) bool {
+	d.{{domainCap}}Id = ulid.Make().String()
 	repo.Mysql.Db.Create(d)
 	return true
 }
 
 func (repo *{{domainCap}}Repository) List() []{{domain}}.{{domainCap}} {
 	var data []{{domain}}.{{domainCap}}
-	repo.Mysql.Db.Find(&data).Limit(100)
+	repo.Mysql.Db.Limit(100).Find(&data)
 	return data
 }
 

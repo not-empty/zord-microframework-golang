@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/logger"
@@ -32,8 +33,14 @@ func (m *MySql) Boot() {
 		m.config.DbPort,
 		m.config.Database,
 	)
+	sqlDB, err := sql.Open("mysql", dsn)
+	if err != nil {
+		m.logger.Critical(err)
+	}
+	sqlDB.SetMaxOpenConns(30)
+	sqlDB.SetMaxIdleConns(20)
 	dialector := mysql.New(mysql.Config{
-		DSN: dsn,
+		Conn: sqlDB,
 	})
 	database, err := gorm.Open(dialector, &gorm.Config{})
 	if err != nil {

@@ -3,6 +3,8 @@ package dummyRepository
 import (
 	"go-skeleton/application/domain/dummy"
 	"go-skeleton/pkg/database"
+
+	"github.com/oklog/ulid/v2"
 )
 
 type DummyRepository struct {
@@ -15,18 +17,19 @@ func NewBaseRepository() *DummyRepository {
 
 func (repo *DummyRepository) Get(id string) (dummy.Dummy, error) {
 	var Data dummy.Dummy
-	repo.Mysql.Db.Find(&Data, id)
+	repo.Mysql.Db.First(&Data, "dummy_id = ?", id)
 	return Data, nil
 }
 
 func (repo *DummyRepository) Create(d *dummy.Dummy) bool {
+	d.DummyId = ulid.Make().String()
 	repo.Mysql.Db.Create(d)
 	return true
 }
 
 func (repo *DummyRepository) List() []dummy.Dummy {
 	var data []dummy.Dummy
-	repo.Mysql.Db.Find(&data).Limit(100)
+	repo.Mysql.Db.Limit(100).Find(&data)
 	return data
 }
 

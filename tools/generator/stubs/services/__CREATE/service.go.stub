@@ -11,14 +11,16 @@ type Service struct {
 	services.BaseService
 	response   *Response
 	repository {{domain}}.Repository
+	idCreator  services.IdCreator
 }
 
-func NewService(log services.Logger, repository {{domain}}.Repository) *Service {
+func NewService(log services.Logger, repository {{domain}}.Repository, idCreator services.IdCreator) *Service {
 	return &Service{
 		BaseService: services.BaseService{
 			Logger: log,
 		},
 		repository: repository,
+		idCreator:  idCreator,
 	}
 }
 
@@ -30,6 +32,7 @@ func (s *Service) Execute(request Request) {
 		return
 	}
 
+	request.{{domainCap}}.{{domainCap}}Id = s.idCreator.Create()
 	s.produceResponseRule(request.{{domainCap}})
 }
 

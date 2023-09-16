@@ -15,7 +15,7 @@ func NewBaseRepository() *{{domainCap}}Repository {
 
 func (repo *{{domainCap}}Repository) Get(id string) ({{domain}}.{{domainCap}}, error) {
 	var Data {{domain}}.{{domainCap}}
-	repo.Mysql.Db.Find(&Data, id)
+		repo.Mysql.Db.First(&Data, "{{domain}}_id = ?", id)
 	return Data, nil
 }
 
@@ -26,7 +26,7 @@ func (repo *{{domainCap}}Repository) Create(d *{{domain}}.{{domainCap}}) bool {
 
 func (repo *{{domainCap}}Repository) List() []{{domain}}.{{domainCap}} {
 	var data []{{domain}}.{{domainCap}}
-	repo.Mysql.Db.Find(&data).Limit(100)
+	repo.Mysql.Db.Limit(100).Find(&data)
 	return data
 }
 

@@ -85,7 +85,7 @@ func (g *Generator) CreateDomain(domain string) error {
 	}
 
 	routesInstanceTemplate := fmt.Sprintf(
-		"%sListRoutes := New%sRoutes(logger, Environment, MySql)\n	//{{codeGen1}}",
+		"%sListRoutes := New%sRoutes(logger, Environment, MySql, idCreator)\n	//{{codeGen1}}",
 		domain,
 		domainCap,
 	)

@@ -15,7 +15,7 @@ func NewBaseRepository() *DummyRepository {
 
 func (repo *DummyRepository) Get(id string) (dummy.Dummy, error) {
 	var Data dummy.Dummy
-	repo.Mysql.Db.Find(&Data, id)
+	repo.Mysql.Db.First(&Data, "dummy_id = ?", id)
 	return Data, nil
 }
 
@@ -26,7 +26,7 @@ func (repo *DummyRepository) Create(d *dummy.Dummy) bool {
 
 func (repo *DummyRepository) List() []dummy.Dummy {
 	var data []dummy.Dummy
-	repo.Mysql.Db.Find(&data).Limit(100)
+	repo.Mysql.Db.Limit(100).Find(&data)
 	return data
 }
 

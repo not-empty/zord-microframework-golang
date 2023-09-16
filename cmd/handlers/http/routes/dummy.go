@@ -9,6 +9,7 @@ import (
 	dummyGet "go-skeleton/application/services/dummy/GET"
 	dummyList "go-skeleton/application/services/dummy/LIST"
 	"go-skeleton/pkg/database"
+	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
 	dummyRepository "go-skeleton/pkg/repositories/dummy"
 	"io"
@@ -20,11 +21,11 @@ type DummyRoutes struct {
 	Environment     string
 	DummyRepository *dummyRepository.DummyRepository
 
-	// config *config.Config
-	logger *logger.Logger
+	logger    *logger.Logger
+	idCreator *idCreator.IdCreator
 }
 
-func NewDummyRoutes(logger *logger.Logger, Environment string, mysql *database.MySql) *DummyRoutes {
+func NewDummyRoutes(logger *logger.Logger, Environment string, mysql *database.MySql, idCreator *idCreator.IdCreator) *DummyRoutes {
 	repository := &dummyRepository.DummyRepository{
 		Mysql: mysql,
 	}
@@ -32,6 +33,7 @@ func NewDummyRoutes(logger *logger.Logger, Environment string, mysql *database.M
 		logger:          logger,
 		Environment:     Environment,
 		DummyRepository: repository,
+		idCreator:       idCreator,
 	}
 }
 
@@ -56,7 +58,7 @@ func (hs *DummyRoutes) HandleGetDummy(context echo.Context) error {
 }
 
 func (hs *DummyRoutes) HandleCreateDummy(context echo.Context) error {
-	s := dummyCreate.NewService(hs.logger, hs.DummyRepository)
+	s := dummyCreate.NewService(hs.logger, hs.DummyRepository, hs.idCreator)
 
 	dummy := dummy.Dummy{}
 	body, errors := io.ReadAll(context.Request().Body)

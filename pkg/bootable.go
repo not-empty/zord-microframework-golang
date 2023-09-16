@@ -3,6 +3,7 @@ package pkg
 import (
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/database"
+	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
 )
 
@@ -17,6 +18,7 @@ var Logger = logger.NewLogger(
 	Config.Version,
 )
 var Mysql = database.NewMysql(Logger, Config)
+var IdCreator = idCreator.NewIdCreator()
 
 var KernelDependencies = map[string]Bootable{
 	"config": Config,
@@ -24,9 +26,10 @@ var KernelDependencies = map[string]Bootable{
 }
 
 var ServerDependencies = map[string]Bootable{
-	"config": Config,
-	"logger": Logger,
-	"mysql":  Mysql,
+	"config":    Config,
+	"logger":    Logger,
+	"mysql":     Mysql,
+	"IdCreator": IdCreator,
 }
 
 var CliDependencies = map[string]Bootable{

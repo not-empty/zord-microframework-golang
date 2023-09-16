@@ -12,6 +12,10 @@ type Logger interface {
 	Critical(Error error, Context ...string)
 }
 
+type IdCreator interface {
+	Create() string
+}
+
 type Error struct {
 	Status  int    `json:"-"`
 	Message string `json:"-"`
@@ -21,6 +25,7 @@ type Error struct {
 type BaseService struct {
 	Logger Logger
 	Error  *Error
+	Ulid   IdCreator
 }
 
 type Request interface {

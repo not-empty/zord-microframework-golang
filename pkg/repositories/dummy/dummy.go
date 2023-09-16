@@ -3,8 +3,6 @@ package dummyRepository
 import (
 	"go-skeleton/application/domain/dummy"
 	"go-skeleton/pkg/database"
-
-	"github.com/oklog/ulid/v2"
 )
 
 type DummyRepository struct {
@@ -22,7 +20,6 @@ func (repo *DummyRepository) Get(id string) (dummy.Dummy, error) {
 }
 
 func (repo *DummyRepository) Create(d *dummy.Dummy) bool {
-	d.DummyId = ulid.Make().String()
 	repo.Mysql.Db.Create(d)
 	return true
 }

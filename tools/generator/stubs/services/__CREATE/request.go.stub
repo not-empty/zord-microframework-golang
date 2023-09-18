@@ -2,22 +2,31 @@ package {{domain}}
 
 import (
 	domain "go-skeleton/application/domain/{{domain}}"
+	"go-skeleton/pkg/validator"
 )
 
 type Request struct {
 	{{domainCap}} domain.{{domainCap}}
 	Err   error
+	validator *validator.Validator
 }
 
-func NewRequest({{domain}} domain.{{domainCap}}) Request {
+func NewRequest({{domain}} domain.{{domainCap}}, validator *validator.Validator) Request {
 	return Request{
 		{{domainCap}}: {{domain}},
+		validator: validator,
 	}
 }
 
 func (r *Request) Validate() error {
 	if err := r.{{domain}}CreateRule(); err != nil {
 		return err
+	}
+	errs := r.validator.ValidateStruct(r.{{domainCap}})
+	for _, err := range errs {
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

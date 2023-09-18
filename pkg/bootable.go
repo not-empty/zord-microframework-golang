@@ -5,6 +5,7 @@ import (
 	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
+	"go-skeleton/pkg/validator"
 )
 
 type Bootable interface {
@@ -19,6 +20,7 @@ var Logger = logger.NewLogger(
 )
 var Mysql = database.NewMysql(Logger, Config)
 var IdCreator = idCreator.NewIdCreator()
+var Validator = validator.NewValidator()
 
 var KernelDependencies = map[string]Bootable{
 	"config": Config,
@@ -30,6 +32,7 @@ var ServerDependencies = map[string]Bootable{
 	"logger":    Logger,
 	"mysql":     Mysql,
 	"IdCreator": IdCreator,
+	"validator": Validator,
 }
 
 var CliDependencies = map[string]Bootable{

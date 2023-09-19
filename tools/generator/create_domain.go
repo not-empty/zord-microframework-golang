@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"errors"
 	"fmt"
 	"go-skeleton/application/services"
 	"io/fs"
@@ -32,6 +33,9 @@ func NewGenerator(l services.Logger) *Generator {
 }
 
 func (g *Generator) CreateDomain(domain string) error {
+	if g.isInvalidDomain(domain) {
+		panic(errors.New("Unable create a new domain, please check domain name"))
+	}
 	domainCap := g.pascalCase(domain)
 
 	targetPaths := map[string]string{
@@ -154,6 +158,10 @@ func (g *Generator) removeFileLine(path string, search string) error {
 }
 
 func (g *Generator) DestroyDomain(domain string) error {
+	if g.isInvalidDomain(domain) {
+		panic(errors.New("Unable delete a domain, please check domain name for delete"))
+	}
+
 	g.removeFileLine(migratorTo, domain)
 	g.removeFileLine(declarableDir, domain)
 
@@ -233,4 +241,11 @@ func (g *Generator) getFullFilePath(targetPath map[string]string, path string, r
 	target := targetPath[dir]
 	file := strings.Split(path, "/"+dir+"/")[1]
 	return fmt.Sprintf("%s/%s", target, file)
+}
+
+func (g *Generator) isInvalidDomain(domain string) bool {
+	if domain == "" {
+		return true
+	}
+	return false
 }

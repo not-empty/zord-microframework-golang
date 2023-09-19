@@ -19,6 +19,7 @@ type Cli struct {
 	config      *config.Config
 	logger      *logger.Logger
 	mysql       *database.MySql
+	validator   bool
 }
 
 func NewCli(Environment string) *Cli {
@@ -36,14 +37,16 @@ func NewCli(Environment string) *Cli {
 
 func (c *Cli) RegisterCommands(cmd *cobra.Command) {
 	c.initFlags(cmd)
+	createDomain := &cobra.Command{
+		Use:              "create-domain",
+		Short:            "Create a new domain service",
+		Run:              c.CreateDomain,
+		PreRun:           c.BootCli,
+		TraverseChildren: true,
+	}
+	createDomain.Flags().BoolVarP(&c.validator, "validator", "v", false, "Create domain with validation")
 	cmd.AddCommand(
-		&cobra.Command{
-			Use:              "create-domain",
-			Short:            "Create a new domain service",
-			Run:              c.BootCli,
-			PreRun:           c.CreateDomain,
-			TraverseChildren: true,
-		},
+		createDomain,
 		&cobra.Command{
 			Use:    "destroy-domain",
 			Short:  "Destroy a domain service",
@@ -62,11 +65,17 @@ func (c *Cli) RegisterCommands(cmd *cobra.Command) {
 
 func (c *Cli) CreateDomain(cmd *cobra.Command, args []string) {
 	generatorInstance := generator.NewGenerator(c.logger)
-	generatorInstance.CreateDomain(domain)
+	if len(args) > 0 {
+		domain = args[0]
+	}
+	generatorInstance.CreateDomain(domain, c.validator)
 }
 
 func (c *Cli) DestroyDomain(cmd *cobra.Command, args []string) {
 	generatorInstance := generator.NewGenerator(c.logger)
+	if len(args) > 0 {
+		domain = args[0]
+	}
 	generatorInstance.DestroyDomain(domain)
 }
 

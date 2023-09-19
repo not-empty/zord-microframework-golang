@@ -32,7 +32,7 @@ func NewGenerator(l services.Logger) *Generator {
 	}
 }
 
-func (g *Generator) CreateDomain(domain string) error {
+func (g *Generator) CreateDomain(domain string, validator bool) error {
 	if g.isInvalidDomain(domain) {
 		panic(errors.New("Unable create a new domain, please check domain name"))
 	}
@@ -47,6 +47,23 @@ func (g *Generator) CreateDomain(domain string) error {
 	g.createFolders(targetPaths)
 
 	stubs := "tools/generator/stubs/"
+
+	declarableTemplate := fmt.Sprintf(
+		"\"%s\": %sListRoutes,\n		//{{codeGen2}}",
+		domain,
+		domain,
+	)
+
+	validatorRuleTemplate :=
+		fmt.Sprintf(
+			`errs := r.validator.ValidateStruct(r.%s)
+			for _, err := range errs {
+				if err != nil {
+					return err
+				}
+			}`,
+			domainCap,
+		)
 
 	filepath.Walk(stubs, func(path string, info fs.FileInfo, err error) error {
 		if info.IsDir() {
@@ -69,16 +86,38 @@ func (g *Generator) CreateDomain(domain string) error {
 				"__":         "",
 			},
 		)
+		changeMap := map[string]string{
+			"{{domain}}":          domain,
+			"{{domainCap}}":       domainCap,
+			"{{validatorImport}}": "\n	\"go-skeleton/pkg/validator\"",
+			"{{validator}}":       "\nvalidator *validator.Validator",
+			"{{,validator}}":      ", validator *validator.Validator",
+			"{{validatorRule}}":   validatorRuleTemplate,
+			"{{validatorInject}}": "validator: validator,",
+			"{{hsValidator}}":     "hs.validator",
+			"{{,hsValidator}}":    ", hs.validator",
+		}
+
+		if !validator {
+			changeMap = map[string]string{
+				"{{domain}}":          domain,
+				"{{domainCap}}":       domainCap,
+				"{{validatorImport}}": "",
+				"{{validator}}":       "",
+				"{{,validator}}":      "",
+				"{{validatorRule}}":   "",
+				"{{validatorInject}}": "",
+				"{{hsValidator}}":     "",
+				"{{,hsValidator}}":    "",
+			}
+		}
 		g.Logger.Info(fullFilePath)
 		g.createFile(
 			domain,
 			domainCap,
 			path,
 			fullFilePath,
-			map[string]string{
-				"{{domain}}":    domain,
-				"{{domainCap}}": domainCap,
-			},
+			changeMap,
 		)
 		return nil
 	})
@@ -88,23 +127,27 @@ func (g *Generator) CreateDomain(domain string) error {
 		return nil
 	}
 
+	routesString := "%sListRoutes := New%sRoutes(logger, Environment, MySql, idCreator)\n	//{{codeGen1}}"
+	if validator {
+		routesString = "%sListRoutes := New%sRoutes(logger, Environment, MySql, idCreator, validator)\n	//{{codeGen1}}"
+	}
 	routesInstanceTemplate := fmt.Sprintf(
-		"%sListRoutes := New%sRoutes(logger, Environment, MySql, idCreator, validator)\n	//{{codeGen1}}",
+		routesString,
 		domain,
 		domainCap,
-	)
-
-	declarableTemplate := fmt.Sprintf(
-		"\"%s\": %sListRoutes,\n		//{{codeGen2}}",
-		domain,
-		domain,
 	)
 
 	newData := g.replacer(
 		oldDecData,
 		map[string]string{
-			"//{{codeGen1}}": routesInstanceTemplate,
-			"//{{codeGen2}}": declarableTemplate,
+			"//{{codeGen1}}":      routesInstanceTemplate,
+			"//{{codeGen2}}":      declarableTemplate,
+			"{{validatorImport}}": "\ngo-skeleton/pkg/validator",
+			"{{validator}}":       "\nvalidator *validator.Validator",
+			"{{,validator}}":      ", validator *validator.Validator",
+			"{{validatorRule}}":   validatorRuleTemplate,
+			"{{validatorInject}}": "validator: validator,",
+			"{{hsValidator}}":     ", hs.validator",
 		},
 	)
 

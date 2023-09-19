@@ -12,6 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var domain string
+
 type Cli struct {
 	Environment string
 	config      *config.Config
@@ -33,13 +35,14 @@ func NewCli(Environment string) *Cli {
 }
 
 func (c *Cli) RegisterCommands(cmd *cobra.Command) {
-
+	c.initFlags(cmd)
 	cmd.AddCommand(
 		&cobra.Command{
-			Use:    "create-domain",
-			Short:  "Create a new domain service",
-			Run:    c.BootCli,
-			PreRun: c.CreateDomain,
+			Use:              "create-domain",
+			Short:            "Create a new domain service",
+			Run:              c.BootCli,
+			PreRun:           c.CreateDomain,
+			TraverseChildren: true,
 		},
 		&cobra.Command{
 			Use:    "destroy-domain",
@@ -59,17 +62,22 @@ func (c *Cli) RegisterCommands(cmd *cobra.Command) {
 
 func (c *Cli) CreateDomain(cmd *cobra.Command, args []string) {
 	generatorInstance := generator.NewGenerator(c.logger)
-	generatorInstance.CreateDomain(args[0])
+	generatorInstance.CreateDomain(domain)
 }
 
 func (c *Cli) DestroyDomain(cmd *cobra.Command, args []string) {
 	generatorInstance := generator.NewGenerator(c.logger)
-	generatorInstance.DestroyDomain(args[0])
+	generatorInstance.DestroyDomain(domain)
 }
 
 func (c *Cli) Migrate(cmd *cobra.Command, args []string) {
 	migratorInstace := migrator.NewMigrator(c.mysql)
 	migratorInstace.MigrateAllDomains()
+}
+
+func (c *Cli) initFlags(cmd *cobra.Command) {
+	cmd.PersistentFlags().StringVar(&domain, "domain", "", "Describe name to New Domain")
+	cmd.MarkFlagsMutuallyExclusive("domain")
 }
 
 func (c *Cli) BootCli(cmd *cobra.Command, args []string) {

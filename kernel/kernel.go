@@ -67,7 +67,6 @@ func (k *kernel) startServer(cmd *cobra.Command, args []string) {
 }
 
 func (k *kernel) startCli(cmd *cobra.Command) {
-
 	cli.NewCli(pkg.Config.Environment).RegisterCommands(cmd)
 }
 

@@ -2,7 +2,7 @@ package dummy
 
 type Dummy struct {
 	DummyId   string `gorm:"primarykey"`
-	DummyName string
+	DummyName string `validate:"required,min=3,max=32"`
 }
 
 type Repository interface {

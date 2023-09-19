@@ -12,6 +12,7 @@ import (
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
 	dummyRepository "go-skeleton/pkg/repositories/dummy"
+	"go-skeleton/pkg/validator"
 	"io"
 
 	"github.com/labstack/echo/v4"
@@ -23,9 +24,10 @@ type DummyRoutes struct {
 
 	logger    *logger.Logger
 	idCreator *idCreator.IdCreator
+	validator *validator.Validator
 }
 
-func NewDummyRoutes(logger *logger.Logger, Environment string, mysql *database.MySql, idCreator *idCreator.IdCreator) *DummyRoutes {
+func NewDummyRoutes(logger *logger.Logger, Environment string, mysql *database.MySql, idCreator *idCreator.IdCreator, validator *validator.Validator) *DummyRoutes {
 	repository := &dummyRepository.DummyRepository{
 		Mysql: mysql,
 	}
@@ -34,6 +36,7 @@ func NewDummyRoutes(logger *logger.Logger, Environment string, mysql *database.M
 		Environment:     Environment,
 		DummyRepository: repository,
 		idCreator:       idCreator,
+		validator:       validator,
 	}
 }
 
@@ -48,7 +51,7 @@ func (hs *DummyRoutes) DeclareRoutes(server *echo.Echo) {
 func (hs *DummyRoutes) HandleGetDummy(context echo.Context) error {
 	s := dummyGet.NewService(hs.logger, hs.DummyRepository)
 	s.Execute(
-		dummyGet.NewRequest(context.Param("dummy_id")),
+		dummyGet.NewRequest(context.Param("dummy_id"), hs.validator),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -72,7 +75,7 @@ func (hs *DummyRoutes) HandleCreateDummy(context echo.Context) error {
 	}
 
 	s.Execute(
-		dummyCreate.NewRequest(dummy),
+		dummyCreate.NewRequest(dummy, hs.validator),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -109,7 +112,7 @@ func (hs *DummyRoutes) HandleEditDummy(context echo.Context) error {
 func (hs *DummyRoutes) HandleListDummy(context echo.Context) error {
 	s := dummyList.NewService(hs.logger, hs.DummyRepository)
 	s.Execute(
-		dummyList.NewRequest(),
+		dummyList.NewRequest(hs.validator),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

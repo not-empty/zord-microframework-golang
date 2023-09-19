@@ -11,6 +11,7 @@ import (
 	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/logger"
 	"go-skeleton/pkg/idCreator"
+	"go-skeleton/pkg/validator"
 	{{domain}}Repository "go-skeleton/pkg/repositories/{{domain}}"
 	"io"
 
@@ -24,9 +25,10 @@ type {{domainCap}}Routes struct {
 	// config *config.Config
 	logger *logger.Logger
 	idCreator *idCreator.IdCreator
+	validator *validator.Validator
 }
 
-func New{{domainCap}}Routes(logger *logger.Logger, Environment string, mysql *database.MySql, idCreator *idCreator.IdCreator) *{{domainCap}}Routes {
+func New{{domainCap}}Routes(logger *logger.Logger, Environment string, mysql *database.MySql, idCreator *idCreator.IdCreator, validator *validator.Validator) *{{domainCap}}Routes {
 	repository := &{{domain}}Repository.{{domainCap}}Repository{
 		Mysql: mysql,
 	}
@@ -35,6 +37,7 @@ func New{{domainCap}}Routes(logger *logger.Logger, Environment string, mysql *da
 		Environment:     Environment,
 		{{domainCap}}Repository: repository,
 		idCreator:       idCreator,
+		validator: validator,
 	}
 }
 
@@ -49,7 +52,7 @@ func (hs *{{domainCap}}Routes) DeclareRoutes(server *echo.Echo) {
 func (hs *{{domainCap}}Routes) HandleGet{{domainCap}}(context echo.Context) error {
 	s := {{domain}}Get.NewService(hs.logger, hs.{{domainCap}}Repository)
 	s.Execute(
-		{{domain}}Get.NewRequest(context.Param("{{domain}}_id")),
+		{{domain}}Get.NewRequest(context.Param("{{domain}}_id"), hs.validator),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -73,7 +76,7 @@ func (hs *{{domainCap}}Routes) HandleCreate{{domainCap}}(context echo.Context) e
 	}
 
 	s.Execute(
-		{{domain}}Create.NewRequest({{domain}}),
+		{{domain}}Create.NewRequest({{domain}}, hs.validator),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -97,7 +100,7 @@ func (hs *{{domainCap}}Routes) HandleEdit{{domainCap}}(context echo.Context) err
 	}
 
 	s.Execute(
-		{{domain}}Edit.NewRequest({{domain}}, context.Param("{{domain}}_id")),
+		{{domain}}Edit.NewRequest({{domain}}, context.Param("{{domain}}_id"), hs.validator),
 	)
 
 	response, err := s.GetResponse()
@@ -110,7 +113,7 @@ func (hs *{{domainCap}}Routes) HandleEdit{{domainCap}}(context echo.Context) err
 func (hs *{{domainCap}}Routes) HandleList{{domainCap}}(context echo.Context) error {
 	s := {{domain}}List.NewService(hs.logger, hs.{{domainCap}}Repository)
 	s.Execute(
-		{{domain}}List.NewRequest(),
+		{{domain}}List.NewRequest(hs.validator),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -122,7 +125,7 @@ func (hs *{{domainCap}}Routes) HandleList{{domainCap}}(context echo.Context) err
 func (hs *{{domainCap}}Routes) HandleDelete{{domainCap}}(context echo.Context) error {
 	s := {{domain}}Delete.NewService(hs.logger, hs.{{domainCap}}Repository)
 	s.Execute(
-		{{domain}}Delete.NewRequest(context.Param("{{domain}}_id")),
+		{{domain}}Delete.NewRequest(context.Param("{{domain}}_id"), hs.validator),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

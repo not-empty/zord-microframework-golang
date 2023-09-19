@@ -8,6 +8,7 @@ import (
 	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
+	"go-skeleton/pkg/validator"
 
 	"github.com/labstack/echo/v4"
 )
@@ -19,6 +20,7 @@ type Server struct {
 	logger    *logger.Logger
 	mysql     *database.MySql
 	idCreator *idCreator.IdCreator
+	validator *validator.Validator
 }
 
 func NewServer(Environment string) *Server {
@@ -26,6 +28,7 @@ func NewServer(Environment string) *Server {
 	l := pkg.ServerDependencies["logger"]
 	m := pkg.ServerDependencies["mysql"]
 	i := pkg.ServerDependencies["IdCreator"]
+	v := pkg.ServerDependencies["validator"]
 
 	return &Server{
 		Environment: Environment,
@@ -33,6 +36,7 @@ func NewServer(Environment string) *Server {
 		logger:      l.(*logger.Logger),
 		mysql:       m.(*database.MySql),
 		idCreator:   i.(*idCreator.IdCreator),
+		validator:   v.(*validator.Validator),
 	}
 }
 
@@ -41,7 +45,7 @@ func (hs *Server) Start(port string) {
 
 	server.HideBanner = true
 	server.HidePort = true
-	routes := routes.GetAllRoutes(hs.logger, hs.Environment, hs.mysql, hs.idCreator)
+	routes := routes.GetAllRoutes(hs.logger, hs.Environment, hs.mysql, hs.idCreator, hs.validator)
 
 	for index, route := range routes {
 		route.DeclareRoutes(server)

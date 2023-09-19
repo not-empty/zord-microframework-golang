@@ -8,16 +8,12 @@ import (
 type Request struct {
 	{{domainCap}} []domain.{{domainCap}}
 	Err   error
-	{{validator}}
 }
 
-func NewRequest({{validator}}) Request {
-	return Request{
-		{{validatorInject}}
-	}
+func NewRequest() Request {
+	return Request{}
 }
 
 func (r *Request) Validate() error {
-	{{validatorRule}}
 	return nil
 }

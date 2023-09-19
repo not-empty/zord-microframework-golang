@@ -112,7 +112,7 @@ func (hs *DummyRoutes) HandleEditDummy(context echo.Context) error {
 func (hs *DummyRoutes) HandleListDummy(context echo.Context) error {
 	s := dummyList.NewService(hs.logger, hs.DummyRepository)
 	s.Execute(
-		dummyList.NewRequest(hs.validator),
+		dummyList.NewRequest(),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

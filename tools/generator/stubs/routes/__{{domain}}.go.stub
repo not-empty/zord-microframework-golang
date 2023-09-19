@@ -111,7 +111,7 @@ func (hs *{{domainCap}}Routes) HandleEdit{{domainCap}}(context echo.Context) err
 func (hs *{{domainCap}}Routes) HandleList{{domainCap}}(context echo.Context) error {
 	s := {{domain}}List.NewService(hs.logger, hs.{{domainCap}}Repository)
 	s.Execute(
-		{{domain}}List.NewRequest({{hsValidator}}),
+		{{domain}}List.NewRequest(),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

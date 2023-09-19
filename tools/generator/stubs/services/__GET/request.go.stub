@@ -3,21 +3,18 @@ package {{domain}}
 import (
 	"errors"
 	domain "go-skeleton/application/domain/{{domain}}"
-	{{validatorImport}}
 )
 
 type Request struct {
 	{{domainCap}} domain.{{domainCap}}
 	Err   error
-	{{validator}}
 }
 
-func NewRequest({{domain}}Id string{{,validator}}) Request {
+func NewRequest({{domain}}Id string) Request {
 	return Request{
 		{{domainCap}}: domain.{{domainCap}}{
 			{{domainCap}}Id: {{domain}}Id,
 		},
-		{{validatorInject}}
 	}
 }
 
@@ -25,7 +22,6 @@ func (r *Request) Validate() error {
 	if err := r.{{domain}}IdRule(); err != nil {
 		return err
 	}
-	{{validatorRule}}
 	return nil
 }
 

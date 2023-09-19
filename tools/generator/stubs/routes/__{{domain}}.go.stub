@@ -50,7 +50,7 @@ func (hs *{{domainCap}}Routes) DeclareRoutes(server *echo.Echo) {
 func (hs *{{domainCap}}Routes) HandleGet{{domainCap}}(context echo.Context) error {
 	s := {{domain}}Get.NewService(hs.logger, hs.{{domainCap}}Repository)
 	s.Execute(
-		{{domain}}Get.NewRequest(context.Param("{{domain}}_id"){{,hsValidator}}),
+		{{domain}}Get.NewRequest(context.Param("{{domain}}_id")),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

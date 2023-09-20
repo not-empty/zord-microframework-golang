@@ -9,7 +9,7 @@ func NewHealthRoute() *Health {
 	return &Health{}
 }
 
-func (hs *Health) DeclareRoutes(server *echo.Echo) {
+func (hs *Health) DeclareRoutes(server *echo.Group) {
 	server.GET("/health", hs.handle)
 }
 

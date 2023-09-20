@@ -49,7 +49,7 @@ func (hs *Server) Start(port string) {
 	publicRoutes := routes.GetPublicRoutes()
 
 	public := server.Group("")
-	protected := server.Group("/v1")
+	protected := server.Group("")
 
 	for index, route := range publicRoutes {
 		route.DeclareRoutes(public)

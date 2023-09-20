@@ -14,10 +14,12 @@ type Declarable interface {
 }
 
 func GetAllRoutes(logger *logger.Logger, Environment string, MySql *database.MySql, idCreator *idCreator.IdCreator, validator *validator.Validator) map[string]Declarable {
+	health := NewHealthRoute()
 	dummyListRoutes := NewDummyRoutes(logger, Environment, MySql, idCreator, validator)
 	//{{codeGen1}}
 	domains := map[string]Declarable{
-		"dummy": dummyListRoutes,
+		"health": health,
+		"dummy":  dummyListRoutes,
 		//{{codeGen2}}
 	}
 	return domains

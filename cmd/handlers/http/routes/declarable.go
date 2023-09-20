@@ -10,15 +10,23 @@ import (
 )
 
 type Declarable interface {
-	DeclareRoutes(*echo.Echo)
+	DeclareRoutes(*echo.Group)
 }
 
-func GetAllRoutes(logger *logger.Logger, Environment string, MySql *database.MySql, idCreator *idCreator.IdCreator, validator *validator.Validator) map[string]Declarable {
+func GetProtectedRoutes(logger *logger.Logger, Environment string, MySql *database.MySql, idCreator *idCreator.IdCreator, validator *validator.Validator) map[string]Declarable {
 	dummyListRoutes := NewDummyRoutes(logger, Environment, MySql, idCreator, validator)
 	//{{codeGen1}}
 	domains := map[string]Declarable{
 		"dummy": dummyListRoutes,
 		//{{codeGen2}}
+	}
+	return domains
+}
+
+func GetPublicRoutes() map[string]Declarable {
+	health := NewHealthRoute()
+	domains := map[string]Declarable{
+		"dummy": health,
 	}
 	return domains
 }

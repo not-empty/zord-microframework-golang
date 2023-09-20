@@ -40,7 +40,7 @@ func NewDummyRoutes(logger *logger.Logger, Environment string, mysql *database.M
 	}
 }
 
-func (hs *DummyRoutes) DeclareRoutes(server *echo.Echo) {
+func (hs *DummyRoutes) DeclareRoutes(server *echo.Group) {
 	server.GET("/v1/dummy", hs.HandleListDummy)
 	server.GET("/v1/dummy/:dummy_id", hs.HandleGetDummy)
 	server.POST("/v1/dummy", hs.HandleCreateDummy)

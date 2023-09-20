@@ -45,10 +45,19 @@ func (hs *Server) Start(port string) {
 
 	server.HideBanner = true
 	server.HidePort = true
-	routes := routes.GetAllRoutes(hs.logger, hs.Environment, hs.mysql, hs.idCreator, hs.validator)
+	protectedRoutes := routes.GetProtectedRoutes(hs.logger, hs.Environment, hs.mysql, hs.idCreator, hs.validator)
+	publicRoutes := routes.GetPublicRoutes()
 
-	for index, route := range routes {
-		route.DeclareRoutes(server)
+	public := server.Group("")
+	protected := server.Group("")
+
+	for index, route := range publicRoutes {
+		route.DeclareRoutes(public)
+		pkg.Logger.Info(fmt.Sprintf("[server.route] Declared %s", index))
+	}
+
+	for index, route := range protectedRoutes {
+		route.DeclareRoutes(protected)
 		pkg.Logger.Info(fmt.Sprintf("[server.route] Declared %s", index))
 	}
 	hs.Shutdown(server.Start(port))

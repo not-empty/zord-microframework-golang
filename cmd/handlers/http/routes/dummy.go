@@ -51,7 +51,7 @@ func (hs *DummyRoutes) DeclareRoutes(server *echo.Group) {
 func (hs *DummyRoutes) HandleGetDummy(context echo.Context) error {
 	s := dummyGet.NewService(hs.logger, hs.DummyRepository)
 	s.Execute(
-		dummyGet.NewRequest(context.Param("dummy_id"), hs.validator),
+		dummyGet.NewRequest(context.Param("dummy_id")),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -112,7 +112,7 @@ func (hs *DummyRoutes) HandleEditDummy(context echo.Context) error {
 func (hs *DummyRoutes) HandleListDummy(context echo.Context) error {
 	s := dummyList.NewService(hs.logger, hs.DummyRepository)
 	s.Execute(
-		dummyList.NewRequest(hs.validator),
+		dummyList.NewRequest(),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

@@ -1,15 +1,15 @@
 version: '3.7'
 services:
-  # go-api:
-  #   build: 
-  #     context: .
-  #     dockerfile: docker/alpine/Dockerfile
-  #   container_name: go-skeleton
-  #   platform: linux/arm64
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - 1323:1323
+  go-api:
+    build: 
+      context: .
+      dockerfile: docker/alpine/Dockerfile
+    container_name: go-skeleton
+    platform: linux/arm64
+    env_file:
+      - .env
+    ports:
+      - 1323:1323
 
   mysql:
     image: mysql:latest

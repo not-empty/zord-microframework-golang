@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
@@ -23,10 +24,12 @@ func GetProtectedRoutes(logger *logger.Logger, Environment string, MySql *databa
 	return domains
 }
 
-func GetPublicRoutes() map[string]Declarable {
+func GetPublicRoutes(logger *logger.Logger, config *config.Config) map[string]Declarable {
 	health := NewHealthRoute()
-	domains := map[string]Declarable{
-		"dummy": health,
+	auth := NewAuthRoute(logger, config)
+	routes := map[string]Declarable{
+		"health": health,
+		"auth":   auth,
 	}
-	return domains
+	return routes
 }

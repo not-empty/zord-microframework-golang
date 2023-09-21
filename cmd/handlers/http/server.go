@@ -32,14 +32,16 @@ func NewServer(Environment string) *Server {
 	m := pkg.ServerDependencies["mysql"]
 	i := pkg.ServerDependencies["IdCreator"]
 	v := pkg.ServerDependencies["validator"]
+	auth := dependencies.MiddlewareList["auth"]
 
 	return &Server{
-		Environment: Environment,
-		config:      c.(*config.Config),
-		logger:      l.(*logger.Logger),
-		mysql:       m.(*database.MySql),
-		idCreator:   i.(*idCreator.IdCreator),
-		validator:   v.(*validator.Validator),
+		Environment:    Environment,
+		config:         c.(*config.Config),
+		logger:         l.(*logger.Logger),
+		mysql:          m.(*database.MySql),
+		idCreator:      i.(*idCreator.IdCreator),
+		validator:      v.(*validator.Validator),
+		authMiddleware: auth.(*middlewares.JwtAuth),
 	}
 }
 
@@ -58,7 +60,7 @@ func (hs *Server) Start(port string) {
 	publicRoutes := routes.GetPublicRoutes(hs.logger, hs.config)
 
 	public := server.Group("")
-	protected := server.Group("", dependencies.MiddlewareList["auth"].GetMiddleware())
+	protected := server.Group("", hs.authMiddleware.GetMiddleware())
 
 	for index, route := range publicRoutes {
 		route.DeclareRoutes(public)

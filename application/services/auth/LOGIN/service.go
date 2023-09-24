@@ -27,6 +27,7 @@ func NewService(log services.Logger, config *config.Config) *Service {
 
 func (s *Service) Execute(request Request) {
 	s.Logger.Debug("Generating Token")
+	defer s.ErrorHandler()
 
 	if err := request.Validate(); err != nil {
 		s.BadRequest(request, err)

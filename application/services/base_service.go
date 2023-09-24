@@ -2,6 +2,7 @@ package services
 
 import (
 	"net/http"
+	"errors"
 )
 
 type Logger interface {
@@ -37,4 +38,21 @@ func (bs *BaseService) BadRequest(request Request, err error) {
 		Message: http.StatusText(http.StatusBadRequest),
 		Error:   err.Error(),
 	}
+}
+
+func (bs *BaseService) ErrorHandler() {
+	rec := recover()
+	if rec != nil {
+		bs.InternalServerError(rec)
+	}
+
+}
+
+func (bs *BaseService) InternalServerError(rec any) {
+	bs.Error = &Error{
+		Status: http.StatusInternalServerError,
+		Message: http.StatusText(http.StatusInternalServerError),
+		Error: "internal_server_error",
+	}
+
 }

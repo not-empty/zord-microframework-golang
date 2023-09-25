@@ -1,8 +1,6 @@
 package middlewares
 
 import (
-	"go-skeleton/pkg/config"
-
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 )
@@ -11,12 +9,13 @@ type JwtAuth struct {
 	Secret string
 }
 
-func NewJwtAuth() *JwtAuth {
-	return &JwtAuth{}
+func NewJwtAuth(Secret string) *JwtAuth {
+	return &JwtAuth{
+		Secret: Secret,
+	}
 }
 
-func (j *JwtAuth) Boot(conf *config.Config) {
-	j.Secret = conf.Secret
+func (j *JwtAuth) Boot() {
 }
 
 func (j *JwtAuth) GetMiddleware() echo.MiddlewareFunc {

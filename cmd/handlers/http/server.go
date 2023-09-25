@@ -3,7 +3,6 @@ package http
 import (
 	"fmt"
 	"go-skeleton/cmd/handlers/http/dependencies"
-	"go-skeleton/cmd/handlers/http/middlewares"
 	"go-skeleton/cmd/handlers/http/routes"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
@@ -18,12 +17,11 @@ import (
 type Server struct {
 	Environment string
 
-	config         *config.Config
-	logger         *logger.Logger
-	mysql          *database.MySql
-	idCreator      *idCreator.IdCreator
-	validator      *validator.Validator
-	authMiddleware *middlewares.JwtAuth
+	config    *config.Config
+	logger    *logger.Logger
+	mysql     *database.MySql
+	idCreator *idCreator.IdCreator
+	validator *validator.Validator
 }
 
 func NewServer(Environment string) *Server {
@@ -32,16 +30,14 @@ func NewServer(Environment string) *Server {
 	m := pkg.ServerDependencies["mysql"]
 	i := pkg.ServerDependencies["IdCreator"]
 	v := pkg.ServerDependencies["validator"]
-	auth := dependencies.MiddlewareList["auth"]
 
 	return &Server{
-		Environment:    Environment,
-		config:         c.(*config.Config),
-		logger:         l.(*logger.Logger),
-		mysql:          m.(*database.MySql),
-		idCreator:      i.(*idCreator.IdCreator),
-		validator:      v.(*validator.Validator),
-		authMiddleware: auth.(*middlewares.JwtAuth),
+		Environment: Environment,
+		config:      c.(*config.Config),
+		logger:      l.(*logger.Logger),
+		mysql:       m.(*database.MySql),
+		idCreator:   i.(*idCreator.IdCreator),
+		validator:   v.(*validator.Validator),
 	}
 }
 
@@ -51,8 +47,10 @@ func (hs *Server) Start(port string) {
 	server.HideBanner = true
 	server.HidePort = true
 
-	for index, mid := range dependencies.MiddlewareList {
-		mid.Boot(hs.config)
+	middlewareList := dependencies.GetAllMiddlewares(hs.config.ReadConfig("JWT_SECRET"))
+
+	for index, mid := range middlewareList {
+		mid.Boot()
 		pkg.Logger.Info(fmt.Sprintf("[http.Server] Booting %s", index))
 	}
 
@@ -60,7 +58,7 @@ func (hs *Server) Start(port string) {
 	publicRoutes := routes.GetPublicRoutes(hs.logger, hs.config)
 
 	public := server.Group("")
-	protected := server.Group("", hs.authMiddleware.GetMiddleware())
+	protected := server.Group("", middlewareList["auth"].GetMiddleware())
 
 	for index, route := range publicRoutes {
 		route.DeclareRoutes(public)

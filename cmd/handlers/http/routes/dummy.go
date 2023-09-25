@@ -63,19 +63,19 @@ func (hs *DummyRoutes) HandleGetDummy(context echo.Context) error {
 func (hs *DummyRoutes) HandleCreateDummy(context echo.Context) error {
 	s := dummyCreate.NewService(hs.logger, hs.DummyRepository, hs.idCreator)
 
-	dummy := dummy.Dummy{}
+	domain := dummy.Dummy{}
 	body, errors := io.ReadAll(context.Request().Body)
 	if errors != nil {
 		return context.JSON(422, errors)
 	}
 
-	errors = json.Unmarshal(body, &dummy)
+	errors = json.Unmarshal(body, &domain)
 	if errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		dummyCreate.NewRequest(dummy, hs.validator),
+		dummyCreate.NewRequest(domain, hs.validator),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -87,19 +87,19 @@ func (hs *DummyRoutes) HandleCreateDummy(context echo.Context) error {
 func (hs *DummyRoutes) HandleEditDummy(context echo.Context) error {
 	s := dummyEdit.NewService(hs.logger, hs.DummyRepository)
 
-	dummy := dummy.Dummy{}
+	domain := dummy.Dummy{}
 	body, errors := io.ReadAll(context.Request().Body)
 	if errors != nil {
 		return context.JSON(422, errors)
 	}
 
-	errors = json.Unmarshal(body, &dummy)
+	errors = json.Unmarshal(body, &domain)
 	if errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		dummyEdit.NewRequest(dummy, context.Param("dummy_id")),
+		dummyEdit.NewRequest(domain, context.Param("dummy_id")),
 	)
 
 	response, err := s.GetResponse()

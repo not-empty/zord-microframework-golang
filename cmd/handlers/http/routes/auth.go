@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"go-skeleton/application/domain/auth"
 	login "go-skeleton/application/services/auth/LOGIN"
-	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/logger"
 	"io"
 
@@ -12,14 +11,29 @@ import (
 )
 
 type Auth struct {
-	logger *logger.Logger
-	config *config.Config
+	logger        *logger.Logger
+	Secret        string
+	JwtExpiration int
+	AccessSecret  []string
+	AccessContext []string
+	AccessToken   []string
 }
 
-func NewAuthRoute(logger *logger.Logger, config *config.Config) *Auth {
+func NewAuthRoute(
+	logger *logger.Logger,
+	Secret string,
+	JwtExpiration int,
+	AccessSecret []string,
+	AccessContext []string,
+	AccessToken []string,
+) *Auth {
 	return &Auth{
-		logger: logger,
-		config: config,
+		logger:        logger,
+		Secret:        Secret,
+		JwtExpiration: JwtExpiration,
+		AccessSecret:  AccessSecret,
+		AccessContext: AccessContext,
+		AccessToken:   AccessToken,
 	}
 }
 
@@ -28,21 +42,28 @@ func (hs *Auth) DeclareRoutes(server *echo.Group) {
 }
 
 func (hs *Auth) handleLogin(c echo.Context) error {
-	auth := auth.Token{}
+	domain := auth.Token{}
 
 	body, errors := io.ReadAll(c.Request().Body)
 	if errors != nil {
 		return c.JSON(422, errors)
 	}
 
-	errors = json.Unmarshal(body, &auth)
+	errors = json.Unmarshal(body, &domain)
 	if errors != nil {
 		return c.JSON(422, errors)
 	}
 
-	s := login.NewService(hs.logger, hs.config)
+	s := login.NewService(
+		hs.logger,
+		hs.Secret,
+		hs.JwtExpiration,
+		hs.AccessSecret,
+		hs.AccessContext,
+		hs.AccessToken,
+	)
 	s.Execute(
-		login.NewRequest(auth),
+		login.NewRequest(domain),
 	)
 
 	response, err := s.GetResponse()

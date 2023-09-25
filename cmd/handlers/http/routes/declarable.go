@@ -26,7 +26,14 @@ func GetProtectedRoutes(logger *logger.Logger, Environment string, MySql *databa
 
 func GetPublicRoutes(logger *logger.Logger, config *config.Config) map[string]Declarable {
 	health := NewHealthRoute()
-	auth := NewAuthRoute(logger, config)
+	auth := NewAuthRoute(
+		logger,
+		config.ReadConfig("JWT_SECRET"),
+		config.ReadNumberConfig("JWT_EXPIRATION"),
+		config.ReadArrayConfig("ACCESS_SECRET"),
+		config.ReadArrayConfig("ACCESS_CONTEXT"),
+		config.ReadArrayConfig("ACCESS_TOKEN"),
+	)
 	routes := map[string]Declarable{
 		"health": health,
 		"auth":   auth,

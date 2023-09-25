@@ -39,7 +39,7 @@ func New{{domainCap}}Routes(logger *logger.Logger, Environment string, mysql *da
 	}
 }
 
-func (hs *{{domainCap}}Routes) DeclareRoutes(server *echo.Echo) {
+func (hs *{{domainCap}}Routes) DeclareRoutes(server *echo.Group) {
 	server.GET("/v1/{{domain}}", hs.HandleList{{domainCap}})
 	server.GET("/v1/{{domain}}/:{{domain}}_id", hs.HandleGet{{domainCap}})
 	server.POST("/v1/{{domain}}", hs.HandleCreate{{domainCap}})
@@ -62,19 +62,19 @@ func (hs *{{domainCap}}Routes) HandleGet{{domainCap}}(context echo.Context) erro
 func (hs *{{domainCap}}Routes) HandleCreate{{domainCap}}(context echo.Context) error {
 	s := {{domain}}Create.NewService(hs.logger, hs.{{domainCap}}Repository, hs.idCreator)
 
-	{{domain}} := {{domain}}.{{domainCap}}{}
+	domain := {{domain}}.{{domainCap}}{}
 	body, errors := io.ReadAll(context.Request().Body)
 	if errors != nil {
 		return context.JSON(422, errors)
 	}
 
-	errors = json.Unmarshal(body, &{{domain}})
+	errors = json.Unmarshal(body, &domain)
 	if errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		{{domain}}Create.NewRequest({{domain}}{{,hsValidator}}),
+		{{domain}}Create.NewRequest(domain{{,hsValidator}}),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -86,19 +86,19 @@ func (hs *{{domainCap}}Routes) HandleCreate{{domainCap}}(context echo.Context) e
 func (hs *{{domainCap}}Routes) HandleEdit{{domainCap}}(context echo.Context) error {
 	s := {{domain}}Edit.NewService(hs.logger, hs.{{domainCap}}Repository)
 
-	{{domain}} := {{domain}}.{{domainCap}}{}
+	domain := {{domain}}.{{domainCap}}{}
 	body, errors := io.ReadAll(context.Request().Body)
 	if errors != nil {
 		return context.JSON(422, errors)
 	}
 
-	errors = json.Unmarshal(body, &{{domain}})
+	errors = json.Unmarshal(body, &domain)
 	if errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		{{domain}}Edit.NewRequest({{domain}}, context.Param("{{domain}}_id"){{,hsValidator}}),
+		{{domain}}Edit.NewRequest(domain, context.Param("{{domain}}_id"){{,hsValidator}}),
 	)
 
 	response, err := s.GetResponse()

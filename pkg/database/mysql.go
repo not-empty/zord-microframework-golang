@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/logger"
 
 	"gorm.io/driver/mysql"
@@ -11,15 +10,30 @@ import (
 )
 
 type MySql struct {
-	logger *logger.Logger
-	Db     *gorm.DB
-	config *config.Config
+	logger   *logger.Logger
+	Db       *gorm.DB
+	DbUser   string
+	DbPass   string
+	DbUrl    string
+	DbPort   string
+	Database string
 }
 
-func NewMysql(l *logger.Logger, c *config.Config) *MySql {
+func NewMysql(
+	l *logger.Logger,
+	DbUser string,
+	DbPass string,
+	DbUrl string,
+	DbPort string,
+	Database string,
+) *MySql {
 	return &MySql{
-		logger: l,
-		config: c,
+		logger:   l,
+		DbUser:   DbUser,
+		DbPass:   DbPass,
+		DbUrl:    DbUrl,
+		DbPort:   DbPort,
+		Database: Database,
 	}
 }
 
@@ -27,11 +41,11 @@ func (m *MySql) Boot() {
 	dsn := "%s:%s@tcp(%s:%s)/%s"
 	dsn = fmt.Sprintf(
 		dsn,
-		m.config.DbUser,
-		m.config.DbPass,
-		m.config.DbUrl,
-		m.config.DbPort,
-		m.config.Database,
+		m.DbUser,
+		m.DbPass,
+		m.DbUrl,
+		m.DbPort,
+		m.Database,
 	)
 	sqlDB, err := sql.Open("mysql", dsn)
 	if err != nil {

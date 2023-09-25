@@ -3,25 +3,45 @@ package auth
 import (
 	"go-skeleton/application/domain/auth"
 	"go-skeleton/application/services"
-	"go-skeleton/pkg/config"
 	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
+type authConfig struct {
+	Secret        string
+	JwtExpiration int
+	AccessSecret  []string
+	AccessContext []string
+	AccessToken   []string
+}
+
 type Service struct {
 	services.BaseService
 	response *Response
-	config   *config.Config
+	config   authConfig
 }
 
-func NewService(log services.Logger, config *config.Config) *Service {
+func NewService(
+	log services.Logger,
+	Secret string,
+	JwtExpiration int,
+	AccessSecret []string,
+	AccessContext []string,
+	AccessToken []string,
+) *Service {
 	return &Service{
 		BaseService: services.BaseService{
 			Logger: log,
 		},
-		config: config,
+		config: authConfig{
+			Secret:        Secret,
+			JwtExpiration: JwtExpiration,
+			AccessSecret:  AccessSecret,
+			AccessContext: AccessContext,
+			AccessToken:   AccessToken,
+		},
 	}
 }
 
@@ -41,7 +61,7 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(Access auth.Token) {
+func (s *Service) ProduceResponseRule(Access auth.Token) {
 	tokenIndex := -1
 	for i, token := range s.config.AccessToken {
 		if token == Access.Token {

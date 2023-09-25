@@ -1,19 +1,18 @@
 package dependencies
 
 import (
-	"go-skeleton/cmd/handlers/http/middlewares"
-	"go-skeleton/pkg/config"
-
 	"github.com/labstack/echo/v4"
+	"go-skeleton/cmd/handlers/http/middlewares"
 )
 
 type Middleware interface {
 	GetMiddleware() echo.MiddlewareFunc
-	Boot(*config.Config)
+	Boot()
 }
 
-var auth = middlewares.NewJwtAuth()
-
-var MiddlewareList = map[string]Middleware{
-	"auth": auth,
+func GetAllMiddlewares(secret string) map[string]Middleware {
+	auth := middlewares.NewJwtAuth(secret)
+	return map[string]Middleware{
+		"auth": auth,
+	}
 }

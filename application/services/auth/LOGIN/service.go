@@ -61,7 +61,7 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) ProduceResponseRule(Access auth.Token) {
+func (s *Service) produceResponseRule(Access auth.Token) {
 	tokenIndex := -1
 	for i, token := range s.config.AccessToken {
 		if token == Access.Token {

@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	"go-skeleton/cmd/handlers/http/dependencies"
 	"go-skeleton/cmd/handlers/http/routes"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
@@ -45,10 +46,27 @@ func (hs *Server) Start(port string) {
 
 	server.HideBanner = true
 	server.HidePort = true
-	routes := routes.GetAllRoutes(hs.logger, hs.Environment, hs.mysql, hs.idCreator, hs.validator)
 
-	for index, route := range routes {
-		route.DeclareRoutes(server)
+	middlewareList := dependencies.GetAllMiddlewares(hs.config.ReadConfig("JWT_SECRET"))
+
+	for index, mid := range middlewareList {
+		mid.Boot()
+		pkg.Logger.Info(fmt.Sprintf("[http.Server] Booting %s", index))
+	}
+
+	protectedRoutes := routes.GetProtectedRoutes(hs.logger, hs.Environment, hs.mysql, hs.idCreator, hs.validator)
+	publicRoutes := routes.GetPublicRoutes(hs.logger, hs.config)
+
+	public := server.Group("")
+	protected := server.Group("", middlewareList["auth"].GetMiddleware())
+
+	for index, route := range publicRoutes {
+		route.DeclareRoutes(public)
+		pkg.Logger.Info(fmt.Sprintf("[server.route] Declared %s", index))
+	}
+
+	for index, route := range protectedRoutes {
+		route.DeclareRoutes(protected)
 		pkg.Logger.Info(fmt.Sprintf("[server.route] Declared %s", index))
 	}
 	hs.Shutdown(server.Start(port))

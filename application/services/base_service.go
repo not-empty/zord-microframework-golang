@@ -31,10 +31,27 @@ type BaseService struct {
 type Request interface {
 }
 
-func (bs *BaseService) BadRequest(request Request, err error) {
+func (bs *BaseService) BadRequest(_ Request, err error) {
 	bs.Error = &Error{
 		Status:  http.StatusBadRequest,
 		Message: http.StatusText(http.StatusBadRequest),
 		Error:   err.Error(),
 	}
+}
+
+func (bs *BaseService) ErrorHandler() {
+	rec := recover()
+	if rec != nil {
+		bs.InternalServerError(rec)
+	}
+
+}
+
+func (bs *BaseService) InternalServerError(_ any) {
+	bs.Error = &Error{
+		Status:  http.StatusInternalServerError,
+		Message: http.StatusText(http.StatusInternalServerError),
+		Error:   "internal_server_error",
+	}
+
 }

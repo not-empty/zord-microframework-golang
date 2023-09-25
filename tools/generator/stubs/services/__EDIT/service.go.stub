@@ -38,11 +38,11 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 
 func (s *Service) produceResponseRule({{domain}} *{{domain}}.{{domainCap}}) {
 	s.Logger.Debug("ProduceResponseRule")
-	teste := s.repository.Edit({{domain}})
+	data := s.repository.Edit({{domain}})
 	if s.Error == nil {
 		s.response = &Response{
 			Status:  http.StatusOK,
-			Message: fmt.Sprint(teste),
+			Message: fmt.Sprint(data),
 		}
 	}
 }

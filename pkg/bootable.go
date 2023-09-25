@@ -14,11 +14,19 @@ type Bootable interface {
 
 var Config = config.NewConfig()
 var Logger = logger.NewLogger(
-	Config.Environment,
-	Config.App,
-	Config.Version,
+	Config.ReadConfig("ENVIRONMENT"),
+	Config.ReadConfig("APP"),
+	Config.ReadConfig("VERSION"),
 )
-var Mysql = database.NewMysql(Logger, Config)
+var Mysql = database.NewMysql(
+	Logger,
+	Config.ReadConfig("DB_USER"),
+	Config.ReadConfig("DB_PASS"),
+	Config.ReadConfig("DB_URL"),
+	Config.ReadConfig("DB_PORT"),
+	Config.ReadConfig("DB_DATABASE"),
+)
+
 var IdCreator = idCreator.NewIdCreator()
 var Validator = validator.NewValidator()
 

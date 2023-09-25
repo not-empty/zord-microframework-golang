@@ -10,8 +10,7 @@ import (
 	{{domain}}List "go-skeleton/application/services/{{domain}}/LIST"
 	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/logger"
-	"go-skeleton/pkg/idCreator"
-	"go-skeleton/pkg/validator"
+	"go-skeleton/pkg/idCreator"{{validatorImport}}
 	{{domain}}Repository "go-skeleton/pkg/repositories/{{domain}}"
 	"io"
 
@@ -24,11 +23,10 @@ type {{domainCap}}Routes struct {
 
 	// config *config.Config
 	logger *logger.Logger
-	idCreator *idCreator.IdCreator
-	validator *validator.Validator
+	idCreator *idCreator.IdCreator{{validator}}
 }
 
-func New{{domainCap}}Routes(logger *logger.Logger, Environment string, mysql *database.MySql, idCreator *idCreator.IdCreator, validator *validator.Validator) *{{domainCap}}Routes {
+func New{{domainCap}}Routes(logger *logger.Logger, Environment string, mysql *database.MySql, idCreator *idCreator.IdCreator{{,validator}}) *{{domainCap}}Routes {
 	repository := &{{domain}}Repository.{{domainCap}}Repository{
 		Mysql: mysql,
 	}
@@ -37,11 +35,11 @@ func New{{domainCap}}Routes(logger *logger.Logger, Environment string, mysql *da
 		Environment:     Environment,
 		{{domainCap}}Repository: repository,
 		idCreator:       idCreator,
-		validator: validator,
+		{{validatorInject}}
 	}
 }
 
-func (hs *{{domainCap}}Routes) DeclareRoutes(server *echo.Echo) {
+func (hs *{{domainCap}}Routes) DeclareRoutes(server *echo.Group) {
 	server.GET("/v1/{{domain}}", hs.HandleList{{domainCap}})
 	server.GET("/v1/{{domain}}/:{{domain}}_id", hs.HandleGet{{domainCap}})
 	server.POST("/v1/{{domain}}", hs.HandleCreate{{domainCap}})
@@ -52,7 +50,7 @@ func (hs *{{domainCap}}Routes) DeclareRoutes(server *echo.Echo) {
 func (hs *{{domainCap}}Routes) HandleGet{{domainCap}}(context echo.Context) error {
 	s := {{domain}}Get.NewService(hs.logger, hs.{{domainCap}}Repository)
 	s.Execute(
-		{{domain}}Get.NewRequest(context.Param("{{domain}}_id"), hs.validator),
+		{{domain}}Get.NewRequest(context.Param("{{domain}}_id")),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -64,19 +62,19 @@ func (hs *{{domainCap}}Routes) HandleGet{{domainCap}}(context echo.Context) erro
 func (hs *{{domainCap}}Routes) HandleCreate{{domainCap}}(context echo.Context) error {
 	s := {{domain}}Create.NewService(hs.logger, hs.{{domainCap}}Repository, hs.idCreator)
 
-	{{domain}} := {{domain}}.{{domainCap}}{}
+	domain := {{domain}}.{{domainCap}}{}
 	body, errors := io.ReadAll(context.Request().Body)
 	if errors != nil {
 		return context.JSON(422, errors)
 	}
 
-	errors = json.Unmarshal(body, &{{domain}})
+	errors = json.Unmarshal(body, &domain)
 	if errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		{{domain}}Create.NewRequest({{domain}}, hs.validator),
+		{{domain}}Create.NewRequest(domain{{,hsValidator}}),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -88,19 +86,19 @@ func (hs *{{domainCap}}Routes) HandleCreate{{domainCap}}(context echo.Context) e
 func (hs *{{domainCap}}Routes) HandleEdit{{domainCap}}(context echo.Context) error {
 	s := {{domain}}Edit.NewService(hs.logger, hs.{{domainCap}}Repository)
 
-	{{domain}} := {{domain}}.{{domainCap}}{}
+	domain := {{domain}}.{{domainCap}}{}
 	body, errors := io.ReadAll(context.Request().Body)
 	if errors != nil {
 		return context.JSON(422, errors)
 	}
 
-	errors = json.Unmarshal(body, &{{domain}})
+	errors = json.Unmarshal(body, &domain)
 	if errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		{{domain}}Edit.NewRequest({{domain}}, context.Param("{{domain}}_id"), hs.validator),
+		{{domain}}Edit.NewRequest(domain, context.Param("{{domain}}_id"){{,hsValidator}}),
 	)
 
 	response, err := s.GetResponse()
@@ -113,7 +111,7 @@ func (hs *{{domainCap}}Routes) HandleEdit{{domainCap}}(context echo.Context) err
 func (hs *{{domainCap}}Routes) HandleList{{domainCap}}(context echo.Context) error {
 	s := {{domain}}List.NewService(hs.logger, hs.{{domainCap}}Repository)
 	s.Execute(
-		{{domain}}List.NewRequest(hs.validator),
+		{{domain}}List.NewRequest(),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -125,7 +123,7 @@ func (hs *{{domainCap}}Routes) HandleList{{domainCap}}(context echo.Context) err
 func (hs *{{domainCap}}Routes) HandleDelete{{domainCap}}(context echo.Context) error {
 	s := {{domain}}Delete.NewService(hs.logger, hs.{{domainCap}}Repository)
 	s.Execute(
-		{{domain}}Delete.NewRequest(context.Param("{{domain}}_id"), hs.validator),
+		{{domain}}Delete.NewRequest(context.Param("{{domain}}_id"){{,hsValidator}}),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

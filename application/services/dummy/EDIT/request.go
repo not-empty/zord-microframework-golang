@@ -12,9 +12,10 @@ type Request struct {
 	validator *validator.Validator
 }
 
-func NewRequest(dummy domain.Dummy, dummyId string) Request {
+func NewRequest(dummy domain.Dummy, dummyId string, validator *validator.Validator) Request {
 	req := Request{
-		Dummy: dummy,
+		Dummy:     dummy,
+		validator: validator,
 	}
 	req.Dummy.DummyId = dummyId
 	return req

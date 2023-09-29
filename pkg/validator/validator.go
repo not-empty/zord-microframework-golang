@@ -77,7 +77,7 @@ func (v *Validator) Boot() {
 }
 
 func (v *Validator) ValidateStruct(modelData any) []error {
-	var errors []error
+	var errorsList []error
 
 	err := v.validate.Struct(modelData)
 	if err != nil {
@@ -88,11 +88,11 @@ func (v *Validator) ValidateStruct(modelData any) []error {
 			element.Value = err.Param()
 
 			message := v.translateError(&element)
-			errors = append(errors, message)
+			errorsList = append(errorsList, message)
 		}
 	}
 
-	return errors
+	return errorsList
 }
 
 func (v *Validator) translateError(errorData *ErrorResponse) error {

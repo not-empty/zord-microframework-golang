@@ -28,9 +28,7 @@ type DummyRoutes struct {
 }
 
 func NewDummyRoutes(logger *logger.Logger, Environment string, mysql *database.MySql, idCreator *idCreator.IdCreator, validator *validator.Validator) *DummyRoutes {
-	repository := &dummyRepository.DummyRepository{
-		Mysql: mysql,
-	}
+	repository := dummyRepository.NewBaseRepository(mysql)
 	return &DummyRoutes{
 		logger:          logger,
 		Environment:     Environment,
@@ -99,7 +97,7 @@ func (hs *DummyRoutes) HandleEditDummy(context echo.Context) error {
 	}
 
 	s.Execute(
-		dummyEdit.NewRequest(domain, context.Param("dummy_id")),
+		dummyEdit.NewRequest(domain, context.Param("dummy_id"), hs.validator),
 	)
 
 	response, err := s.GetResponse()

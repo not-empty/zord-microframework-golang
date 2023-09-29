@@ -1,7 +1,6 @@
 package dummy
 
 import (
-	"fmt"
 	"go-skeleton/application/domain/dummy"
 	"go-skeleton/application/services"
 	"net/http"
@@ -28,7 +27,7 @@ func (s *Service) Execute(request Request) {
 		s.BadRequest(request, err)
 		return
 	}
-	s.produceResponseRule(request.Dummy)
+	s.produceResponseRule(request.dummy)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
@@ -37,11 +36,18 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 
 func (s *Service) produceResponseRule(d dummy.Dummy) {
 	s.Logger.Debug("ProduceResponseRule")
-	dummy := s.repository.Delete(&d)
-	if s.Error == nil {
-		s.response = &Response{
-			Status:  http.StatusOK,
-			Message: fmt.Sprint(dummy),
+	err := s.repository.Delete(&d)
+	if err != nil {
+		s.Error = &services.Error{
+			Status:  400,
+			Message: "Try again in a few minutes",
+			Error:   "Error on request process",
 		}
+		return
 	}
+
+	s.response = &Response{
+		Status: http.StatusOK,
+	}
+
 }

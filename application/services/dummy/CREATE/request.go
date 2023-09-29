@@ -1,7 +1,6 @@
 package dummy
 
 import (
-	"errors"
 	domain "go-skeleton/application/domain/dummy"
 	"go-skeleton/pkg/validator"
 )
@@ -33,9 +32,5 @@ func (r *Request) Validate() error {
 }
 
 func (r *Request) dummyCreateRule() error {
-
-	if r.Dummy.DummyName == "" {
-		return errors.New("invalid_argument")
-	}
 	return nil
 }

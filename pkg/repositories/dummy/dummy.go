@@ -9,33 +9,42 @@ type DummyRepository struct {
 	Mysql *database.MySql
 }
 
-func NewBaseRepository() *DummyRepository {
-	return &DummyRepository{}
+func NewBaseRepository(mysql *database.MySql) *DummyRepository {
+	return &DummyRepository{
+		Mysql: mysql,
+	}
 }
 
-func (repo *DummyRepository) Get(id string) (dummy.Dummy, error) {
+func (repo *DummyRepository) Get(id string) (*dummy.Dummy, error) {
 	var Data dummy.Dummy
-	repo.Mysql.Db.First(&Data, "dummy_id = ?", id)
-	return Data, nil
+	err := repo.Mysql.Db.First(&Data, "dummy_id = ?", id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &Data, nil
 }
 
-func (repo *DummyRepository) Create(d *dummy.Dummy) bool {
-	repo.Mysql.Db.Create(d)
-	return true
+func (repo *DummyRepository) Create(d *dummy.Dummy) error {
+	err := repo.Mysql.Db.Create(d).Error
+	return err
 }
 
-func (repo *DummyRepository) List() []dummy.Dummy {
+func (repo *DummyRepository) List() (*[]dummy.Dummy, error) {
 	var data []dummy.Dummy
-	repo.Mysql.Db.Limit(100).Find(&data)
-	return data
+	err := repo.Mysql.Db.Limit(100).Find(&data).Error
+	if err != nil {
+		return nil, err
+	}
+	return &data, nil
 }
 
-func (repo *DummyRepository) Edit(d *dummy.Dummy) bool {
-	repo.Mysql.Db.Updates(d)
-	return true
+func (repo *DummyRepository) Edit(d *dummy.Dummy) error {
+	err := repo.Mysql.Db.Updates(d).Error
+	return err
+
 }
 
-func (repo *DummyRepository) Delete(d *dummy.Dummy) bool {
-	repo.Mysql.Db.Delete(d)
-	return true
+func (repo *DummyRepository) Delete(d *dummy.Dummy) error {
+	err := repo.Mysql.Db.Delete(d).Error
+	return err
 }

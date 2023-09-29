@@ -1,7 +1,7 @@
 package dummy
 
 type Dummy struct {
-	DummyId   string `gorm:"primarykey" json:"dummy_id"`
+	DummyId   string `gorm:"type:char(26);primarykey" json:"dummy_id"`
 	DummyName string `validate:"required,min=3,max=32" json:"dummy_name"`
 }
 

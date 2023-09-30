@@ -7,10 +7,7 @@ import (
 	"go-skeleton/cmd/handlers/types"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
-	"go-skeleton/pkg/database"
-	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
-	"go-skeleton/pkg/validator"
 
 	"github.com/labstack/echo/v4"
 )
@@ -18,27 +15,18 @@ import (
 type Server struct {
 	Environment string
 
-	config    *config.Config
-	logger    *logger.Logger
-	mysql     *database.MySql
-	idCreator *idCreator.IdCreator
-	validator *validator.Validator
+	config *config.Config
+	logger *logger.Logger
 }
 
 func NewServer(Environment string) *Server {
 	c := pkg.ServerDependencies["config"]
 	l := pkg.ServerDependencies["logger"]
-	m := pkg.ServerDependencies["mysql"]
-	i := pkg.ServerDependencies["IdCreator"]
-	v := pkg.ServerDependencies["validator"]
 
 	return &Server{
 		Environment: Environment,
 		config:      c.(*config.Config),
 		logger:      l.(*logger.Logger),
-		mysql:       m.(*database.MySql),
-		idCreator:   i.(*idCreator.IdCreator),
-		validator:   v.(*validator.Validator),
 	}
 }
 

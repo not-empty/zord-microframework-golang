@@ -9,7 +9,7 @@ services:
       - .env
     ports:
       - 1323:1323
-    command: air
+    command: air http
     volumes:
       - ./:/app
 

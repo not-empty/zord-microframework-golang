@@ -8,7 +8,7 @@ import (
 	dummyEdit "go-skeleton/application/services/dummy/EDIT"
 	dummyGet "go-skeleton/application/services/dummy/GET"
 	dummyList "go-skeleton/application/services/dummy/LIST"
-	"go-skeleton/pkg/database"
+	"go-skeleton/cmd/handlers/types"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
 	dummyRepository "go-skeleton/pkg/repositories/dummy"
@@ -27,14 +27,15 @@ type DummyRoutes struct {
 	validator *validator.Validator
 }
 
-func NewDummyRoutes(logger *logger.Logger, Environment string, mysql *database.MySql, idCreator *idCreator.IdCreator, validator *validator.Validator) *DummyRoutes {
-	repository := dummyRepository.NewBaseRepository(mysql)
+func NewDummyRoutes(server *types.Server) *DummyRoutes {
+	repository := dummyRepository.NewBaseRepository(server.Mysql)
+
 	return &DummyRoutes{
-		logger:          logger,
-		Environment:     Environment,
+		logger:          server.Logger,
+		Environment:     server.Environment,
 		DummyRepository: repository,
-		idCreator:       idCreator,
-		validator:       validator,
+		idCreator:       server.IdCreator,
+		validator:       server.Validator,
 	}
 }
 

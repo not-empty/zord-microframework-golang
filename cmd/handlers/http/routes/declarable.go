@@ -10,8 +10,8 @@ type Declarable interface {
 	DeclareRoutes(*echo.Group)
 }
 
-func GetProtectedRoutes(server *types.Server) map[string]Declarable {
-	dummyListRoutes := NewDummyRoutes(server)
+func GetProtectedRoutes(deps *types.Dependencies) map[string]Declarable {
+	dummyListRoutes := NewDummyRoutes(deps)
 	//{{codeGen1}}
 	domains := map[string]Declarable{
 		"dummy": dummyListRoutes,
@@ -21,15 +21,15 @@ func GetProtectedRoutes(server *types.Server) map[string]Declarable {
 	return domains
 }
 
-func GetPublicRoutes(server *types.Server) map[string]Declarable {
+func GetPublicRoutes(deps *types.Dependencies) map[string]Declarable {
 	health := NewHealthRoute()
 	auth := NewAuthRoute(
-		server.Logger,
-		server.Config.ReadConfig("JWT_SECRET"),
-		server.Config.ReadNumberConfig("JWT_EXPIRATION"),
-		server.Config.ReadArrayConfig("ACCESS_SECRET"),
-		server.Config.ReadArrayConfig("ACCESS_CONTEXT"),
-		server.Config.ReadArrayConfig("ACCESS_TOKEN"),
+		deps.Logger,
+		deps.Config.ReadConfig("JWT_SECRET"),
+		deps.Config.ReadNumberConfig("JWT_EXPIRATION"),
+		deps.Config.ReadArrayConfig("ACCESS_SECRET"),
+		deps.Config.ReadArrayConfig("ACCESS_CONTEXT"),
+		deps.Config.ReadArrayConfig("ACCESS_TOKEN"),
 	)
 
 	routes := map[string]Declarable{

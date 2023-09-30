@@ -6,27 +6,58 @@ import (
 	"go-skeleton/cmd/handlers/http/routes"
 	"go-skeleton/cmd/handlers/types"
 	"go-skeleton/pkg"
+	"go-skeleton/pkg/config"
+	"go-skeleton/pkg/database"
+	"go-skeleton/pkg/idCreator"
+	"go-skeleton/pkg/logger"
+	"go-skeleton/pkg/validator"
 
 	"github.com/labstack/echo/v4"
 )
 
-func Start(port string) {
-	var server = echo.New()
+type Server struct {
+	Environment string
 
-	hs := types.NewServer()
+	config    *config.Config
+	logger    *logger.Logger
+	mysql     *database.MySql
+	idCreator *idCreator.IdCreator
+	validator *validator.Validator
+}
+
+func NewServer(Environment string) *Server {
+	c := pkg.ServerDependencies["config"]
+	l := pkg.ServerDependencies["logger"]
+	m := pkg.ServerDependencies["mysql"]
+	i := pkg.ServerDependencies["IdCreator"]
+	v := pkg.ServerDependencies["validator"]
+
+	return &Server{
+		Environment: Environment,
+		config:      c.(*config.Config),
+		logger:      l.(*logger.Logger),
+		mysql:       m.(*database.MySql),
+		idCreator:   i.(*idCreator.IdCreator),
+		validator:   v.(*validator.Validator),
+	}
+}
+
+func (hs *Server) Start(port string) {
+	var server = echo.New()
 
 	server.HideBanner = true
 	server.HidePort = true
 
-	middlewareList := dependencies.GetAllMiddlewares(hs.Config.ReadConfig("JWT_SECRET"))
+	deps := types.NewDependencies()
+	middlewareList := dependencies.GetAllMiddlewares(hs.config.ReadConfig("JWT_SECRET"))
 
 	for index, mid := range middlewareList {
 		mid.Boot()
 		pkg.Logger.Info(fmt.Sprintf("[http.Server] Booting %s", index))
 	}
 
-	protectedRoutes := routes.GetProtectedRoutes(hs)
-	publicRoutes := routes.GetPublicRoutes(hs)
+	protectedRoutes := routes.GetProtectedRoutes(deps)
+	publicRoutes := routes.GetPublicRoutes(deps)
 
 	public := server.Group("")
 	protected := server.Group("", middlewareList["auth"].GetMiddleware())
@@ -40,6 +71,9 @@ func Start(port string) {
 		route.DeclareRoutes(protected)
 		pkg.Logger.Info(fmt.Sprintf("[server.route] Declared %s", index))
 	}
+	hs.Shutdown(server.Start(port))
+}
 
-	hs.Logger.Critical(server.Start(port), "Unable to start server, Shutdown")
+func (hs *Server) Shutdown(err error) {
+	hs.logger.Critical(err, "Unable to start server, Shutdown")
 }

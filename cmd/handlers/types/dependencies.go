@@ -9,24 +9,23 @@ import (
 	"go-skeleton/pkg/validator"
 )
 
-type Server struct {
+type Dependencies struct {
 	Environment string
-
-	Config    *config.Config
-	Logger    *logger.Logger
-	Mysql     *database.MySql
-	IdCreator *idCreator.IdCreator
-	Validator *validator.Validator
+	Config      *config.Config
+	Logger      *logger.Logger
+	Mysql       *database.MySql
+	IdCreator   *idCreator.IdCreator
+	Validator   *validator.Validator
 }
 
-func NewServer() *Server {
+func NewDependencies() *Dependencies {
 	c := pkg.ServerDependencies["config"]
 	l := pkg.ServerDependencies["logger"]
 	m := pkg.ServerDependencies["mysql"]
 	i := pkg.ServerDependencies["IdCreator"]
 	v := pkg.ServerDependencies["validator"]
 
-	return &Server{
+	return &Dependencies{
 		Environment: pkg.Config.ReadConfig("ENVIRONMENT"),
 		Config:      c.(*config.Config),
 		Logger:      l.(*logger.Logger),

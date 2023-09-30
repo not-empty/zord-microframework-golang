@@ -63,7 +63,7 @@ func (k *Kernel) RootCmd(_ *cobra.Command, _ []string) {
 }
 
 func (k *Kernel) startServer(_ *cobra.Command, _ []string) {
-	http.Start("0.0.0.0:1323")
+	http.NewServer(pkg.Config.ReadConfig("ENVIRONMENT")).Start(":1323")
 }
 
 func (k *Kernel) startCli(cmd *cobra.Command) {

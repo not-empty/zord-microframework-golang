@@ -49,5 +49,4 @@ func (s *Service) produceResponseRule() {
 		Status: http.StatusOK,
 		Data:   dummyData,
 	}
-
 }

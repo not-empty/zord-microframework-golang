@@ -13,29 +13,35 @@ func NewBaseRepository() *{{domainCap}}Repository {
 	return &{{domainCap}}Repository{}
 }
 
-func (repo *{{domainCap}}Repository) Get(id string) ({{domain}}.{{domainCap}}, error) {
+func (repo *{{domainCap}}Repository) Get(id string) (*{{domain}}.{{domainCap}}, error) {
 	var Data {{domain}}.{{domainCap}}
-		repo.Mysql.Db.First(&Data, "{{domain}}_id = ?", id)
-	return Data, nil
+	err := repo.Mysql.Db.First(&Data, "{{domain}}_id = ?", id).Error
+	if err != nil {
+        return nil, err
+    }
+	return &Data, nil
 }
 
-func (repo *{{domainCap}}Repository) Create(d *{{domain}}.{{domainCap}}) bool {
-	repo.Mysql.Db.Create(d)
-	return true
+func (repo *{{domainCap}}Repository) Create(d *{{domain}}.{{domainCap}}) error {
+	err := repo.Mysql.Db.Create(d).Error
+	return err
 }
 
-func (repo *{{domainCap}}Repository) List() []{{domain}}.{{domainCap}} {
+func (repo *{{domainCap}}Repository) List() (*[]{{domain}}.{{domainCap}}, error) {
 	var data []{{domain}}.{{domainCap}}
-	repo.Mysql.Db.Limit(100).Find(&data)
-	return data
+	err := repo.Mysql.Db.Limit(100).Find(&data).Error
+	if err != nil {
+        return nil, err
+    }
+	return &data, nil
 }
 
-func (repo *{{domainCap}}Repository) Edit(d *{{domain}}.{{domainCap}}) bool {
-	repo.Mysql.Db.Updates(d)
-	return true
+func (repo *{{domainCap}}Repository) Edit(d *{{domain}}.{{domainCap}}) error {
+	err := repo.Mysql.Db.Updates(d).Error
+	return err
 }
 
-func (repo *{{domainCap}}Repository) Delete(d *{{domain}}.{{domainCap}}) bool {
-	repo.Mysql.Db.Delete(d)
-	return true
+func (repo *{{domainCap}}Repository) Delete(d *{{domain}}.{{domainCap}}) error {
+	err := repo.Mysql.Db.Delete(d).Error
+	return err
 }

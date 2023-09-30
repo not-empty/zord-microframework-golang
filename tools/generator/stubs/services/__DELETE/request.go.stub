@@ -1,7 +1,6 @@
 package {{domain}}
 
 import (
-	"errors"
 	domain "go-skeleton/application/domain/{{domain}}"
 	{{validatorImport}}
 )
@@ -9,7 +8,6 @@ import (
 type Request struct {
 	{{domainCap}} domain.{{domainCap}}
 	err   error
-	{{validator}}
 }
 
 func NewRequest({{domain}}Id string{{,validator}}) Request {
@@ -17,7 +15,6 @@ func NewRequest({{domain}}Id string{{,validator}}) Request {
 		{{domainCap}}: domain.{{domainCap}}{
 			{{domainCap}}Id: {{domain}}Id,
 		},
-		{{validatorInject}}
 	}
 }
 
@@ -25,13 +22,9 @@ func (r *Request) Validate() error {
 	if err := r.{{domain}}IdRule(); err != nil {
 		return err
 	}
-	{{validatorRule}}
 	return nil
 }
 
 func (r *Request) {{domain}}IdRule() error {
-	if r.{{domainCap}}.{{domainCap}}Id == `""` {
-		return errors.New("invalid_argument")
-	}
 	return nil
 }

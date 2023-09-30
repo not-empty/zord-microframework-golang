@@ -5,9 +5,9 @@ type {{domainCap}} struct {
 }
 
 type Repository interface {
-	Get(id string) ({{domainCap}}, error)
-	Create(data *{{domainCap}}) bool
-	List() []{{domainCap}}
-	Edit(data *{{domainCap}}) bool
-	Delete(id *{{domainCap}}) bool
+	Get(id string) (*{{domainCap}}, error)
+	Create(*{{domainCap}}) error
+	List() (*[]{{domainCap}}, error)
+	Edit(*{{domainCap}}) error
+	Delete(*{{domainCap}}) error
 }

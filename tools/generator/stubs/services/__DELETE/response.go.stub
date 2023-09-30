@@ -2,5 +2,4 @@ package {{domain}}
 
 type Response struct {
 	Status  int
-	Message string
 }

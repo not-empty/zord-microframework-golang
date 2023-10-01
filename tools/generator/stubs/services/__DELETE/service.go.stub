@@ -38,14 +38,14 @@ func (s *Service) produceResponseRule(d {{domain}}.{{domainCap}}) {
 	s.Logger.Debug("ProduceResponseRule")
 	err := s.repository.Delete(&d)
 	if err != nil {
-        s.Error = &services.Error{
-            Status:  400,
-            Message: "Try again in a few minutes",
-            Error:   "Error on request process",
-        }
-        return
-    }
-    s.response = &Response{
-        Status: http.StatusOK,
-    }
+			s.Error = &services.Error{
+					Status:  400,
+					Message: "Try again in a few minutes",
+					Error:   "Error on request process",
+			}
+			return
+	}
+	s.response = &Response{
+			Status: http.StatusOK,
+	}
 }

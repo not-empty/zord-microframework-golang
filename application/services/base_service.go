@@ -16,6 +16,8 @@ type IdCreator interface {
 	Create() string
 }
 
+// {{moduleInterface}}
+
 type Error struct {
 	Status  int    `json:"-"`
 	Message string `json:"-"`

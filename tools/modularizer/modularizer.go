@@ -1,8 +1,9 @@
 package modularizer
 
 import (
+	"encoding/json"
 	"errors"
-	git "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5"
 	"go-skeleton/pkg/logger"
 	"io/fs"
 	"os"
@@ -10,30 +11,43 @@ import (
 	"strings"
 )
 
+type Config struct {
+	replacer       map[string]string
+	filesToReplace []string
+}
+
 type Modularizer struct {
 	Logger *logger.Logger
+	Config *Config
 }
 
 var ModulesList = map[string]string{
 	"grpc": "https://github.com/not-empty/zord-grpc-microframework-golang.git",
 }
 var IgnoreList []string
+var tempFolder = "tools/modularizer/temp"
 
 func NewModularizer(l *logger.Logger) *Modularizer {
-	IgnoreList = append(IgnoreList, ".git", "application")
+	IgnoreList = append(
+		IgnoreList,
+		".git",
+		"application",
+		"config.json",
+		"kernel",
+	)
 	return &Modularizer{
 		Logger: l,
 	}
 }
 
-func (m Modularizer) GetModule(module string) error {
+func (m *Modularizer) GetModule(module string) error {
 	module, exists := ModulesList[module]
 	if !exists {
 		err := errors.New("modulo inexistente ou não mapeado")
 		m.Logger.Error(err)
 		return err
 	}
-	_, err := git.PlainClone("tools/modularizer/temp", false, &git.CloneOptions{
+	_, err := git.PlainClone(tempFolder, false, &git.CloneOptions{
 		URL: module,
 	})
 	if err != nil {
@@ -41,7 +55,23 @@ func (m Modularizer) GetModule(module string) error {
 		return err
 	}
 
-	filepath.Walk("tools/modularizer/temp", func(path string, info fs.FileInfo, err error) error {
+	jsonBytes, err := os.ReadFile(tempFolder + "/config.json")
+
+	if err != nil {
+		m.Logger.Info("Missing configuration")
+		m.Logger.Error(err)
+		return err
+	}
+
+	err = json.Unmarshal(jsonBytes, &m.Config)
+
+	if err != nil {
+		m.Logger.Info("Invalid configuration file")
+		m.Logger.Error(err)
+		return err
+	}
+
+	err = filepath.Walk(tempFolder, func(path string, info fs.FileInfo, err error) error {
 		if m.isInIgnore(info.Name()) {
 			return filepath.SkipDir
 		}
@@ -62,7 +92,20 @@ func (m Modularizer) GetModule(module string) error {
 		return nil
 	})
 
-	if err := os.RemoveAll("tools/modularizer/temp"); err != nil {
+	if err != nil {
+		m.Logger.Error(err)
+		return err
+	}
+
+	for _, file := range m.Config.filesToReplace {
+		replaced := m.replacer(tempFolder+m.getFileData(file), m.Config.replacer)
+		err = os.WriteFile(file, []byte(replaced), 0755)
+		if err != nil {
+			m.Logger.Error(err, "modularizer")
+		}
+	}
+
+	if err := os.RemoveAll(tempFolder); err != nil {
 		m.Logger.Error(err)
 		return err
 	}
@@ -118,7 +161,6 @@ func (m *Modularizer) getFullFilePath(path string) string {
 func (m *Modularizer) isInIgnore(file string) bool {
 	for _, ignore := range IgnoreList {
 		if file == ignore {
-
 			return true
 		}
 	}

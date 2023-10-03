@@ -48,6 +48,8 @@ func (k *Kernel) Boot() {
 		},
 	)
 
+	// {{cobraCommand}}
+
 	cliCmd := &cobra.Command{
 		Use:   "cli",
 		Short: "",
@@ -69,6 +71,8 @@ func (k *Kernel) startServer(_ *cobra.Command, _ []string) {
 func (k *Kernel) startCli(cmd *cobra.Command) {
 	cli.NewCli(pkg.Config.ReadConfig("ENVIRONMENT")).RegisterCommands(cmd)
 }
+
+// {{kernelFunc}}
 
 func (k *Kernel) BootServer(_ *cobra.Command, _ []string) {
 	for index, dep := range pkg.ServerDependencies {

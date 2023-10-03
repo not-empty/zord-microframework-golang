@@ -8,6 +8,7 @@ import (
 	"go-skeleton/pkg/logger"
 	"go-skeleton/tools/generator"
 	"go-skeleton/tools/migrator"
+	"go-skeleton/tools/modularizer"
 
 	"github.com/spf13/cobra"
 )
@@ -59,6 +60,12 @@ func (c *Cli) RegisterCommands(cmd *cobra.Command) {
 			Run:    c.Migrate,
 			PreRun: c.BootCli,
 		},
+		&cobra.Command{
+			Use:    "module",
+			Short:  "Get new module",
+			Run:    c.GetModule,
+			PreRun: c.BootCli,
+		},
 	)
 
 }
@@ -69,6 +76,15 @@ func (c *Cli) CreateDomain(cmd *cobra.Command, args []string) {
 		domain = args[0]
 	}
 	generatorInstance.CreateDomain(domain, c.validator)
+}
+
+func (c Cli) GetModule(_ *cobra.Command, args []string) {
+	modularizerInstance := modularizer.NewModularizer(c.logger)
+	module := ""
+	if len(args) > 0 {
+		module = args[0]
+	}
+	modularizerInstance.GetModule(module)
 }
 
 func (c *Cli) DestroyDomain(cmd *cobra.Command, args []string) {

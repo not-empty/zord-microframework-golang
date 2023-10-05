@@ -9,13 +9,20 @@ services:
       - .env
     ports:
       - 1323:1323
-    command: air
+    command: air http
+    depends_on:
+      mysql:
+        condition: service_healthy
     volumes:
       - ./:/app
 
   mysql:
     image: mysql:latest
     container_name: mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 5s
+      retries: 10
     environment:
         MYSQL_ROOT_PASSWORD: root
         MYSQL_DATABASE: skeleton

@@ -27,7 +27,7 @@ type DummyRoutes struct {
 	validator *validator.Validator
 }
 
-func NewDummyRoutes(logger *logger.Logger, Environment string, mysql *database.MySql, idCreator *idCreator.IdCreator, validator *validator.Validator) *DummyRoutes {
+func NewDummyRoutes(logger *logger.Logger, mysql *database.MySql, idCreator *idCreator.IdCreator, validator *validator.Validator, Environment string) *DummyRoutes {
 	repository := dummyRepository.NewBaseRepository(mysql)
 	return &DummyRoutes{
 		logger:          logger,

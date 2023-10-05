@@ -1,21 +1,32 @@
 package routes
 
 import (
+	"github.com/labstack/echo/v4"
+	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
 	"go-skeleton/pkg/validator"
-
-	"github.com/labstack/echo/v4"
 )
 
 type Declarable interface {
 	DeclareRoutes(*echo.Group)
 }
 
-func GetProtectedRoutes(logger *logger.Logger, Environment string, MySql *database.MySql, idCreator *idCreator.IdCreator, validator *validator.Validator) map[string]Declarable {
-	dummyListRoutes := NewDummyRoutes(logger, Environment, MySql, idCreator, validator)
+func GetProtectedRoutes(deps map[string]pkg.Bootable, Env string) map[string]Declarable {
+	logger := deps["logger"].(*logger.Logger)
+	mysql := deps["mysql"].(*database.MySql)
+	idCreator := deps["idCreator"].(*idCreator.IdCreator)
+	validator := deps["validator"].(*validator.Validator)
+
+	dummyListRoutes := NewDummyRoutes(
+		logger,
+		mysql,
+		idCreator,
+		validator,
+		Env,
+	)
 	//{{codeGen1}}
 	domains := map[string]Declarable{
 		"dummy": dummyListRoutes,
@@ -24,10 +35,11 @@ func GetProtectedRoutes(logger *logger.Logger, Environment string, MySql *databa
 	return domains
 }
 
-func GetPublicRoutes(logger *logger.Logger, config *config.Config) map[string]Declarable {
+func GetPublicRoutes(deps map[string]pkg.Bootable) map[string]Declarable {
+	config := deps["config"].(*config.Config)
 	health := NewHealthRoute()
 	auth := NewAuthRoute(
-		logger,
+		deps["logger"].(*logger.Logger),
 		config.ReadConfig("JWT_SECRET"),
 		config.ReadNumberConfig("JWT_EXPIRATION"),
 		config.ReadArrayConfig("ACCESS_SECRET"),

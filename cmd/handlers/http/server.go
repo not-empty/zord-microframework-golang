@@ -2,42 +2,31 @@ package http
 
 import (
 	"fmt"
-	"go-skeleton/cmd/handlers/http/dependencies"
+	"github.com/labstack/echo/v4"
+	"go-skeleton/cmd/handlers/http/middlewares"
 	"go-skeleton/cmd/handlers/http/routes"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
-	"go-skeleton/pkg/database"
-	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
-	"go-skeleton/pkg/validator"
-
-	"github.com/labstack/echo/v4"
 )
 
 type Server struct {
 	Environment string
 
-	config    *config.Config
-	logger    *logger.Logger
-	mysql     *database.MySql
-	idCreator *idCreator.IdCreator
-	validator *validator.Validator
+	config *config.Config
+	logger *logger.Logger
+	deps   map[string]pkg.Bootable
 }
 
 func NewServer(Environment string) *Server {
 	c := pkg.ServerDependencies["config"]
 	l := pkg.ServerDependencies["logger"]
-	m := pkg.ServerDependencies["mysql"]
-	i := pkg.ServerDependencies["IdCreator"]
-	v := pkg.ServerDependencies["validator"]
 
 	return &Server{
 		Environment: Environment,
 		config:      c.(*config.Config),
 		logger:      l.(*logger.Logger),
-		mysql:       m.(*database.MySql),
-		idCreator:   i.(*idCreator.IdCreator),
-		validator:   v.(*validator.Validator),
+		deps:        pkg.ServerDependencies,
 	}
 }
 
@@ -47,15 +36,15 @@ func (hs *Server) Start(port string) {
 	server.HideBanner = true
 	server.HidePort = true
 
-	middlewareList := dependencies.GetAllMiddlewares(hs.config.ReadConfig("JWT_SECRET"))
+	middlewareList := middlewares.GetAllMiddlewares(hs.config.ReadConfig("JWT_SECRET"))
 
 	for index, mid := range middlewareList {
 		mid.Boot()
 		pkg.Logger.Info(fmt.Sprintf("[http.Server] Booting %s", index))
 	}
 
-	protectedRoutes := routes.GetProtectedRoutes(hs.logger, hs.Environment, hs.mysql, hs.idCreator, hs.validator)
-	publicRoutes := routes.GetPublicRoutes(hs.logger, hs.config)
+	protectedRoutes := routes.GetProtectedRoutes(hs.deps, hs.config.ReadConfig("ENVIRONMENT"))
+	publicRoutes := routes.GetPublicRoutes(hs.deps)
 
 	public := server.Group("")
 	protected := server.Group("", middlewareList["auth"].GetMiddleware())

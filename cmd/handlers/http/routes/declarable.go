@@ -15,16 +15,16 @@ type Declarable interface {
 }
 
 func GetProtectedRoutes(deps map[string]pkg.Bootable, Env string) map[string]Declarable {
-	logger := deps["logger"].(*logger.Logger)
-	mysql := deps["mysql"].(*database.MySql)
-	idCreator := deps["idCreator"].(*idCreator.IdCreator)
-	validator := deps["validator"].(*validator.Validator)
+	l := deps["logger"].(*logger.Logger)
+	m := deps["mysql"].(*database.MySql)
+	i := deps["IdCreator"].(*idCreator.IdCreator)
+	v := deps["validator"].(*validator.Validator)
 
 	dummyListRoutes := NewDummyRoutes(
-		logger,
-		mysql,
-		idCreator,
-		validator,
+		l,
+		m,
+		i,
+		v,
 		Env,
 	)
 	//{{codeGen1}}
@@ -36,15 +36,15 @@ func GetProtectedRoutes(deps map[string]pkg.Bootable, Env string) map[string]Dec
 }
 
 func GetPublicRoutes(deps map[string]pkg.Bootable) map[string]Declarable {
-	config := deps["config"].(*config.Config)
+	c := deps["config"].(*config.Config)
 	health := NewHealthRoute()
 	auth := NewAuthRoute(
 		deps["logger"].(*logger.Logger),
-		config.ReadConfig("JWT_SECRET"),
-		config.ReadNumberConfig("JWT_EXPIRATION"),
-		config.ReadArrayConfig("ACCESS_SECRET"),
-		config.ReadArrayConfig("ACCESS_CONTEXT"),
-		config.ReadArrayConfig("ACCESS_TOKEN"),
+		c.ReadConfig("JWT_SECRET"),
+		c.ReadNumberConfig("JWT_EXPIRATION"),
+		c.ReadArrayConfig("ACCESS_SECRET"),
+		c.ReadArrayConfig("ACCESS_CONTEXT"),
+		c.ReadArrayConfig("ACCESS_TOKEN"),
 	)
 	routes := map[string]Declarable{
 		"health": health,

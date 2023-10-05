@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"go-skeleton/cmd/handlers/types"
+	"go-skeleton/cmd/handlers/http/dependencies"
 
 	"github.com/labstack/echo/v4"
 )
@@ -10,7 +10,7 @@ type Declarable interface {
 	DeclareRoutes(*echo.Group)
 }
 
-func GetProtectedRoutes(deps *types.Dependencies) map[string]Declarable {
+func GetProtectedRoutes(deps *dependencies.ServerDependencies) map[string]Declarable {
 	dummyListRoutes := NewDummyRoutes(deps)
 	//{{codeGen1}}
 	domains := map[string]Declarable{
@@ -21,7 +21,7 @@ func GetProtectedRoutes(deps *types.Dependencies) map[string]Declarable {
 	return domains
 }
 
-func GetPublicRoutes(deps *types.Dependencies) map[string]Declarable {
+func GetPublicRoutes(deps *dependencies.ServerDependencies) map[string]Declarable {
 	health := NewHealthRoute()
 	auth := NewAuthRoute(
 		deps.Logger,

@@ -8,7 +8,7 @@ import (
 	dummyEdit "go-skeleton/application/services/dummy/EDIT"
 	dummyGet "go-skeleton/application/services/dummy/GET"
 	dummyList "go-skeleton/application/services/dummy/LIST"
-	"go-skeleton/cmd/handlers/types"
+	"go-skeleton/cmd/handlers/http/dependencies"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
 	dummyRepository "go-skeleton/pkg/repositories/dummy"
@@ -27,7 +27,7 @@ type DummyRoutes struct {
 	validator *validator.Validator
 }
 
-func NewDummyRoutes(deps *types.Dependencies) *DummyRoutes {
+func NewDummyRoutes(deps *dependencies.ServerDependencies) *DummyRoutes {
 	repository := dummyRepository.NewBaseRepository(deps.Mysql)
 
 	return &DummyRoutes{

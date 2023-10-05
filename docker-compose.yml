@@ -12,6 +12,9 @@ services:
     command: air http
     volumes:
       - ./:/app
+    depends_on:
+      mysql:
+        condition: service_healthy
 
   mysql:
     image: mysql:latest
@@ -23,6 +26,10 @@ services:
         - "3306:3306"
     volumes:
         - ./storage/mysql:/var/lib/mysql
+    healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        timeout: 5s
+        retries: 10
 
 networks:
     default:

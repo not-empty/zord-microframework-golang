@@ -1,4 +1,4 @@
-package types
+package dependencies
 
 import (
 	"go-skeleton/pkg"
@@ -9,7 +9,7 @@ import (
 	"go-skeleton/pkg/validator"
 )
 
-type Dependencies struct {
+type ServerDependencies struct {
 	Environment string
 	Config      *config.Config
 	Logger      *logger.Logger
@@ -18,14 +18,14 @@ type Dependencies struct {
 	Validator   *validator.Validator
 }
 
-func NewDependencies() *Dependencies {
+func NewServerDependencies() *ServerDependencies {
 	c := pkg.ServerDependencies["config"]
 	l := pkg.ServerDependencies["logger"]
 	m := pkg.ServerDependencies["mysql"]
 	i := pkg.ServerDependencies["IdCreator"]
 	v := pkg.ServerDependencies["validator"]
 
-	return &Dependencies{
+	return &ServerDependencies{
 		Environment: pkg.Config.ReadConfig("ENVIRONMENT"),
 		Config:      c.(*config.Config),
 		Logger:      l.(*logger.Logger),

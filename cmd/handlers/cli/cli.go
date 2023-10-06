@@ -20,23 +20,30 @@ type Cli struct {
 	logger      *logger.Logger
 	mysql       *database.MySql
 	validator   bool
+	cmd         *cobra.Command
 }
 
-func NewCli(Environment string) *Cli {
+func NewCli() *Cli {
 	c := pkg.CliDependencies["config"]
 	l := pkg.CliDependencies["logger"]
 	m := pkg.CliDependencies["mysql"]
+	cmd := &cobra.Command{
+		Use:   "cli",
+		Short: "",
+		Long:  ``,
+	}
 
 	return &Cli{
-		Environment: Environment,
+		Environment: pkg.Config.ReadConfig("ENVIRONMENT"),
 		config:      c.(*config.Config),
 		logger:      l.(*logger.Logger),
 		mysql:       m.(*database.MySql),
+		cmd:         cmd,
 	}
 }
 
-func (c *Cli) RegisterCommands(cmd *cobra.Command) {
-	c.initFlags(cmd)
+func (c *Cli) RegisterCommands() {
+	c.initFlags(c.cmd)
 	createDomain := &cobra.Command{
 		Use:              "create-domain",
 		Short:            "Create a new domain service",
@@ -45,7 +52,7 @@ func (c *Cli) RegisterCommands(cmd *cobra.Command) {
 		TraverseChildren: true,
 	}
 	createDomain.Flags().BoolVarP(&c.validator, "validator", "v", false, "Create domain with validation")
-	cmd.AddCommand(
+	c.cmd.AddCommand(
 		createDomain,
 		&cobra.Command{
 			Use:    "destroy-domain",
@@ -80,8 +87,8 @@ func (c *Cli) DestroyDomain(cmd *cobra.Command, args []string) {
 }
 
 func (c *Cli) Migrate(cmd *cobra.Command, args []string) {
-	migratorInstace := migrator.NewMigrator(c.mysql)
-	migratorInstace.MigrateAllDomains()
+	migratorInstance := migrator.NewMigrator(c.mysql)
+	migratorInstance.MigrateAllDomains()
 }
 
 func (c *Cli) initFlags(cmd *cobra.Command) {
@@ -94,4 +101,9 @@ func (c *Cli) BootCli(cmd *cobra.Command, args []string) {
 		dep.Boot()
 		c.logger.Info(fmt.Sprintf("[cli.cli] Booting %s", index))
 	}
+}
+
+func (c *Cli) BaseCommand() *cobra.Command {
+	c.RegisterCommands()
+	return c.cmd
 }

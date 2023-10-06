@@ -41,7 +41,7 @@ func (hs *Server) Boot(_ *cobra.Command, _ []string) {
 	pkg.Logger.Info("[http.Server] Done!")
 }
 
-func (hs *Server) Start(cmd *cobra.Command, args []string) {
+func (hs *Server) Start(_ *cobra.Command, _ []string) {
 	var server = echo.New()
 
 	server.HideBanner = true
@@ -74,4 +74,14 @@ func (hs *Server) Start(cmd *cobra.Command, args []string) {
 
 func (hs *Server) Shutdown(err error) {
 	hs.logger.Critical(err, "Unable to start server, Shutdown")
+}
+
+func (hs *Server) BaseCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:               "http",
+		Short:             "Start a http server (API)",
+		Long:              ``,
+		Run:               hs.Boot,
+		PersistentPostRun: hs.Start,
+	}
 }

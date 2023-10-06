@@ -2,6 +2,7 @@ package kernel
 
 import (
 	"fmt"
+	"go-skeleton/cmd"
 	"go-skeleton/pkg"
 	"time"
 
@@ -35,6 +36,11 @@ func (k *Kernel) Boot() {
 
 	pkg.Logger.Info("[Kernel.Kernel] Booting application!")
 	time.Local = time.FixedZone("America/Sao_Paulo", 0)
+
+	for ind, cmd := range cmd.CommandList {
+		k.rootCmd.AddCommand(cmd.BaseCommand())
+		pkg.Logger.Info(fmt.Sprintf("Command Loaded %s", ind))
+	}
 }
 
 func (k *Kernel) RootCmd(_ *cobra.Command, _ []string) {

@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/spf13/cobra"
 	"go-skeleton/cmd/handlers/http/middlewares"
 	"go-skeleton/cmd/handlers/http/routes"
 	"go-skeleton/pkg"
@@ -18,19 +19,29 @@ type Server struct {
 	deps   map[string]pkg.Bootable
 }
 
-func NewServer(Environment string) *Server {
+func NewServer() *Server {
+	e := pkg.Config.ReadConfig("ENVIRONMENT")
 	c := pkg.ServerDependencies["config"]
 	l := pkg.ServerDependencies["logger"]
 
 	return &Server{
-		Environment: Environment,
+		Environment: e,
 		config:      c.(*config.Config),
 		logger:      l.(*logger.Logger),
 		deps:        pkg.ServerDependencies,
 	}
 }
 
-func (hs *Server) Start(port string) {
+func (hs *Server) Boot(_ *cobra.Command, _ []string) {
+	for index, dep := range pkg.ServerDependencies {
+		dep.Boot()
+		pkg.Logger.Info(fmt.Sprintf("[http.Server] Booting %s", index))
+	}
+
+	pkg.Logger.Info("[http.Server] Done!")
+}
+
+func (hs *Server) Start(cmd *cobra.Command, args []string) {
 	var server = echo.New()
 
 	server.HideBanner = true
@@ -58,8 +69,7 @@ func (hs *Server) Start(port string) {
 		route.DeclareRoutes(protected)
 		pkg.Logger.Info(fmt.Sprintf("[server.route] Declared %s", index))
 	}
-	hs.Shutdown(server.Start(port))
-
+	hs.Shutdown(server.Start(hs.config.ReadConfig("HTTP_PORT")))
 }
 
 func (hs *Server) Shutdown(err error) {

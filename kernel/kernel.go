@@ -37,8 +37,8 @@ func (k *Kernel) Boot() {
 	pkg.Logger.Info("[Kernel.Kernel] Booting application!")
 	time.Local = time.FixedZone("America/Sao_Paulo", 0)
 
-	for ind, cmd := range cmd.CommandList {
-		k.rootCmd.AddCommand(cmd.BaseCommand())
+	for ind, command := range cmd.CommandList {
+		k.rootCmd.AddCommand(command.BaseCommand())
 		pkg.Logger.Info(fmt.Sprintf("Command Loaded %s", ind))
 	}
 }

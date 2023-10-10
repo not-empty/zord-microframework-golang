@@ -1,0 +1,8 @@
+package {{domain}}
+
+import domain "go-skeleton/application/domain/{{domain}}"
+
+type Response struct {
+	Status int                     `json:"status,omitempty"`
+	Data   *[]domain.{{domainCap}} `json:"data,omitempty"`
+}

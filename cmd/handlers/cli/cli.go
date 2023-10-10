@@ -20,6 +20,7 @@ type Cli struct {
 	logger      *logger.Logger
 	mysql       *database.MySql
 	validator   bool
+	service     string
 }
 
 func NewCli(Environment string) *Cli {
@@ -44,7 +45,10 @@ func (c *Cli) RegisterCommands(cmd *cobra.Command) {
 		PreRun:           c.BootCli,
 		TraverseChildren: true,
 	}
+
 	createDomain.Flags().BoolVarP(&c.validator, "validator", "v", false, "Create domain with validation")
+	createDomain.Flags().StringVar(&c.service, "service", "", "Create specific service name")
+
 	cmd.AddCommand(
 		createDomain,
 		&cobra.Command{
@@ -68,7 +72,10 @@ func (c *Cli) CreateDomain(cmd *cobra.Command, args []string) {
 	if len(args) > 0 {
 		domain = args[0]
 	}
-	generatorInstance.CreateDomain(domain, c.validator)
+	err := generatorInstance.CreateDomain(domain, c.validator, c.service)
+	if err != nil {
+		return
+	}
 }
 
 func (c *Cli) DestroyDomain(cmd *cobra.Command, args []string) {
@@ -76,12 +83,15 @@ func (c *Cli) DestroyDomain(cmd *cobra.Command, args []string) {
 	if len(args) > 0 {
 		domain = args[0]
 	}
-	generatorInstance.DestroyDomain(domain)
+	err := generatorInstance.DestroyDomain(domain)
+	if err != nil {
+		return
+	}
 }
 
 func (c *Cli) Migrate(cmd *cobra.Command, args []string) {
-	migratorInstace := migrator.NewMigrator(c.mysql)
-	migratorInstace.MigrateAllDomains()
+	migratorInstance := migrator.NewMigrator(c.mysql)
+	migratorInstance.MigrateAllDomains()
 }
 
 func (c *Cli) initFlags(cmd *cobra.Command) {

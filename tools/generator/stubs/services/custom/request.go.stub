@@ -1,0 +1,19 @@
+package {{domain}}
+
+import (
+	domain "go-skeleton/application/domain/{{domain}}"
+	{{validatorImport}}
+)
+
+type Request struct {
+	{{domainCap}} []domain.{{domainCap}}
+	Err   error
+}
+
+func NewRequest() Request {
+	return Request{}
+}
+
+func (r *Request) Validate() error {
+	return nil
+}

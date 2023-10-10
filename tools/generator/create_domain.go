@@ -32,9 +32,9 @@ func NewGenerator(l services.Logger) *Generator {
 	}
 }
 
-func (g *Generator) CreateDomain(domain string, validator bool) error {
+func (g *Generator) CreateDomain(domain string, validator bool, service string) error {
 	if g.isInvalidDomain(domain) {
-		panic(errors.New("Unable create a new domain, please check domain name"))
+		panic(errors.New("unable create a new domain, please check domain name"))
 	}
 	domainCap := g.pascalCase(domain)
 
@@ -44,7 +44,8 @@ func (g *Generator) CreateDomain(domain string, validator bool) error {
 		"repositories": repositoriesTo + domain,
 		"routes":       routesTo,
 	}
-	g.createFolders(targetPaths)
+	// debug
+	// g.createFolders(targetPaths)
 
 	stubs := "tools/generator/stubs/"
 
@@ -53,7 +54,6 @@ func (g *Generator) CreateDomain(domain string, validator bool) error {
 		domain,
 		domain,
 	)
-
 	validatorRuleTemplate :=
 		fmt.Sprintf(
 			`errs := r.validator.ValidateStruct(r.%s)
@@ -65,13 +65,35 @@ func (g *Generator) CreateDomain(domain string, validator bool) error {
 			domainCap,
 		)
 
-	filepath.Walk(stubs, func(path string, info fs.FileInfo, err error) error {
+	useCustomService := false
+	customService := ""
+	customServiceCap := ""
+	if service != "" {
+		useCustomService = true
+		customService = service
+		customServiceCap = g.pascalCase(customService)
+		//{{customService}}
+		//{{customServiceCap}}
+	}
+
+	fmt.Println(customService)
+	fmt.Println(customServiceCap)
+
+	err := filepath.Walk(stubs, func(path string, info fs.FileInfo, e error) error {
+		if useCustomService && !strings.Contains(path, "custom") {
+			return nil
+		}
+
 		if info.IsDir() {
 			folders := strings.Split(path, "/__")
-			if len(folders) > 1 {
+			if (len(folders) > 1 && !useCustomService) || (useCustomService && strings.Contains("custom", path)) {
+				// todo: continue
 				fullPath := g.getFullFolderPath(targetPaths, folders[0], folders[1], "/stubs/")
 				if _, err := os.Stat(fullPath); os.IsNotExist(err) {
-					os.Mkdir(fullPath, 0755)
+					err = os.Mkdir(fullPath, 0755)
+					if err != nil {
+						return err
+					}
 				}
 				g.Logger.Info("CREATE FOLDER: " + fullPath)
 			}
@@ -111,16 +133,25 @@ func (g *Generator) CreateDomain(domain string, validator bool) error {
 				"{{,hsValidator}}":    "",
 			}
 		}
+
 		g.Logger.Info(fullFilePath)
-		g.createFile(
+		err := g.createFile(
 			domain,
 			domainCap,
 			path,
 			fullFilePath,
 			changeMap,
 		)
+		if err != nil {
+			return err
+		}
+
 		return nil
 	})
+
+	if err != nil {
+		return err
+	}
 
 	oldDecData := g.getFileData(declarableDir)
 	if strings.Contains(oldDecData, domain) {
@@ -152,7 +183,7 @@ func (g *Generator) CreateDomain(domain string, validator bool) error {
 	)
 
 	g.Logger.Info("ADD ROUTES: " + declarableDir)
-	err := os.WriteFile(declarableDir, []byte(newData), 0755)
+	err = os.WriteFile(declarableDir, []byte(newData), 0755)
 	if err != nil {
 		g.Logger.Error(err)
 		return err
@@ -205,8 +236,15 @@ func (g *Generator) DestroyDomain(domain string) error {
 		panic(errors.New("Unable delete a domain, please check domain name for delete"))
 	}
 
-	g.removeFileLine(migratorTo, domain)
-	g.removeFileLine(declarableDir, domain)
+	err := g.removeFileLine(migratorTo, domain)
+	if err != nil {
+		return err
+	}
+
+	err = g.removeFileLine(declarableDir, domain)
+	if err != nil {
+		return err
+	}
 
 	destroyPaths := []string{
 		routesTo + "/" + domain + ".go",
@@ -245,8 +283,8 @@ func (g *Generator) getFileData(path string) string {
 
 func (g *Generator) replacer(str string, replaces map[string]string) string {
 	strReplaced := str
-	for old, new := range replaces {
-		strReplaced = strings.ReplaceAll(strReplaced, old, new)
+	for old, newValue := range replaces {
+		strReplaced = strings.ReplaceAll(strReplaced, old, newValue)
 	}
 	return strReplaced
 }
@@ -267,7 +305,10 @@ func (g *Generator) createFile(domain string, domainCap string, from string, to 
 func (g *Generator) createFolders(folders map[string]string) {
 	for _, path := range folders {
 		if _, err := os.Stat(path); os.IsNotExist(err) {
-			os.Mkdir(path, 0755)
+			err := os.Mkdir(path, 0755)
+			if err != nil {
+				return
+			}
 		}
 	}
 }

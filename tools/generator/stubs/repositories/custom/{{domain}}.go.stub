@@ -1,0 +1,24 @@
+package {{domain}}Repository
+
+import (
+	"go-skeleton/application/domain/{{domain}}"
+	"go-skeleton/pkg/database"
+)
+
+type {{domainCap}}Repository struct {
+	Mysql *database.MySql
+}
+
+func NewBaseRepository() *{{domainCap}}Repository {
+	return &{{domainCap}}Repository{}
+}
+
+func (repo *{{domainCap}}Repository) {{customService}}(id string) (*{{domain}}.{{domainCap}}, error) {
+	var Data {{domain}}.{{domainCap}}
+	// Add db operation
+	// err := repo.Mysql.Db.First(&Data, "{{domain}}_id = ?", id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &Data, nil
+}

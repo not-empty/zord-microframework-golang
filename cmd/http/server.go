@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/cobra"
-	"go-skeleton/cmd/handlers/http/middlewares"
-	"go-skeleton/cmd/handlers/http/routes"
+	"go-skeleton/cmd/http/middlewares"
+	"go-skeleton/cmd/http/routes"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/logger"
@@ -30,15 +30,6 @@ func NewServer() *Server {
 		logger:      l.(*logger.Logger),
 		deps:        pkg.ServerDependencies,
 	}
-}
-
-func (hs *Server) Boot(_ *cobra.Command, _ []string) {
-	for index, dep := range pkg.ServerDependencies {
-		dep.Boot()
-		pkg.Logger.Info(fmt.Sprintf("[http.Server] Booting %s", index))
-	}
-
-	pkg.Logger.Info("[http.Server] Done!")
 }
 
 func (hs *Server) Start(_ *cobra.Command, _ []string) {
@@ -72,16 +63,13 @@ func (hs *Server) Start(_ *cobra.Command, _ []string) {
 	hs.Shutdown(server.Start(hs.config.ReadConfig("HTTP_PORT")))
 }
 
-func (hs *Server) Shutdown(err error) {
-	hs.logger.Critical(err, "Unable to start server, Shutdown")
+func (hs *Server) Boot(_ *cobra.Command, _ []string) {
+	for index, dep := range pkg.ServerDependencies {
+		dep.Boot()
+		pkg.Logger.Info(fmt.Sprintf("[Kernel.Kernel] Booting %s", index))
+	}
 }
 
-func (hs *Server) BaseCommand() *cobra.Command {
-	return &cobra.Command{
-		Use:               "http",
-		Short:             "Start a http server (API)",
-		Long:              ``,
-		Run:               hs.Boot,
-		PersistentPostRun: hs.Start,
-	}
+func (hs *Server) Shutdown(err error) {
+	hs.logger.Critical(err, "Unable to start server, Shutdown")
 }

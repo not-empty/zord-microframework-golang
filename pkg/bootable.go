@@ -43,8 +43,10 @@ var ServerDependencies = map[string]Bootable{
 	"validator": Validator,
 }
 
+var MigratorDependencies = map[string]Bootable{
+	"mysql": Mysql,
+}
+
 var CliDependencies = map[string]Bootable{
-	"config": Config,
 	"logger": Logger,
-	"mysql":  Mysql,
 }

@@ -2,7 +2,8 @@ package kernel
 
 import (
 	"fmt"
-	"go-skeleton/cmd"
+	"go-skeleton/cmd/cli"
+	"go-skeleton/cmd/http"
 	"go-skeleton/pkg"
 	"time"
 
@@ -37,13 +38,27 @@ func (k *Kernel) Boot() {
 	pkg.Logger.Info("[Kernel.Kernel] Booting application!")
 	time.Local = time.FixedZone("America/Sao_Paulo", 0)
 
-	for ind, command := range cmd.CommandList {
-		k.rootCmd.AddCommand(command.BaseCommand())
-		pkg.Logger.Info(fmt.Sprintf("Command Loaded %s", ind))
-	}
+	k.bootHttp()
+	k.BootCli()
 }
 
 func (k *Kernel) RootCmd(_ *cobra.Command, _ []string) {
 	pkg.Logger.Info(fmt.Sprintf("Go Skeleton Version %v", pkg.Config.ReadConfig("VERSION")))
 	pkg.Logger.Info("Use --help to check witch commands are available")
+}
+
+func (k *Kernel) BootCli() {
+	cliInstance := cli.NewCli()
+	cliInstance.Start(k.rootCmd)
+}
+
+func (k *Kernel) bootHttp() {
+	server := http.NewServer()
+	k.rootCmd.AddCommand(&cobra.Command{
+		Use:               "http",
+		Short:             "Start a http server (API)",
+		Long:              ``,
+		Run:               server.Boot,
+		PersistentPostRun: server.Start,
+	})
 }

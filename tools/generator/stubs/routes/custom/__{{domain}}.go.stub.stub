@@ -40,7 +40,7 @@ func New{{domainCap}}Routes(logger *logger.Logger, Environment string, mysql *da
 }
 
 func (hs *{{domainCap}}Routes) DeclareRoutes(server *echo.Group) {
-	server.{{customServiceHTTPMethod}}("/v1/{{domain}}", hs.HandleList{{domainCap}})
+	// server.GET("/v1/{{domain}}", hs.HandleList{{domainCap}})
 }
 
 func (hs *{{domainCap}}Routes) {{customServiceCap}}{{domainCap}}(context echo.Context) error {

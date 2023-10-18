@@ -86,8 +86,19 @@ func (g *Generator) CreateDomain(domain string, validator bool, service string) 
 
 		if info.IsDir() {
 			folders := strings.Split(path, "/__")
-			if (len(folders) > 1 && !useCustomService) || (useCustomService && strings.Contains("custom", path)) {
-				// todo: continue
+			if useCustomService {
+				fmt.Println("path:::::: " + path)
+				folders = []string{
+					strings.Split(path, "/custom")[0],
+					strings.ToUpper(service),
+				}
+				fmt.Println(folders)
+				fullPath := g.getFullFolderPath(targetPaths, folders[0], folders[1], "/stubs/")
+				fmt.Println(fullPath)
+				return nil
+			}
+
+			if len(folders) > 1 {
 				fullPath := g.getFullFolderPath(targetPaths, folders[0], folders[1], "/stubs/")
 				if _, err := os.Stat(fullPath); os.IsNotExist(err) {
 					err = os.Mkdir(fullPath, 0755)
@@ -99,6 +110,7 @@ func (g *Generator) CreateDomain(domain string, validator bool, service string) 
 			}
 			return nil
 		}
+
 		fullFilePath := g.getFullFilePath(targetPaths, path, "/stubs/")
 		fullFilePath = g.replacer(
 			fullFilePath,
@@ -108,6 +120,7 @@ func (g *Generator) CreateDomain(domain string, validator bool, service string) 
 				"__":         "",
 			},
 		)
+
 		changeMap := map[string]string{
 			"{{domain}}":          domain,
 			"{{domainCap}}":       domainCap,
@@ -142,12 +155,15 @@ func (g *Generator) CreateDomain(domain string, validator bool, service string) 
 			fullFilePath,
 			changeMap,
 		)
+
 		if err != nil {
 			return err
 		}
 
 		return nil
 	})
+
+	os.Exit(0)
 
 	if err != nil {
 		return err
@@ -162,6 +178,7 @@ func (g *Generator) CreateDomain(domain string, validator bool, service string) 
 	if validator {
 		routesString = "%sListRoutes := New%sRoutes(logger, Environment, MySql, idCreator, validator)\n	//{{codeGen1}}"
 	}
+
 	routesInstanceTemplate := fmt.Sprintf(
 		routesString,
 		domain,

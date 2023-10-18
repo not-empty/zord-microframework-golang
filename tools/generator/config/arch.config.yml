@@ -1,0 +1,42 @@
+---
+architecture:
+    replacers:
+        - "{{domain}}"
+        - "{{domainCap}}"
+        - ".stub"
+        - "//{{codeGen1}}"
+        - "//{{codeGen2}}"
+    artefacts:
+        domain:
+            path: application/domain/{{domain}}/
+            stub_path: tools/generator/stubs/domain/
+        services:
+            path: application/services/{{domain}}/
+            artefacts:
+                create:
+                    path: CREATE/
+                    stub_path: tools/generator/stubs/services/CREATE/
+                delete:
+                    path: DELETE/
+                    stub_path: tools/generator/stubs/services/DELETE/
+                edit:
+                    path: EDIT/
+                    stub_path: tools/generator/stubs/services/EDIT/
+                get:
+                    path: GET/
+                    stub_path: tools/generator/stubs/services/GET/
+                list:
+                    path: LIST/
+                    stub_path: tools/generator/stubs/services/LIST/
+                custom:
+                    path: "{{custom}}/"
+                    stub_path: tools/generator/stubs/services/{{custom}}/
+        repositories:
+            path: pkg/repositories/{{domain}}/
+            stub_path: tools/generator/stubs/repositories/
+        routes:
+            path: cmd/handlers/http/routes/
+            stub_path: tools/generator/stubs/routes/
+            custom:
+                path: "{{custom}}/"
+                stub_path: tools/generator/stubs/routes/custom/

@@ -2,7 +2,6 @@ package generator
 
 import (
 	"errors"
-	"fmt"
 	"go-skeleton/application/services"
 	"io/fs"
 	"path/filepath"
@@ -38,7 +37,24 @@ func GetConfig(l services.Logger) *Config {
 	return c
 }
 
-func (cg *CodeGenerator) StubHandler() {
+func (cg *CodeGenerator) WalkProcess(name string, stub Stubs) {
+	filepath.Walk(stub.FromPath, func(path string, info fs.FileInfo, e error) error {
+		if info.IsDir() {
+			err := ProcessFolder(stub.ToPath + info.Name())
+			if err != nil {
+				cg.Logger.Error(err)
+			}
+			return nil
+		}
+		err := ProcessFile(MountFilePath(path, stub.ToPath, name))
+		if err != nil {
+			cg.Logger.Error(err)
+		}
+		return nil
+	})
+}
+
+func (cg *CodeGenerator) Handler() {
 	stubs, ok := cg.config.Stubs[cg.domainType]
 	if !ok {
 		cg.Logger.Error(errors.New("invalid domain type"))
@@ -46,21 +62,4 @@ func (cg *CodeGenerator) StubHandler() {
 	for name, stub := range stubs {
 		cg.WalkProcess(name, stub)
 	}
-}
-
-func (cg *CodeGenerator) WalkProcess(name string, stub Stubs) error {
-	filepath.Walk(stub.FromPath, func(path string, info fs.FileInfo, e error) error {
-		fmt.Println(path)
-		if info.IsDir() {
-			ProcessFolder(path)
-			return nil
-		}
-		ProcessFile(path)
-		return nil
-	})
-	return nil
-}
-
-func (cg *CodeGenerator) Handler() {
-	cg.StubHandler()
 }

@@ -1,7 +1,9 @@
 package generator
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 )
@@ -27,6 +29,29 @@ func GetTomlConfig(filePath string) (*Config, error) {
 	return &c, nil
 }
 
-func ProcessFile(path string) {}
+func MountFilePath(fromPath string, toFolderPath string, separator string) string {
+	return toFolderPath + strings.Split(fromPath, separator+"/")[1]
+}
 
-func ProcessFolder(path string) {}
+func ProcessFile(path string) error {
+	fmt.Println(path)
+	return nil
+}
+
+func ProcessFolder(folderPath string) error {
+	if _, err := os.Stat(folderPath); os.IsNotExist(err) {
+		err := os.Mkdir(folderPath, 0755)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (g *Generator) Replacer(str string, replaces map[string]string) string {
+	strReplaced := str
+	for old, newValue := range replaces {
+		strReplaced = strings.ReplaceAll(strReplaced, old, newValue)
+	}
+	return strReplaced
+}

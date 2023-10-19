@@ -87,7 +87,6 @@ func (g *Generator) CreateDomain(domain string, validator bool, service string) 
 		if info.IsDir() {
 			folders := strings.Split(path, "/__")
 			if useCustomService {
-				fmt.Println("path:::::: " + path)
 				folders = []string{
 					strings.Split(path, "/custom")[0],
 					strings.ToUpper(service),
@@ -162,8 +161,6 @@ func (g *Generator) CreateDomain(domain string, validator bool, service string) 
 
 		return nil
 	})
-
-	os.Exit(0)
 
 	if err != nil {
 		return err

@@ -1,0 +1,15 @@
+[replacers.crud]
+domain = "{{domain}}"
+domainCap = "{{domainCap}}"
+
+[stubs.crud.domain]
+toPath = "application/domain/{{domain}}/"
+fromPath = "tools/generator/stubs/domain/"
+
+[stubs.crud.services]
+toPath = "application/services/{{domain}}/"
+fromPath = "tools/generator/stubs/services/"
+
+[stubs.crud.repositories]
+toPath = "pkg/repositories/{{domain}}/"
+fromPath = "tools/generator/stubs/repositories/"

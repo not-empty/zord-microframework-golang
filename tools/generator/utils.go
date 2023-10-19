@@ -3,7 +3,7 @@ package generator
 import (
 	"os"
 
-	"gopkg.in/yaml.v3"
+	"github.com/BurntSushi/toml"
 )
 
 func GetFileData(path string) (string, error) {
@@ -14,15 +14,15 @@ func GetFileData(path string) (string, error) {
 	return string(data), nil
 }
 
-func GetYamlConfig(filePath string) (Config, error) {
+func GetTomlConfig(filePath string) (*Config, error) {
 	data, err := GetFileData(filePath)
 	if err != nil {
-		return Config{}, err
+		return nil, err
 	}
 	c := Config{}
-	err = yaml.Unmarshal([]byte(data), &c)
+	_, err = toml.Decode(data, &c)
 	if err != nil {
-		return Config{}, err
+		return nil, err
 	}
-	return c, nil
+	return &c, nil
 }

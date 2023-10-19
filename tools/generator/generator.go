@@ -5,17 +5,17 @@ import (
 	"go-skeleton/application/services"
 )
 
-// type Config struct {
-// 	replacers map[string]string
-// 	stubs     map[string]struct {
-// 		toPath   string
-// 		fromPath string
-// 	}
-// }
+type Config struct {
+	Replacers map[string]string `yaml:"replacers"`
+	Stubs     map[string]struct {
+		ToPath   string `yaml:"toPath"`
+		FromPath string `yaml:"fromPath"`
+	} `yaml:"stubs"`
+}
 
 type CodeGenerator struct {
 	Logger services.Logger
-	c      map[interface{}]interface{}
+	c      Config
 }
 
 func NewCodeGenerator(l services.Logger) *CodeGenerator {
@@ -25,7 +25,7 @@ func NewCodeGenerator(l services.Logger) *CodeGenerator {
 	}
 }
 
-func GetConfig(l services.Logger) map[interface{}]interface{} {
+func GetConfig(l services.Logger) Config {
 	c, err := GetYamlConfig("tools/generator/config.yaml")
 	if err != nil {
 		l.Error(err)
@@ -34,6 +34,8 @@ func GetConfig(l services.Logger) map[interface{}]interface{} {
 }
 
 func (g *CodeGenerator) Handler(args []string) {
-	fmt.Println("Handler.....")
-	fmt.Println(g.c["replacers"])
+	for name, stub := range g.c.Stubs {
+		g.Logger.Info("Creating: " + name)
+		fmt.Println(stub.FromPath)
+	}
 }

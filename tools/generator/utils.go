@@ -14,16 +14,15 @@ func GetFileData(path string) (string, error) {
 	return string(data), nil
 }
 
-func GetYamlConfig(filePath string) (map[interface{}]interface{}, error) {
-	c := make(map[interface{}]interface{})
+func GetYamlConfig(filePath string) (Config, error) {
 	data, err := GetFileData(filePath)
 	if err != nil {
-		return map[interface{}]interface{}{}, err
+		return Config{}, err
 	}
-
+	c := Config{}
 	err = yaml.Unmarshal([]byte(data), &c)
 	if err != nil {
-		return map[interface{}]interface{}{}, err
+		return Config{}, err
 	}
 	return c, nil
 }

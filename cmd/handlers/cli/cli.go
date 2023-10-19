@@ -68,14 +68,15 @@ func (c *Cli) RegisterCommands(cmd *cobra.Command) {
 }
 
 func (c *Cli) CreateDomain(cmd *cobra.Command, args []string) {
-	generatorInstance := generator.NewGenerator(c.logger)
-	if len(args) > 0 {
-		domain = args[0]
-	}
-	err := generatorInstance.CreateDomain(domain, c.validator, c.service)
-	if err != nil {
-		return
-	}
+	// generatorInstance := generator.NewGenerator(c.logger)
+	// if len(args) > 0 {
+	// 	domain = args[0]
+	// }
+	// err := generatorInstance.CreateDomain(domain, c.validator, c.service)
+	// if err != nil {
+	// 	return
+	// }
+	generator.NewCodeGenerator(c.logger).Handler(args)
 }
 
 func (c *Cli) DestroyDomain(cmd *cobra.Command, args []string) {

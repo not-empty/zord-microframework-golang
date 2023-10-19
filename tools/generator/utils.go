@@ -26,3 +26,7 @@ func GetTomlConfig(filePath string) (*Config, error) {
 	}
 	return &c, nil
 }
+
+func ProcessFile(path string) {}
+
+func ProcessFolder(path string) {}

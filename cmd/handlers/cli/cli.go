@@ -19,8 +19,11 @@ type Cli struct {
 	config      *config.Config
 	logger      *logger.Logger
 	mysql       *database.MySql
-	validator   bool
-	service     string
+	flags       struct {
+		validator  bool
+		service    string
+		domainType string
+	}
 }
 
 func NewCli(Environment string) *Cli {
@@ -46,8 +49,9 @@ func (c *Cli) RegisterCommands(cmd *cobra.Command) {
 		TraverseChildren: true,
 	}
 
-	createDomain.Flags().BoolVarP(&c.validator, "validator", "v", false, "Create domain with validation")
-	createDomain.Flags().StringVar(&c.service, "service", "", "Create specific service name")
+	createDomain.Flags().BoolVarP(&c.flags.validator, "validator", "v", false, "Create domain with validation")
+	createDomain.Flags().StringVar(&c.flags.service, "service", "", "Create specific service name")
+	createDomain.Flags().StringVar(&c.flags.domainType, "type", "crud", "Define domain type: ['crud'|'<custom>']")
 
 	cmd.AddCommand(
 		createDomain,
@@ -67,16 +71,8 @@ func (c *Cli) RegisterCommands(cmd *cobra.Command) {
 
 }
 
-func (c *Cli) CreateDomain(cmd *cobra.Command, args []string) {
-	// generatorInstance := generator.NewGenerator(c.logger)
-	// if len(args) > 0 {
-	// 	domain = args[0]
-	// }
-	// err := generatorInstance.CreateDomain(domain, c.validator, c.service)
-	// if err != nil {
-	// 	return
-	// }
-	generator.NewCodeGenerator(c.logger).Handler(args)
+func (c *Cli) CreateDomain(_ *cobra.Command, _ []string) {
+	generator.NewCodeGenerator(c.logger, c.flags.service, c.flags.validator, c.flags.domainType).Handler()
 }
 
 func (c *Cli) DestroyDomain(cmd *cobra.Command, args []string) {

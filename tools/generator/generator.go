@@ -34,26 +34,6 @@ func GetConfig(l services.Logger) *Config {
 	return c
 }
 
-func (cg *CodeGenerator) DefineFromToReplaceVariables(args []string, replacers map[string]string) map[string]string {
-	vars := map[string]string{
-		"domain":           args[0],
-		"domainPascalCase": PascalCase(args[0]),
-		"domainCamelCase":  CamelCase(args[0]),
-	}
-
-	replaced := map[string]string{}
-	for varName, templ := range replacers {
-		data, ok := vars[varName]
-		if ok {
-			replaced[templ] = data
-			continue
-		}
-		replaced[varName] = templ
-	}
-
-	return replaced
-}
-
 func (cg *CodeGenerator) WalkProcess(name string, stub Stubs, replacers map[string]string) {
 	filepath.Walk(stub.FromPath, func(path string, info fs.FileInfo, e error) error {
 		if name == info.Name() {

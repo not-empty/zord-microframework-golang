@@ -1,9 +1,22 @@
 [replacers.crud]
+".stub" = ""
 domain = "{{domain}}"
 domainCamelCase = "{{domainCamelCase}}"
 domainPascalCase = "{{domainPascalCase}}"
-".stub" = ""
+"{{validatorImport}}" = "\n	\"go-skeleton/pkg/validator\""
+"{{validator}}" = "\nvalidator *validator.Validator"
+"{{,validator}}" = ", validator *validator.Validator"
+"{{validatorInject}}" = "validator: validator,"
+"{{hsValidator}}" = ", hs.validator"
 "//codeGen1" = "My Code..."
+"{{validatorRule}}" = """
+	errs := r.validator.ValidateStruct(r.{{domainPascalCase}})
+	for _, err := range errs {
+		if err != nil {
+			return err
+		}
+	}
+"""
 
 [stubs.crud.domain]
 toPath = "application/domain/{{domain}}/"
@@ -19,3 +32,7 @@ isGenerated = true
 toPath = "pkg/repositories/{{domain}}/"
 fromPath = "tools/generator/stubs/repositories/"
 isGenerated = true
+
+[stubs.crud.routes]
+toPath = "cmd/handlers/http/routes/declarable.go"
+isGenerated = false

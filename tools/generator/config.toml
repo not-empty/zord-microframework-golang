@@ -35,10 +35,11 @@ toPath = "pkg/repositories/{{domain}}/"
 fromPath = "tools/generator/stubs/repositories/"
 isGenerated = true
 
-# [stubs.crud.routes]
-# toPath = "cmd/handlers/http/routes/{{domain}}.go"
-# fromPath = "tools/generator/stubs/routes/{{domain}}.go"
-# isGenerated = true
+[stubs.crud.routes]
+toPath = "cmd/handlers/http/routes/"
+fromPath = "tools/generator/stubs/routes/"
+isGenerated = true
+uniqueDelete = "cmd/handlers/http/routes/{{domain}}.go"
 
 [stubs.crud.declarable]
 toPath = "cmd/handlers/http/routes/declarable.go"

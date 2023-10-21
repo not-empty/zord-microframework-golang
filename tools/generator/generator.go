@@ -3,6 +3,7 @@ package generator
 import (
 	"go-skeleton/application/services"
 	"io/fs"
+	"os"
 	"path/filepath"
 )
 
@@ -61,8 +62,20 @@ func (cg *CodeGenerator) Handler(args []string) {
 
 	for name, stub := range stubs {
 		if !stub.IsGenerated {
+			data, err := GetFileData(stub.ToPath)
+			if err != nil {
+				cg.Logger.Error(err)
+			}
+
+			replData := Replacer(data, replacers)
+			err = os.WriteFile(stub.ToPath, []byte(replData), 0755)
+			if err != nil {
+				cg.Logger.Error(err)
+			}
+
 			continue
 		}
+
 		err := ProcessFolder(stub.ToPath, replacers)
 		if err != nil {
 			cg.Logger.Error(err)

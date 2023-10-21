@@ -39,8 +39,9 @@ func GetConfig(l services.Logger) *Config {
 
 func (cg *CodeGenerator) DefineFromToReplaceVariables(args []string, replacers map[string]string) map[string]string {
 	vars := map[string]string{
-		"domain":    args[0],
-		"domainCap": PascalCase(args[0]),
+		"domain":           args[0],
+		"domainPascalCase": PascalCase(args[0]),
+		"domainCamelCase":  CamelCase(args[0]),
 	}
 
 	replaced := map[string]string{}

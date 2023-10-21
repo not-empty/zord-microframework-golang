@@ -79,3 +79,18 @@ func PascalCase(str string) string {
 	)
 	return strings.ReplaceAll(strCap, " ", "")
 }
+
+func CamelCase(str string) string {
+	before, after, found := strings.Cut(str, "_")
+	if !found {
+		return str
+	}
+	after = strings.ReplaceAll(after, "_", " ")
+	after = cases.Title(
+		language.English,
+	).String(
+		after,
+	)
+	after = strings.ReplaceAll(after, " ", "")
+	return before + after
+}

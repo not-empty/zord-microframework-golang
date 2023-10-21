@@ -1,13 +1,14 @@
 package routes
 
 import (
-	"github.com/labstack/echo/v4"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
 	"go-skeleton/pkg/validator"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Declarable interface {

@@ -7,8 +7,8 @@ domainPascalCase = "{{domainPascalCase}}"
 "{{validator}}" = "\nvalidator *validator.Validator"
 "{{,validator}}" = ", validator *validator.Validator"
 "{{validatorInject}}" = "validator: validator,"
-"{{hsValidator}}" = ", hs.validator"
-"//codeGen1" = "My Code..."
+"{{hsValidator}}" = "hs.validator"
+"{{,hsValidator}}" = ", hs.validator"
 "{{validatorRule}}" = """
 	errs := r.validator.ValidateStruct(r.{{domainPascalCase}})
 	for _, err := range errs {
@@ -17,6 +17,8 @@ domainPascalCase = "{{domainPascalCase}}"
 		}
 	}
 """
+"//{{codeGen1}}" = "{{domainCamelCase}}ListRoutes := New{{domainPascalCase}}Routes(logger, Environment, MySql, idCreator)\n	$repeat$"
+"//{{codeGen2}}" = "\"{{domain}}\": {{domainCamelCase}}ListRoutes,\n		$repeat$"
 
 [stubs.crud.domain]
 toPath = "application/domain/{{domain}}/"
@@ -33,6 +35,11 @@ toPath = "pkg/repositories/{{domain}}/"
 fromPath = "tools/generator/stubs/repositories/"
 isGenerated = true
 
-[stubs.crud.routes]
+# [stubs.crud.routes]
+# toPath = "cmd/handlers/http/routes/{{domain}}.go"
+# fromPath = "tools/generator/stubs/routes/{{domain}}.go"
+# isGenerated = true
+
+[stubs.crud.declarable]
 toPath = "cmd/handlers/http/routes/declarable.go"
 isGenerated = false

@@ -133,8 +133,18 @@ func GetReplacersConfig(l services.Logger, c *Config, domainType string, args []
 	}
 
 	replacers = DefineFromToReplaceVariables(vars, args, replacers)
+
 	for r, vl := range replacers {
 		replacers[r] = Replacer(vl, replacers)
+		if !strings.Contains(vl, "$repeat$") {
+			continue
+		}
+		replacers[r] = Replacer(
+			replacers[r],
+			map[string]string{
+				"$repeat$": r,
+			},
+		)
 	}
 
 	return replacers

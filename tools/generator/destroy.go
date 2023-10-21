@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"fmt"
 	"go-skeleton/application/services"
 	"os"
 )
@@ -26,6 +27,7 @@ func (cd *CodeDestroy) Handler(args []string) {
 	for _, stub := range stubs {
 		path := Replacer(stub.ToPath, replacers)
 		if !stub.IsGenerated {
+			fmt.Println("Dont delete")
 			continue
 		}
 		if err := os.RemoveAll(path); err != nil {

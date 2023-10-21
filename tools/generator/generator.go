@@ -50,6 +50,7 @@ func (cg *CodeGenerator) WalkProcess(name string, stub Stubs, replacers map[stri
 		if err != nil {
 			cg.Logger.Error(err)
 		}
+
 		return nil
 	})
 }

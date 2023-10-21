@@ -1,6 +1,10 @@
 [replacers.crud]
 domain = "{{domain}}"
 domainCap = "{{domainCap}}"
+".stub" = ""
+domainCamelCase = "{{domainCamelCase}}"
+domainPascalCase = "{{domainPascalCase}}"
+"//codeGen1" = "My Code..."
 
 [stubs.crud.domain]
 toPath = "application/domain/{{domain}}/"

@@ -1,11 +1,12 @@
 package generator
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
 	"github.com/BurntSushi/toml"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 func GetFileData(path string) (string, error) {
@@ -33,14 +34,35 @@ func MountFilePath(fromPath string, toFolderPath string, separator string) strin
 	return toFolderPath + strings.Split(fromPath, separator+"/")[1]
 }
 
-func ProcessFile(path string) error {
-	fmt.Println(path)
+func Replacer(str string, replaces map[string]string) string {
+	strReplaced := str
+	for old, newValue := range replaces {
+		strReplaced = strings.ReplaceAll(strReplaced, old, newValue)
+	}
+	return strReplaced
+}
+
+func ProcessFile(fromPath string, toPath string, replacers map[string]string) error {
+	data, err := GetFileData(fromPath)
+	if err != nil {
+		return err
+	}
+
+	replData := Replacer(data, replacers)
+	replPath := Replacer(toPath, replacers)
+
+	err = os.WriteFile(replPath, []byte(replData), 0755)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func ProcessFolder(folderPath string) error {
-	if _, err := os.Stat(folderPath); os.IsNotExist(err) {
-		err := os.Mkdir(folderPath, 0755)
+func ProcessFolder(folderPath string, replacers map[string]string) error {
+	replPath := Replacer(folderPath, replacers)
+	if _, err := os.Stat(replPath); os.IsNotExist(err) {
+		err := os.Mkdir(replPath, 0755)
 		if err != nil {
 			return err
 		}
@@ -48,10 +70,12 @@ func ProcessFolder(folderPath string) error {
 	return nil
 }
 
-func (g *Generator) Replacer(str string, replaces map[string]string) string {
-	strReplaced := str
-	for old, newValue := range replaces {
-		strReplaced = strings.ReplaceAll(strReplaced, old, newValue)
-	}
-	return strReplaced
+func PascalCase(str string) string {
+	strCap := strings.ReplaceAll(str, "_", " ")
+	strCap = cases.Title(
+		language.English,
+	).String(
+		strCap,
+	)
+	return strings.ReplaceAll(strCap, " ", "")
 }

@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
@@ -71,8 +72,18 @@ func (c *Cli) RegisterCommands(cmd *cobra.Command) {
 
 }
 
-func (c *Cli) CreateDomain(_ *cobra.Command, _ []string) {
-	generator.NewCodeGenerator(c.logger, c.flags.service, c.flags.validator, c.flags.domainType).Handler()
+func (c *Cli) CreateDomain(_ *cobra.Command, args []string) {
+	if len(args) == 0 {
+		c.logger.Error(errors.New("empty args"))
+	}
+	generator.NewCodeGenerator(
+		c.logger,
+		c.flags.service,
+		c.flags.validator,
+		c.flags.domainType,
+	).Handler(
+		args,
+	)
 }
 
 func (c *Cli) DestroyDomain(cmd *cobra.Command, args []string) {

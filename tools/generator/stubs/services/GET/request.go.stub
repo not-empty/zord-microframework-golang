@@ -6,14 +6,14 @@ import (
 )
 
 type Request struct {
-	{{domainCap}} domain.{{domainCap}}
+	{{domainPascalCase}} domain.{{domainPascalCase}}
 	Err   error
 }
 
 func NewRequest({{domain}}Id string) Request {
 	return Request{
-		{{domainCap}}: domain.{{domainCap}}{
-			{{domainCap}}Id: {{domain}}Id,
+		{{domainPascalCase}}: domain.{{domainPascalCase}}{
+			{{domainPascalCase}}Id: {{domain}}Id,
 		},
 	}
 }
@@ -26,7 +26,7 @@ func (r *Request) Validate() error {
 }
 
 func (r *Request) {{domain}}IdRule() error {
-	if r.{{domainCap}}.{{domainCap}}Id == `""` {
+	if r.{{domainPascalCase}}.{{domainPascalCase}}Id == `""` {
 		return errors.New("invalid_argument")
 	}
 	return nil

@@ -7,17 +7,17 @@ import (
 )
 
 type Request struct {
-	{{domainCap}}   domain.{{domainCap}}
-	{{domainCap}}id string
+	{{domainPascalCase}}   domain.{{domainPascalCase}}
+	{{domainPascalCase}}id string
 	{{validator}}
 }
 
-func NewRequest({{domain}} domain.{{domainCap}}, {{domain}}Id string{{,validator}}) Request {
+func NewRequest({{domain}} domain.{{domainPascalCase}}, {{domain}}Id string{{,validator}}) Request {
 	req := Request{
-		{{domainCap}}: {{domain}},
+		{{domainPascalCase}}: {{domain}},
 		{{validatorInject}}
 	}
-	req.{{domainCap}}.{{domainCap}}Id = {{domain}}Id
+	req.{{domainPascalCase}}.{{domainPascalCase}}Id = {{domain}}Id
 	return req
 }
 
@@ -30,7 +30,7 @@ func (r *Request) Validate() error {
 }
 
 func (r *Request) {{domain}}IdRule() error {
-	if r.{{domainCap}}.{{domainCap}}Id == `""` {
+	if r.{{domainPascalCase}}.{{domainPascalCase}}Id == `""` {
 		return errors.New("invalid_argument")
 	}
 	return nil

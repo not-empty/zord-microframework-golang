@@ -6,7 +6,7 @@ import (
 )
 
 type Request struct {
-	{{domainCap}} []domain.{{domainCap}}
+	{{domainPascalCase}} []domain.{{domainPascalCase}}
 	Err   error
 }
 

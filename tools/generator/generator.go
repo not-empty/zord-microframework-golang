@@ -1,7 +1,6 @@
 package generator
 
 import (
-	"errors"
 	"go-skeleton/application/services"
 	"io/fs"
 	"path/filepath"
@@ -14,16 +13,14 @@ var (
 type CodeGenerator struct {
 	Logger     services.Logger
 	config     *Config
-	service    string
 	validator  bool
 	domainType string
 }
 
-func NewCodeGenerator(logger services.Logger, service string, validator bool, domainType string) *CodeGenerator {
+func NewCodeGenerator(logger services.Logger, validator bool, domainType string) *CodeGenerator {
 	return &CodeGenerator{
 		Logger:     logger,
 		config:     GetConfig(logger),
-		service:    service,
 		validator:  validator,
 		domainType: domainType,
 	}
@@ -78,17 +75,8 @@ func (cg *CodeGenerator) WalkProcess(name string, stub Stubs, replacers map[stri
 }
 
 func (cg *CodeGenerator) Handler(args []string) {
-	stubs, ok := cg.config.Stubs[cg.domainType]
-	if !ok {
-		cg.Logger.Error(errors.New("invalid domain type"))
-	}
-
-	replacers, ok := cg.config.Replacers[cg.domainType]
-	if ok {
-		replacers = cg.DefineFromToReplaceVariables(args, replacers)
-	} else {
-		replacers = map[string]string{}
-	}
+	stubs := GetStubsConfig(cg.Logger, cg.config, cg.domainType)
+	replacers := GetReplacersConfig(cg.Logger, cg.config, cg.domainType, args)
 
 	for name, stub := range stubs {
 		err := ProcessFolder(stub.ToPath, replacers)

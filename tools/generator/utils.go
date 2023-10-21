@@ -1,6 +1,8 @@
 package generator
 
 import (
+	"errors"
+	"go-skeleton/application/services"
 	"os"
 	"strings"
 
@@ -93,4 +95,42 @@ func CamelCase(str string) string {
 	)
 	after = strings.ReplaceAll(after, " ", "")
 	return before + after
+}
+
+func DefineFromToReplaceVariables(args []string, replacers map[string]string) map[string]string {
+	vars := map[string]string{
+		"domain":           args[0],
+		"domainPascalCase": PascalCase(args[0]),
+		"domainCamelCase":  CamelCase(args[0]),
+	}
+
+	replaced := map[string]string{}
+	for varName, templ := range replacers {
+		data, ok := vars[varName]
+		if ok {
+			replaced[templ] = data
+			continue
+		}
+		replaced[varName] = templ
+	}
+
+	return replaced
+}
+
+func GetStubsConfig(l services.Logger, c *Config, domainType string) map[string]Stubs {
+	stubs, ok := c.Stubs[domainType]
+	if !ok {
+		l.Error(errors.New("invalid domain type"))
+	}
+	return stubs
+}
+
+func GetReplacersConfig(l services.Logger, c *Config, domainType string, args []string) map[string]string {
+	replacers, ok := c.Replacers[domainType]
+	if ok {
+		replacers = DefineFromToReplaceVariables(args, replacers)
+	} else {
+		replacers = map[string]string{}
+	}
+	return replacers
 }

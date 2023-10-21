@@ -1,13 +1,13 @@
 package {{domain}}
 
-type {{domainCap}} struct {
-	{{domainCap}}Id   string `gorm:"type:char(26);primarykey"`
+type {{domainPascalCase}} struct {
+	{{domainPascalCase}}Id   string `gorm:"type:char(26);primarykey"`
 }
 
 type Repository interface {
-	Get(id string) (*{{domainCap}}, error)
-	Create(*{{domainCap}}) error
-	List() (*[]{{domainCap}}, error)
-	Edit(*{{domainCap}}) error
-	Delete(*{{domainCap}}) error
+	Get(id string) (*{{domainPascalCase}}, error)
+	Create(*{{domainPascalCase}}) error
+	List() (*[]{{domainPascalCase}}, error)
+	Edit(*{{domainPascalCase}}) error
+	Delete(*{{domainPascalCase}}) error
 }

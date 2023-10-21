@@ -78,7 +78,6 @@ func (c *Cli) CreateDomain(_ *cobra.Command, args []string) {
 	}
 	generator.NewCodeGenerator(
 		c.logger,
-		c.flags.service,
 		c.flags.validator,
 		c.flags.domainType,
 	).Handler(
@@ -87,14 +86,15 @@ func (c *Cli) CreateDomain(_ *cobra.Command, args []string) {
 }
 
 func (c *Cli) DestroyDomain(cmd *cobra.Command, args []string) {
-	generatorInstance := generator.NewGenerator(c.logger)
-	if len(args) > 0 {
-		domain = args[0]
+	if len(args) == 0 {
+		c.logger.Error(errors.New("empty args"))
 	}
-	err := generatorInstance.DestroyDomain(domain)
-	if err != nil {
-		return
-	}
+	generator.NewCodeDestroy(
+		c.logger,
+		c.flags.domainType,
+	).Handler(
+		args,
+	)
 }
 
 func (c *Cli) Migrate(cmd *cobra.Command, args []string) {

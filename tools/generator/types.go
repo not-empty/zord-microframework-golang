@@ -1,8 +1,9 @@
 package generator
 
 type Stubs struct {
-	ToPath   string
-	FromPath string
+	ToPath      string
+	FromPath    string
+	IsDeletable bool
 }
 
 type Config struct {

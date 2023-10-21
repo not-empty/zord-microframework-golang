@@ -87,12 +87,14 @@ func CamelCase(str string) string {
 	if !found {
 		return str
 	}
+
 	after = strings.ReplaceAll(after, "_", " ")
 	after = cases.Title(
 		language.English,
 	).String(
 		after,
 	)
+
 	after = strings.ReplaceAll(after, " ", "")
 	return before + after
 }
@@ -107,7 +109,6 @@ func DefineFromToReplaceVariables(vars map[string]string, args []string, replace
 		}
 		replaced[varName] = templ
 	}
-
 	return replaced
 }
 
@@ -121,18 +122,20 @@ func GetStubsConfig(l services.Logger, c *Config, domainType string) map[string]
 
 func GetReplacersConfig(l services.Logger, c *Config, domainType string, args []string) map[string]string {
 	replacers, ok := c.Replacers[domainType]
-	if ok {
-		vars := map[string]string{
-			"domain":           args[0],
-			"domainPascalCase": PascalCase(args[0]),
-			"domainCamelCase":  CamelCase(args[0]),
-		}
-		replacers = DefineFromToReplaceVariables(vars, args, replacers)
-		for r, vl := range replacers {
-			replacers[r] = Replacer(vl, replacers)
-		}
-	} else {
-		replacers = map[string]string{}
+	if !ok {
+		return map[string]string{}
 	}
+
+	vars := map[string]string{
+		"domain":           args[0],
+		"domainPascalCase": PascalCase(args[0]),
+		"domainCamelCase":  CamelCase(args[0]),
+	}
+
+	replacers = DefineFromToReplaceVariables(vars, args, replacers)
+	for r, vl := range replacers {
+		replacers[r] = Replacer(vl, replacers)
+	}
+
 	return replacers
 }

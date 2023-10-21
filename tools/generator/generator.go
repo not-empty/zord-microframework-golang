@@ -79,6 +79,9 @@ func (cg *CodeGenerator) Handler(args []string) {
 	replacers := GetReplacersConfig(cg.Logger, cg.config, cg.domainType, args)
 
 	for name, stub := range stubs {
+		if !stub.IsGenerated {
+			continue
+		}
 		err := ProcessFolder(stub.ToPath, replacers)
 		if err != nil {
 			cg.Logger.Error(err)

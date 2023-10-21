@@ -25,7 +25,7 @@ func (cd *CodeDestroy) Handler(args []string) {
 
 	for _, stub := range stubs {
 		path := Replacer(stub.ToPath, replacers)
-		if !stub.IsDeletable {
+		if !stub.IsGenerated {
 			continue
 		}
 		if err := os.RemoveAll(path); err != nil {

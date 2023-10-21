@@ -8,18 +8,14 @@ domainPascalCase = "{{domainPascalCase}}"
 [stubs.crud.domain]
 toPath = "application/domain/{{domain}}/"
 fromPath = "tools/generator/stubs/domain/"
-isDeletable = true
+isGenerated = true
 
 [stubs.crud.services]
 toPath = "application/services/{{domain}}/"
 fromPath = "tools/generator/stubs/services/"
-isDeletable = true
+isGenerated = true
 
 [stubs.crud.repositories]
 toPath = "pkg/repositories/{{domain}}/"
 fromPath = "tools/generator/stubs/repositories/"
-isDeletable = true
-
-[stubs.crud.routes]
-toPath = "testetete"
-isDeletable = false
+isGenerated = true

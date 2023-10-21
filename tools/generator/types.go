@@ -3,7 +3,7 @@ package generator
 type Stubs struct {
 	ToPath      string
 	FromPath    string
-	IsDeletable bool
+	IsGenerated bool
 }
 
 type Config struct {

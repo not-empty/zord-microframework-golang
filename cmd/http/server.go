@@ -1,9 +1,8 @@
-package http
+package main
 
 import (
 	"fmt"
 	"github.com/labstack/echo/v4"
-	"github.com/spf13/cobra"
 	"go-skeleton/cmd/http/middlewares"
 	"go-skeleton/cmd/http/routes"
 	"go-skeleton/pkg"
@@ -32,7 +31,13 @@ func NewServer() *Server {
 	}
 }
 
-func (hs *Server) Start(_ *cobra.Command, _ []string) {
+func main() {
+	server := NewServer()
+	server.Boot()
+	server.Start()
+}
+
+func (hs *Server) Start() {
 	var server = echo.New()
 
 	server.HideBanner = true
@@ -60,10 +65,10 @@ func (hs *Server) Start(_ *cobra.Command, _ []string) {
 		route.DeclareRoutes(protected)
 		pkg.Logger.Info(fmt.Sprintf("[server.route] Declared %s", index))
 	}
-	hs.Shutdown(server.Start(hs.config.ReadConfig("HTTP_PORT")))
+	hs.Shutdown(server.Start(":" + hs.config.ReadConfig("HTTP_PORT")))
 }
 
-func (hs *Server) Boot(_ *cobra.Command, _ []string) {
+func (hs *Server) Boot() {
 	for index, dep := range pkg.ServerDependencies {
 		dep.Boot()
 		pkg.Logger.Info(fmt.Sprintf("[Kernel.Kernel] Booting %s", index))

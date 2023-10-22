@@ -1,4 +1,4 @@
-package cli
+package main
 
 import (
 	"fmt"
@@ -16,33 +16,45 @@ var domain string
 type Cli struct {
 	Environment string
 	validator   bool
+	cmd         *cobra.Command
 }
 
-func NewCli() *Cli {
+func NewCli(cmd *cobra.Command) *Cli {
 	return &Cli{
 		Environment: pkg.Config.ReadConfig("ENVIRONMENT"),
+		cmd:         cmd,
 	}
 }
 
-func (c *Cli) Start(cmd *cobra.Command) {
-	c.initFlags(cmd)
+func main() {
+	cmd := &cobra.Command{}
+	cli := NewCli(cmd)
+	cli.Start()
+	cli.cmd.Execute()
+}
+
+func (c *Cli) Start() {
+	c.initFlags(c.cmd)
 	createDomain := &cobra.Command{
-		Use:   "create-domain",
-		Short: "Create a new domain service",
-		Run:   c.CreateDomain,
+		Use:    "create-domain",
+		Short:  "Create a new domain service",
+		PreRun: c.BootGenerator,
+		Run:    c.CreateDomain,
 	}
 	createDomain.Flags().BoolVarP(&c.validator, "validator", "v", false, "Create domain with validation")
-	cmd.AddCommand(
+	c.cmd.AddCommand(
 		createDomain,
 		&cobra.Command{
-			Use:   "destroy-domain",
-			Short: "Destroy a domain service",
-			Run:   c.DestroyDomain,
+			Use:    "destroy-domain",
+			Short:  "Destroy a domain service",
+			PreRun: c.BootGenerator,
+			Run:    c.DestroyDomain,
 		},
 		&cobra.Command{
-			Use:   "migrate",
-			Short: "Migrate Gorm Database",
-			Run:   c.Migrate,
+			Use:    "migrate",
+			Short:  "Migrate Gorm Database",
+			PreRun: c.BootMigrator,
+			Run:    c.Migrate,
 		},
 	)
 }
@@ -75,14 +87,14 @@ func (c *Cli) initFlags(cmd *cobra.Command) {
 	cmd.MarkFlagsMutuallyExclusive("domain")
 }
 
-func (c *Cli) BootGenerator() {
+func (c *Cli) BootGenerator(_ *cobra.Command, _ []string) {
 	for index, dep := range pkg.CliDependencies {
 		dep.Boot()
 		pkg.Logger.Info(fmt.Sprintf("[Kernel.Kernel] Booting %s", index))
 	}
 }
 
-func (c *Cli) BootMigrator() {
+func (c *Cli) BootMigrator(_ *cobra.Command, _ []string) {
 	for index, dep := range pkg.MigratorDependencies {
 		dep.Boot()
 		pkg.Logger.Info(fmt.Sprintf("[Kernel.Kernel] Booting %s", index))

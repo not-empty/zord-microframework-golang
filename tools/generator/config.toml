@@ -17,7 +17,7 @@ domainPascalCase = "{{domainPascalCase}}"
 		}
 	}
 """
-"//{{codeGen1}}" = "{{domainCamelCase}}ListRoutes := New{{domainPascalCase}}Routes(logger, Environment, MySql, idCreator)\n	$repeat$"
+"//{{codeGen1}}" = "{{domainCamelCase}}ListRoutes := New{{domainPascalCase}}Routes(l, Env, m, i, v)\n	$repeat$"
 "//{{codeGen2}}" = "\"{{domain}}\": {{domainCamelCase}}ListRoutes,\n		$repeat$"
 
 [stubs.crud.domain]

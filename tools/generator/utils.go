@@ -149,3 +149,21 @@ func GetReplacersConfig(l services.Logger, c *Config, domainType string, args []
 
 	return replacers
 }
+
+func RemoveFileLine(path string, search string) error {
+	data, err := GetFileData(path)
+	if err != nil {
+		return err
+	}
+	lines := strings.Split(string(data), "\n")
+	for i, l := range lines {
+		if strings.Contains(string(l), search) {
+			lines = append(lines[:i], lines[i+1:]...)
+		}
+	}
+	err = os.WriteFile(path, []byte(strings.Join(lines, "\n")), 0755)
+	if err != nil {
+		return err
+	}
+	return nil
+}

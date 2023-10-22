@@ -22,14 +22,16 @@ func NewCodeDestroy(l services.Logger, domainType string) *CodeDestroy {
 func (cd *CodeDestroy) Handler(args []string) {
 	stubs := GetStubsConfig(cd.Logger, cd.config, cd.domainType)
 	replacers := GetReplacersConfig(cd.Logger, cd.config, cd.domainType, args)
-	domain := args[0]
 
 	for _, stub := range stubs {
 		path := Replacer(stub.ToPath, replacers)
 		if !stub.IsGenerated {
-			err := RemoveFileLine(stub.ToPath, domain)
-			if err != nil {
-				cd.Logger.Error(err)
+			for _, p := range stub.DeletePatterns {
+				deletePattern := Replacer(p, replacers)
+				err := RemoveFileLine(path, deletePattern)
+				if err != nil {
+					cd.Logger.Error(err)
+				}
 			}
 			continue
 		}

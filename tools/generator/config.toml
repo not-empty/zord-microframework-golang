@@ -44,3 +44,7 @@ uniqueDelete = "cmd/handlers/http/routes/{{domain}}.go"
 [stubs.crud.declarable]
 toPath = "cmd/handlers/http/routes/declarable.go"
 isGenerated = false
+deletePatterns = [
+	"New{{domainPascalCase}}Routes",
+	"\"{{domain}}\": "
+]

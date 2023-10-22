@@ -1,10 +1,11 @@
 package generator
 
 type Stubs struct {
-	ToPath       string
-	FromPath     string
-	IsGenerated  bool
-	UniqueDelete string
+	ToPath         string
+	FromPath       string
+	IsGenerated    bool
+	UniqueDelete   string
+	DeletePatterns []string
 }
 
 type Config struct {

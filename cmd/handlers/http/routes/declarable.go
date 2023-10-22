@@ -21,13 +21,7 @@ func GetProtectedRoutes(deps map[string]pkg.Bootable, Env string) map[string]Dec
 	i := deps["IdCreator"].(*idCreator.IdCreator)
 	v := deps["validator"].(*validator.Validator)
 
-	dummyListRoutes := NewDummyRoutes(
-		l,
-		m,
-		i,
-		v,
-		Env,
-	)
+	dummyListRoutes := NewDummyRoutes(l, m, i, v, Env)
 	//{{codeGen1}}
 	domains := map[string]Declarable{
 		"dummy": dummyListRoutes,

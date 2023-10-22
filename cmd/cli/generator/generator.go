@@ -17,7 +17,7 @@ func NewGenerator() *Generator {
 	return &Generator{}
 }
 
-func (g *Generator) DeclareCommand(cmd *cobra.Command) {
+func (g *Generator) DeclareCommands(cmd *cobra.Command) {
 	g.initFlags(cmd)
 	createDomain := &cobra.Command{
 		Use:    "create-domain",

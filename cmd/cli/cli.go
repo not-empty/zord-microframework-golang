@@ -29,7 +29,7 @@ func main() {
 
 func (c *Cli) Start() {
 	generatorInstance := generator.NewGenerator()
-	generatorInstance.DeclareCommand(c.cmd)
+	generatorInstance.DeclareCommands(c.cmd)
 	migratorInstance := migrator.NewMigrator()
 	migratorInstance.DeclareCommands(c.cmd)
 }

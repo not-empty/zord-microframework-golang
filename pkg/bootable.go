@@ -48,5 +48,6 @@ var MigratorDependencies = map[string]Bootable{
 }
 
 var CliDependencies = map[string]Bootable{
-	"logger": Logger,
+	"logger":    Logger,
+	"IdCreator": IdCreator,
 }

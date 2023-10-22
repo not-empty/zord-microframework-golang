@@ -1,10 +1,10 @@
-package http
+package main
 
 import (
 	"fmt"
 	"github.com/labstack/echo/v4"
-	"go-skeleton/cmd/handlers/http/middlewares"
-	"go-skeleton/cmd/handlers/http/routes"
+	"go-skeleton/cmd/http/middlewares"
+	"go-skeleton/cmd/http/routes"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/logger"
@@ -18,19 +18,26 @@ type Server struct {
 	deps   map[string]pkg.Bootable
 }
 
-func NewServer(Environment string) *Server {
+func NewServer() *Server {
+	e := pkg.Config.ReadConfig("ENVIRONMENT")
 	c := pkg.ServerDependencies["config"]
 	l := pkg.ServerDependencies["logger"]
 
 	return &Server{
-		Environment: Environment,
+		Environment: e,
 		config:      c.(*config.Config),
 		logger:      l.(*logger.Logger),
 		deps:        pkg.ServerDependencies,
 	}
 }
 
-func (hs *Server) Start(port string) {
+func main() {
+	server := NewServer()
+	server.Boot()
+	server.Start()
+}
+
+func (hs *Server) Start() {
 	var server = echo.New()
 
 	server.HideBanner = true
@@ -58,8 +65,14 @@ func (hs *Server) Start(port string) {
 		route.DeclareRoutes(protected)
 		pkg.Logger.Info(fmt.Sprintf("[server.route] Declared %s", index))
 	}
-	hs.Shutdown(server.Start(port))
+	hs.Shutdown(server.Start(":" + hs.config.ReadConfig("HTTP_PORT")))
+}
 
+func (hs *Server) Boot() {
+	for index, dep := range pkg.ServerDependencies {
+		dep.Boot()
+		pkg.Logger.Info(fmt.Sprintf("[Kernel.Kernel] Booting %s", index))
+	}
 }
 
 func (hs *Server) Shutdown(err error) {

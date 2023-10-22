@@ -30,11 +30,6 @@ var Mysql = database.NewMysql(
 var IdCreator = idCreator.NewIdCreator()
 var Validator = validator.NewValidator()
 
-var KernelDependencies = map[string]Bootable{
-	"config": Config,
-	"logger": Logger,
-}
-
 var ServerDependencies = map[string]Bootable{
 	"config":    Config,
 	"logger":    Logger,
@@ -43,8 +38,10 @@ var ServerDependencies = map[string]Bootable{
 	"validator": Validator,
 }
 
+var MigratorDependencies = map[string]Bootable{
+	"mysql": Mysql,
+}
+
 var CliDependencies = map[string]Bootable{
-	"config": Config,
 	"logger": Logger,
-	"mysql":  Mysql,
 }

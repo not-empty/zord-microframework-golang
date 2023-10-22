@@ -19,6 +19,8 @@ domainPascalCase = "{{domainPascalCase}}"
 """
 "//{{codeGen1}}" = "{{domainCamelCase}}ListRoutes := New{{domainPascalCase}}Routes(l, Env, m, i, v)\n	$repeat$"
 "//{{codeGen2}}" = "\"{{domain}}\": {{domainCamelCase}}ListRoutes,\n		$repeat$"
+"//{{codeGen3}}" = "\"go-skeleton/application/domain/{{domain}}\"\n	$repeat$"
+"//{{codeGen4}}" = "m.db.Db.Migrator().CreateTable(&{{domain}}.{{domainPascalCase}}{})\n	$repeat$"
 
 [stubs.crud.domain]
 toPath = "application/domain/{{domain}}/"
@@ -47,4 +49,12 @@ isGenerated = false
 deletePatterns = [
 	"New{{domainPascalCase}}Routes",
 	"\"{{domain}}\": "
+]
+
+[stubs.crud.migrator]
+toPath = "tools/migrator/migrate.go"
+isGenerated = false
+deletePatterns = [
+	"\"go-skeleton/application/domain/{{domain}}",
+	"&{{domain}}.{{domainPascalCase}}{}"
 ]

@@ -3,7 +3,7 @@ package migrator
 import (
 	"go-skeleton/application/domain/dummy"
 
-	//{{codeGen1}}
+	//{{codeGen3}}
 	"go-skeleton/pkg/database"
 )
 
@@ -19,5 +19,5 @@ func NewMigrator(db *database.MySql) *Migrator {
 
 func (m *Migrator) MigrateAllDomains() {
 	m.db.Db.Migrator().CreateTable(&dummy.Dummy{})
-	//{{codeGen2}}
+	//{{codeGen4}}
 }

@@ -17,7 +17,7 @@ docker compose up
 #### Using raw go build
 
 ``` SHELL
-go build .
+go build cmd/http/server.go
 ```
 
 to run local build you need a mysql server running, the easiest way is using docker
@@ -29,32 +29,81 @@ docker compose up mysql -d
 Then run the server
 
 ``` SHELL
-./go-skeleton http
+./server
 ```
 
-### Usage
+#### Running from go file
 
-#### Create new crud
-
-helpers (All sub commands has their own helper using -h flag):
+to run local build you need a mysql server running, the easiest way is using docker
 ``` SHELL
-./go-skeleton -h
+docker compose up mysql -d
 ```
+
+``` SHELL
+go run cmd/http/server.go
+```
+
+### Cli
+
+#### build cli
+
+to build cli into binary file run
+``` SHELL
+go build cmd/cli/cli.go
+```
+
+then you can run all cli commands with the binary file
+``` SHELL
+./cli -h
+```
+
+if you`re developing something in the cli the best way is run it directly to all changes 
+``` SHELL
+go run cmd/cli/cli.go
+```
+
+#### Cli usage
 
 create new domain (crud):
 ``` SHELL
-./go-skeleton create-domain {{domain}}
+./cli create-domain {{domain}}
 ```
 
 destroy domain:
 ``` SHELL
-./go-skeleton destroy-domain {{domain}}
+./cli destroy-domain {{domain}}
 ```
 
 migrate all domains:
 ``` SHELL
-./go-skeleton migrate
+./cli migrate
 ```
+
+#### Cli usage inside docker image
+
+Enter in zord image:
+``` SHELL
+docker exec -it zord-http sh
+```
+
+Build cli binary:
+``` SHELL
+go build cmd/cli/cli.go
+```
+
+Use it:
+``` SHELL
+./cli -h
+```
+
+If you`re generating code inside docker container you need to change generated folder and file permissions to code out of docker container.
+
+run the follow command to edit generated files:
+``` SHELL
+sudo chown $USER:$USER -R .
+```
+
+if you have a group name different from username change the command accordingly
 
 ### Development
 

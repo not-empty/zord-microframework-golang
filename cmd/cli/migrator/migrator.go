@@ -34,6 +34,6 @@ func (m *Migrator) Migrate(_ *cobra.Command, _ []string) {
 func (m *Migrator) BootMigrator(_ *cobra.Command, _ []string) {
 	for index, dep := range pkg.MigratorDependencies {
 		dep.Boot()
-		pkg.Logger.Info(fmt.Sprintf("[Kernel.Kernel] Booting %s", index))
+		pkg.Logger.Info(fmt.Sprintf("[migrator.Migrator] Booting %s", index))
 	}
 }

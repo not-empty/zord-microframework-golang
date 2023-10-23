@@ -71,7 +71,7 @@ func (hs *Server) Start() {
 func (hs *Server) Boot() {
 	for index, dep := range pkg.ServerDependencies {
 		dep.Boot()
-		pkg.Logger.Info(fmt.Sprintf("[Kernel.Kernel] Booting %s", index))
+		pkg.Logger.Info(fmt.Sprintf("[http.server] Booting %s", index))
 	}
 }
 

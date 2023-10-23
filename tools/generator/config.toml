@@ -6,11 +6,10 @@ domainPascalCase = "{{domainPascalCase}}"
 "{{validatorImport}}" = "\n	\"go-skeleton/pkg/validator\""
 "{{validator}}" = "\nvalidator *validator.Validator"
 "{{,validator}}" = ", validator *validator.Validator"
-"{{validatorInject}}" = "validator: validator,"
+"{{validatorInject}}" = "	validator: validator,"
 "{{hsValidator}}" = "hs.validator"
 "{{,hsValidator}}" = ", hs.validator"
-"{{validatorRule}}" = """
-	errs := r.validator.ValidateStruct(r.{{domainPascalCase}})
+"{{validatorRule}}" = """errs := r.validator.ValidateStruct(r.{{domainPascalCase}})
 	for _, err := range errs {
 		if err != nil {
 			return err

@@ -4,7 +4,7 @@ domain = "{{domain}}"
 domainCamelCase = "{{domainCamelCase}}"
 domainPascalCase = "{{domainPascalCase}}"
 "{{validatorImport}}" = "\n	\"go-skeleton/pkg/validator\""
-"{{validator}}" = "\nvalidator *validator.Validator"
+"{{validator}}" = "\n	validator *validator.Validator"
 "{{,validator}}" = ", validator *validator.Validator"
 "{{validatorInject}}" = "	validator: validator,"
 "{{hsValidator}}" = "hs.validator"
@@ -37,13 +37,13 @@ fromPath = "tools/generator/stubs/repositories/"
 isGenerated = true
 
 [stubs.crud.routes]
-toPath = "cmd/handlers/http/routes/"
+toPath = "cmd/http/routes/"
 fromPath = "tools/generator/stubs/routes/"
 isGenerated = true
-uniqueDelete = "cmd/handlers/http/routes/{{domain}}.go"
+uniqueDelete = "cmd/http/routes/{{domain}}.go"
 
 [stubs.crud.declarable]
-toPath = "cmd/handlers/http/routes/declarable.go"
+toPath = "cmd/http/routes/declarable.go"
 isGenerated = false
 deletePatterns = [
 	"New{{domainPascalCase}}Routes",

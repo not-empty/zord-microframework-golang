@@ -22,22 +22,21 @@ func NewService(log services.Logger, repository {{domain}}.Repository) *Service 
 }
 
 func (s *Service) Execute(request Request) {
-	s.Logger.Debug("Hello Im {{domainCap}} Server!")
+	s.Logger.Debug("Hello Im {{domainPascalCase}} Server!")
 	if err := request.Validate(); err != nil {
 		s.BadRequest(request, err)
 		return
 	}
-
-	s.produceResponseRule(&request.{{domainCap}})
+	s.produceResponseRule(request.{{domainPascalCase}}.{{domainPascalCase}}Id)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule({{domain}} *{{domain}}.{{domainCap}}) {
+func (s *Service) produceResponseRule(id string) {
 	s.Logger.Debug("ProduceResponseRule")
-	err := s.repository.Edit({{domain}})
+	{{domain}}Data, err := s.repository.Get(id)
 	if err != nil {
 			s.Error = &services.Error{
 					Status:  400,
@@ -48,5 +47,6 @@ func (s *Service) produceResponseRule({{domain}} *{{domain}}.{{domainCap}}) {
 	}
 	s.response = &Response{
 			Status: http.StatusOK,
+			Data:   {{domain}}Data,
 	}
 }

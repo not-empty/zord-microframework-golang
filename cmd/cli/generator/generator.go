@@ -1,20 +1,30 @@
 package generator
 
 import (
+	"errors"
 	"fmt"
-	"github.com/spf13/cobra"
+	"go-skeleton/application/services"
 	"go-skeleton/pkg"
-	"go-skeleton/pkg/logger"
 	"go-skeleton/tools/generator"
+
+	"github.com/spf13/cobra"
 )
 
 type Generator struct {
-	validator bool
-	domain    string
+	Logger services.Logger
+	Flags  Flags
 }
 
-func NewGenerator() *Generator {
-	return &Generator{}
+type Flags struct {
+	validator  bool
+	domainType string
+	domain     string
+}
+
+func NewGenerator(l services.Logger) *Generator {
+	return &Generator{
+		Logger: l,
+	}
 }
 
 func (g *Generator) DeclareCommands(cmd *cobra.Command) {
@@ -25,42 +35,56 @@ func (g *Generator) DeclareCommands(cmd *cobra.Command) {
 		PreRun: g.BootGenerator,
 		Run:    g.CreateDomain,
 	}
-	createDomain.Flags().BoolVarP(&g.validator, "validator", "v", false, "Create domain with validation")
-	cmd.AddCommand(createDomain)
-	cmd.AddCommand(&cobra.Command{
+
+	createDomain.Flags().BoolVarP(&g.Flags.validator, "validator", "v", false, "Create domain with validation")
+	createDomain.Flags().StringVar(&g.Flags.domainType, "type", "crud", "Define domain type: ['crud'|'<custom>']")
+
+	destroyDomain := &cobra.Command{
 		Use:    "destroy-domain",
 		Short:  "Destroy a domain service",
 		PreRun: g.BootGenerator,
 		Run:    g.DestroyDomain,
-	})
+	}
+
+	cmd.AddCommand(
+		createDomain,
+		destroyDomain,
+	)
 }
 
 func (g *Generator) CreateDomain(_ *cobra.Command, args []string) {
-	generatorInstance := generator.NewGenerator(pkg.CliDependencies["logger"].(*logger.Logger))
-	if len(args) > 0 {
-		g.domain = args[0]
+	if len(args) == 0 {
+		g.Logger.Error(errors.New("empty args"))
 	}
-	err := generatorInstance.CreateDomain(g.domain, g.validator)
-	pkg.Logger.Error(err)
+	generator.NewCodeGenerator(
+		g.Logger,
+		g.Flags.validator,
+		g.Flags.domainType,
+	).Handler(
+		args,
+	)
 }
 
 func (g *Generator) DestroyDomain(_ *cobra.Command, args []string) {
-	generatorInstance := generator.NewGenerator(pkg.CliDependencies["logger"].(*logger.Logger))
-	if len(args) > 0 {
-		g.domain = args[0]
+	if len(args) == 0 {
+		g.Logger.Error(errors.New("empty args"))
 	}
-	err := generatorInstance.DestroyDomain(g.domain)
-	pkg.Logger.Error(err)
+	generator.NewCodeDestroy(
+		g.Logger,
+		g.Flags.domainType,
+	).Handler(
+		args,
+	)
 }
 
 func (g *Generator) BootGenerator(_ *cobra.Command, _ []string) {
 	for index, dep := range pkg.CliDependencies {
 		dep.Boot()
-		pkg.Logger.Info(fmt.Sprintf("[Kernel.Kernel] Booting %s", index))
+		pkg.Logger.Info(fmt.Sprintf("[generator.generator] Booting %s", index))
 	}
 }
 
 func (g *Generator) initFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().StringVar(&g.domain, "domain", "", "Describe name to New Domain")
+	cmd.PersistentFlags().StringVar(&g.Flags.domain, "domain", "", "Describe name to New Domain")
 	cmd.MarkFlagsMutuallyExclusive("domain")
 }

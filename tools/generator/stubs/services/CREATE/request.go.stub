@@ -6,14 +6,14 @@ import (
 )
 
 type Request struct {
-	{{domainCap}} domain.{{domainCap}}
+	{{domainPascalCase}} domain.{{domainPascalCase}}
 	Err   error
 	{{validator}}
 }
 
-func NewRequest({{domain}} domain.{{domainCap}}{{,validator}}) Request {
+func NewRequest({{domain}} domain.{{domainPascalCase}}{{,validator}}) Request {
 	return Request{
-		{{domainCap}}: {{domain}},
+		{{domainPascalCase}}: {{domain}},
 		{{validatorInject}}
 	}
 }

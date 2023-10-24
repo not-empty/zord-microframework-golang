@@ -27,14 +27,14 @@ func (s *Service) Execute(request Request) {
 		s.BadRequest(request, err)
 		return
 	}
-	s.produceResponseRule(request.{{domainCap}})
+	s.produceResponseRule(request.{{domainPascalCase}})
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(d {{domain}}.{{domainCap}}) {
+func (s *Service) produceResponseRule(d {{domain}}.{{domainPascalCase}}) {
 	s.Logger.Debug("ProduceResponseRule")
 	err := s.repository.Delete(&d)
 	if err != nil {

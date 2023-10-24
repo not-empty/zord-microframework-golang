@@ -17,38 +17,38 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type {{domainCap}}Routes struct {
+type {{domainPascalCase}}Routes struct {
 	Environment     string
-	{{domainCap}}Repository *{{domain}}Repository.{{domainCap}}Repository
+	{{domainPascalCase}}Repository *{{domain}}Repository.{{domainPascalCase}}Repository
 
 	// config *config.Config
 	logger *logger.Logger
 	idCreator *idCreator.IdCreator{{validator}}
 }
 
-func New{{domainCap}}Routes(logger *logger.Logger, Environment string, mysql *database.MySql, idCreator *idCreator.IdCreator{{,validator}}) *{{domainCap}}Routes {
-	repository := &{{domain}}Repository.{{domainCap}}Repository{
+func New{{domainPascalCase}}Routes(logger *logger.Logger, Environment string, mysql *database.MySql, idCreator *idCreator.IdCreator{{,validator}}) *{{domainPascalCase}}Routes {
+	repository := &{{domain}}Repository.{{domainPascalCase}}Repository{
 		Mysql: mysql,
 	}
-	return &{{domainCap}}Routes{
+	return &{{domainPascalCase}}Routes{
 		logger:          logger,
 		Environment:     Environment,
-		{{domainCap}}Repository: repository,
+		{{domainPascalCase}}Repository: repository,
 		idCreator:       idCreator,
 		{{validatorInject}}
 	}
 }
 
-func (hs *{{domainCap}}Routes) DeclareRoutes(server *echo.Group) {
-	server.GET("/v1/{{domain}}", hs.HandleList{{domainCap}})
-	server.GET("/v1/{{domain}}/:{{domain}}_id", hs.HandleGet{{domainCap}})
-	server.POST("/v1/{{domain}}", hs.HandleCreate{{domainCap}})
-	server.PUT("/v1/{{domain}}/:{{domain}}_id", hs.HandleEdit{{domainCap}})
-	server.DELETE("/v1/{{domain}}/:{{domain}}_id", hs.HandleDelete{{domainCap}})
+func (hs *{{domainPascalCase}}Routes) DeclareRoutes(server *echo.Group) {
+	server.GET("/v1/{{domain}}", hs.HandleList{{domainPascalCase}})
+	server.GET("/v1/{{domain}}/:{{domain}}_id", hs.HandleGet{{domainPascalCase}})
+	server.POST("/v1/{{domain}}", hs.HandleCreate{{domainPascalCase}})
+	server.PUT("/v1/{{domain}}/:{{domain}}_id", hs.HandleEdit{{domainPascalCase}})
+	server.DELETE("/v1/{{domain}}/:{{domain}}_id", hs.HandleDelete{{domainPascalCase}})
 }
 
-func (hs *{{domainCap}}Routes) HandleGet{{domainCap}}(context echo.Context) error {
-	s := {{domain}}Get.NewService(hs.logger, hs.{{domainCap}}Repository)
+func (hs *{{domainPascalCase}}Routes) HandleGet{{domainPascalCase}}(context echo.Context) error {
+	s := {{domain}}Get.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
 	s.Execute(
 		{{domain}}Get.NewRequest(context.Param("{{domain}}_id")),
 	)
@@ -59,10 +59,10 @@ func (hs *{{domainCap}}Routes) HandleGet{{domainCap}}(context echo.Context) erro
 	return context.JSON(response.Status, response)
 }
 
-func (hs *{{domainCap}}Routes) HandleCreate{{domainCap}}(context echo.Context) error {
-	s := {{domain}}Create.NewService(hs.logger, hs.{{domainCap}}Repository, hs.idCreator)
+func (hs *{{domainPascalCase}}Routes) HandleCreate{{domainPascalCase}}(context echo.Context) error {
+	s := {{domain}}Create.NewService(hs.logger, hs.{{domainPascalCase}}Repository, hs.idCreator)
 
-	domain := {{domain}}.{{domainCap}}{}
+	domain := {{domain}}.{{domainPascalCase}}{}
 	body, errors := io.ReadAll(context.Request().Body)
 	if errors != nil {
 		return context.JSON(422, errors)
@@ -83,10 +83,10 @@ func (hs *{{domainCap}}Routes) HandleCreate{{domainCap}}(context echo.Context) e
 	return context.JSON(response.Status, response)
 }
 
-func (hs *{{domainCap}}Routes) HandleEdit{{domainCap}}(context echo.Context) error {
-	s := {{domain}}Edit.NewService(hs.logger, hs.{{domainCap}}Repository)
+func (hs *{{domainPascalCase}}Routes) HandleEdit{{domainPascalCase}}(context echo.Context) error {
+	s := {{domain}}Edit.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
 
-	domain := {{domain}}.{{domainCap}}{}
+	domain := {{domain}}.{{domainPascalCase}}{}
 	body, errors := io.ReadAll(context.Request().Body)
 	if errors != nil {
 		return context.JSON(422, errors)
@@ -108,8 +108,8 @@ func (hs *{{domainCap}}Routes) HandleEdit{{domainCap}}(context echo.Context) err
 	return context.JSON(response.Status, response)
 }
 
-func (hs *{{domainCap}}Routes) HandleList{{domainCap}}(context echo.Context) error {
-	s := {{domain}}List.NewService(hs.logger, hs.{{domainCap}}Repository)
+func (hs *{{domainPascalCase}}Routes) HandleList{{domainPascalCase}}(context echo.Context) error {
+	s := {{domain}}List.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
 	s.Execute(
 		{{domain}}List.NewRequest(),
 	)
@@ -120,8 +120,8 @@ func (hs *{{domainCap}}Routes) HandleList{{domainCap}}(context echo.Context) err
 	return context.JSON(response.Status, response)
 }
 
-func (hs *{{domainCap}}Routes) HandleDelete{{domainCap}}(context echo.Context) error {
-	s := {{domain}}Delete.NewService(hs.logger, hs.{{domainCap}}Repository)
+func (hs *{{domainPascalCase}}Routes) HandleDelete{{domainPascalCase}}(context echo.Context) error {
+	s := {{domain}}Delete.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
 	s.Execute(
 		{{domain}}Delete.NewRequest(context.Param("{{domain}}_id"){{,hsValidator}}),
 	)

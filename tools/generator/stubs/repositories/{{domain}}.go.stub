@@ -5,16 +5,16 @@ import (
 	"go-skeleton/pkg/database"
 )
 
-type {{domainCap}}Repository struct {
+type {{domainPascalCase}}Repository struct {
 	Mysql *database.MySql
 }
 
-func NewBaseRepository() *{{domainCap}}Repository {
-	return &{{domainCap}}Repository{}
+func NewBaseRepository() *{{domainPascalCase}}Repository {
+	return &{{domainPascalCase}}Repository{}
 }
 
-func (repo *{{domainCap}}Repository) Get(id string) (*{{domain}}.{{domainCap}}, error) {
-	var Data {{domain}}.{{domainCap}}
+func (repo *{{domainPascalCase}}Repository) Get(id string) (*{{domain}}.{{domainPascalCase}}, error) {
+	var Data {{domain}}.{{domainPascalCase}}
 	err := repo.Mysql.Db.First(&Data, "{{domain}}_id = ?", id).Error
 	if err != nil {
         return nil, err
@@ -22,13 +22,13 @@ func (repo *{{domainCap}}Repository) Get(id string) (*{{domain}}.{{domainCap}}, 
 	return &Data, nil
 }
 
-func (repo *{{domainCap}}Repository) Create(d *{{domain}}.{{domainCap}}) error {
+func (repo *{{domainPascalCase}}Repository) Create(d *{{domain}}.{{domainPascalCase}}) error {
 	err := repo.Mysql.Db.Create(d).Error
 	return err
 }
 
-func (repo *{{domainCap}}Repository) List() (*[]{{domain}}.{{domainCap}}, error) {
-	var data []{{domain}}.{{domainCap}}
+func (repo *{{domainPascalCase}}Repository) List() (*[]{{domain}}.{{domainPascalCase}}, error) {
+	var data []{{domain}}.{{domainPascalCase}}
 	err := repo.Mysql.Db.Limit(100).Find(&data).Error
 	if err != nil {
         return nil, err
@@ -36,12 +36,12 @@ func (repo *{{domainCap}}Repository) List() (*[]{{domain}}.{{domainCap}}, error)
 	return &data, nil
 }
 
-func (repo *{{domainCap}}Repository) Edit(d *{{domain}}.{{domainCap}}) error {
+func (repo *{{domainPascalCase}}Repository) Edit(d *{{domain}}.{{domainPascalCase}}) error {
 	err := repo.Mysql.Db.Updates(d).Error
 	return err
 }
 
-func (repo *{{domainCap}}Repository) Delete(d *{{domain}}.{{domainCap}}) error {
+func (repo *{{domainPascalCase}}Repository) Delete(d *{{domain}}.{{domainPascalCase}}) error {
 	err := repo.Mysql.Db.Delete(d).Error
 	return err
 }

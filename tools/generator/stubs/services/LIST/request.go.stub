@@ -2,11 +2,10 @@ package {{domain}}
 
 import (
 	domain "go-skeleton/application/domain/{{domain}}"
-	{{validatorImport}}
 )
 
 type Request struct {
-	{{domainCap}} []domain.{{domainCap}}
+	{{domainPascalCase}} []domain.{{domainPascalCase}}
 	Err   error
 }
 

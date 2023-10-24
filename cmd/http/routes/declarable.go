@@ -1,13 +1,14 @@
 package routes
 
 import (
-	"github.com/labstack/echo/v4"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
 	"go-skeleton/pkg/validator"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Declarable interface {
@@ -20,13 +21,7 @@ func GetProtectedRoutes(deps map[string]pkg.Bootable, Env string) map[string]Dec
 	i := deps["IdCreator"].(*idCreator.IdCreator)
 	v := deps["validator"].(*validator.Validator)
 
-	dummyListRoutes := NewDummyRoutes(
-		l,
-		m,
-		i,
-		v,
-		Env,
-	)
+	dummyListRoutes := NewDummyRoutes(l, m, i, v, Env)
 	//{{codeGen1}}
 	domains := map[string]Declarable{
 		"dummy": dummyListRoutes,

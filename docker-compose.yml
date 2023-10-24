@@ -1,10 +1,10 @@
 version: '3.7'
 services:
-  go-api:
+  zord-http:
     build:
       context: .
       dockerfile: docker/dev/Dockerfile
-    container_name: go-skeleton
+    container_name: zord-http
     env_file:
       - .env
     ports:

@@ -12,6 +12,7 @@ import (
 
 type Server struct {
 	Environment string
+	jwtSecret   string
 
 	config *config.Config
 	logger *logger.Logger
@@ -20,11 +21,13 @@ type Server struct {
 
 func NewServer() *Server {
 	e := pkg.Config.ReadConfig("ENVIRONMENT")
+	jwt := pkg.Config.ReadConfig("JWT_SECRET")
 	c := pkg.ServerDependencies["config"]
 	l := pkg.ServerDependencies["logger"]
 
 	return &Server{
 		Environment: e,
+		jwtSecret:   jwt,
 		config:      c.(*config.Config),
 		logger:      l.(*logger.Logger),
 		deps:        pkg.ServerDependencies,
@@ -43,18 +46,11 @@ func (hs *Server) Start() {
 	server.HideBanner = true
 	server.HidePort = true
 
-	middlewareList := middlewares.GetAllMiddlewares(hs.config.ReadConfig("JWT_SECRET"))
-
-	for index, mid := range middlewareList {
-		mid.Boot()
-		pkg.Logger.Info(fmt.Sprintf("[http.Server] Booting %s", index))
-	}
-
-	protectedRoutes := routes.GetProtectedRoutes(hs.deps, hs.config.ReadConfig("ENVIRONMENT"))
+	protectedRoutes := routes.GetProtectedRoutes(hs.deps, hs.Environment)
 	publicRoutes := routes.GetPublicRoutes(hs.deps)
 
 	public := server.Group("")
-	protected := server.Group("", middlewareList["auth"].GetMiddleware())
+	protected := server.Group("", middlewares.AuthMiddleware(hs.jwtSecret))
 
 	for index, route := range publicRoutes {
 		route.DeclareRoutes(public)

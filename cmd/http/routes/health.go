@@ -10,9 +10,7 @@ func NewHealthRoute() *Health {
 }
 
 func (hs *Health) DeclareRoutes(server *echo.Group) {
-	server.GET("/health", hs.handle)
-}
-
-func (hs *Health) handle(c echo.Context) error {
-	return c.JSON(200, "OK")
+	server.GET("/health", func(c echo.Context) error {
+		return c.JSON(200, "OK")
+	})
 }

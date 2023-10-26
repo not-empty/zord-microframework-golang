@@ -1,0 +1,59 @@
+[replacers.crud]
+".stub" = ""
+domain = "{{domain}}"
+domainCamelCase = "{{domainCamelCase}}"
+domainPascalCase = "{{domainPascalCase}}"
+"{{validatorImport}}" = "\n	\"go-skeleton/pkg/validator\""
+"{{validator}}" = "\n	validator *validator.Validator"
+"{{,validator}}" = ", validator *validator.Validator"
+"{{validatorInject}}" = "	validator: validator,"
+"{{hsValidator}}" = "hs.validator"
+"{{,hsValidator}}" = ", hs.validator"
+"{{validatorRule}}" = """errs := r.validator.ValidateStruct(r.{{domainPascalCase}})
+	for _, err := range errs {
+		if err != nil {
+			return err
+		}
+	}
+"""
+"//{{codeGen1}}" = "{{domainCamelCase}}ListRoutes := New{{domainPascalCase}}Routes(l, Env, m, i, v)\n	$repeat$"
+"//{{codeGen2}}" = "\"{{domain}}\": {{domainCamelCase}}ListRoutes,\n		$repeat$"
+"//{{codeGen3}}" = "\"go-skeleton/application/domain/{{domain}}\"\n	$repeat$"
+"//{{codeGen4}}" = "m.db.Db.Migrator().CreateTable(&{{domain}}.{{domainPascalCase}}{})\n	$repeat$"
+
+[stubs.crud.domain]
+toPath = "application/domain/{{domain}}/"
+fromPath = "tools/generator/stubs/domain/"
+isGenerated = true
+
+[stubs.crud.services]
+toPath = "application/services/{{domain}}/"
+fromPath = "tools/generator/stubs/services/"
+isGenerated = true
+
+[stubs.crud.repositories]
+toPath = "pkg/repositories/{{domain}}/"
+fromPath = "tools/generator/stubs/repositories/"
+isGenerated = true
+
+[stubs.crud.routes]
+toPath = "cmd/http/routes/"
+fromPath = "tools/generator/stubs/routes/"
+isGenerated = true
+uniqueDelete = "cmd/http/routes/{{domain}}.go"
+
+[stubs.crud.declarable]
+toPath = "cmd/http/routes/declarable.go"
+isGenerated = false
+deletePatterns = [
+	"New{{domainPascalCase}}Routes",
+	"\"{{domain}}\": "
+]
+
+[stubs.crud.migrator]
+toPath = "tools/migrator/migrate.go"
+isGenerated = false
+deletePatterns = [
+	"\"go-skeleton/application/domain/{{domain}}",
+	"&{{domain}}.{{domainPascalCase}}{}"
+]

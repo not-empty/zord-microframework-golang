@@ -16,6 +16,10 @@ type IdCreator interface {
 	Create() string
 }
 
+type Validator interface {
+	ValidateStruct(modelData any) []error
+}
+
 type Error struct {
 	Status  int    `json:"-"`
 	Message string `json:"-"`

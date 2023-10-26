@@ -3,16 +3,16 @@ package dummy
 import (
 	"errors"
 	domain "go-skeleton/application/domain/dummy"
-	"go-skeleton/pkg/validator"
+	"go-skeleton/application/services"
 )
 
 type Request struct {
 	Dummy     domain.Dummy
 	Dummyid   string
-	validator *validator.Validator
+	validator services.Validator
 }
 
-func NewRequest(dummy domain.Dummy, dummyId string, validator *validator.Validator) Request {
+func NewRequest(dummy domain.Dummy, dummyId string, validator services.Validator) Request {
 	req := Request{
 		Dummy:     dummy,
 		validator: validator,

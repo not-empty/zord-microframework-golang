@@ -44,15 +44,15 @@ var validationMessages = map[string]string{
 	"ulid":                 "The :attribute must be a valid ULID string.",
 }
 
-type Validator struct {
-	validate           *validator.Validate
-	validationMessages map[string]string
-}
-
 type ErrorResponse struct {
 	FailedField string
 	Tag         string
 	Value       string
+}
+
+type Validator struct {
+	validate           *validator.Validate
+	validationMessages map[string]string
 }
 
 func NewValidator() *Validator {

@@ -16,6 +16,17 @@ type IdCreator interface {
 	Create() string
 }
 
+type Validator interface {
+	ValidateStruct(modelData any) []error
+	translateError(errorData *ErrorResponse) error
+}
+
+type ErrorResponse struct {
+	FailedField string
+	Tag         string
+	Value       string
+}
+
 type Error struct {
 	Status  int    `json:"-"`
 	Message string `json:"-"`

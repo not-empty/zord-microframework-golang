@@ -2,7 +2,6 @@ package validator
 
 import (
 	"errors"
-	"go-skeleton/application/services"
 	"reflect"
 	"strings"
 
@@ -45,6 +44,12 @@ var validationMessages = map[string]string{
 	"ulid":                 "The :attribute must be a valid ULID string.",
 }
 
+type ErrorResponse struct {
+	FailedField string
+	Tag         string
+	Value       string
+}
+
 type Validator struct {
 	validate           *validator.Validate
 	validationMessages map[string]string
@@ -77,7 +82,7 @@ func (v *Validator) ValidateStruct(modelData any) []error {
 	err := v.validate.Struct(modelData)
 	if err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
-			var element services.ErrorResponse
+			var element ErrorResponse
 			element.FailedField = err.Field()
 			element.Tag = err.Tag()
 			element.Value = err.Param()
@@ -90,7 +95,7 @@ func (v *Validator) ValidateStruct(modelData any) []error {
 	return errorsList
 }
 
-func (v *Validator) translateError(errorData *services.ErrorResponse) error {
+func (v *Validator) translateError(errorData *ErrorResponse) error {
 	var message string = "The :attribute with :values is not valid."
 
 	if v, ok := v.validationMessages[errorData.Tag]; ok {

@@ -2,30 +2,31 @@ package dummy
 
 import (
 	"errors"
-	domain "go-skeleton/application/domain/dummy"
 	"go-skeleton/application/services"
 )
 
+type RequestDTO struct {
+	DummyId   string `param:"dummy_id"`
+	DummyName string `json:"dummy_name"`
+}
+
 type Request struct {
-	Dummy     domain.Dummy
-	Dummyid   string
+	DTO       *RequestDTO
 	validator services.Validator
 }
 
-func NewRequest(dummy domain.Dummy, dummyId string, validator services.Validator) Request {
-	req := Request{
-		Dummy:     dummy,
+func NewRequest(dto *RequestDTO, validator services.Validator) Request {
+	return Request{
+		DTO:       dto,
 		validator: validator,
 	}
-	req.Dummy.DummyId = dummyId
-	return req
 }
 
 func (r *Request) Validate() error {
 	if err := r.dummyIdRule(); err != nil {
 		return err
 	}
-	errs := r.validator.ValidateStruct(r.Dummy)
+	errs := r.validator.ValidateStruct(r.DTO)
 	for _, err := range errs {
 		if err != nil {
 			return err
@@ -35,7 +36,7 @@ func (r *Request) Validate() error {
 }
 
 func (r *Request) dummyIdRule() error {
-	if r.Dummy.DummyId == `""` {
+	if r.DTO.DummyId == `""` {
 		return errors.New("invalid_argument")
 	}
 	return nil

@@ -27,16 +27,16 @@ func (s *Service) Execute(request Request) {
 		s.BadRequest(request, err)
 		return
 	}
-	s.produceResponseRule(request.Dummy.DummyId)
+	s.produceResponseRule(request.DTO)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(id string) {
+func (s *Service) produceResponseRule(dto *RequestDTO) {
 	s.Logger.Debug("ProduceResponseRule")
-	dummyData, err := s.repository.Get(id)
+	dummyData, err := s.repository.Get(dto.DummyId)
 	if err != nil {
 		s.Error = &services.Error{
 			Status:  400,

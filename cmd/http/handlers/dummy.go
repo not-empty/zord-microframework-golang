@@ -1,9 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
-	"github.com/labstack/echo/v4"
-	"go-skeleton/application/domain/dummy"
 	dummyCreate "go-skeleton/application/services/dummy/CREATE"
 	dummyDelete "go-skeleton/application/services/dummy/DELETE"
 	dummyEdit "go-skeleton/application/services/dummy/EDIT"
@@ -15,7 +12,8 @@ import (
 	"go-skeleton/pkg/logger"
 	dummyRepository "go-skeleton/pkg/repositories/dummy"
 	"go-skeleton/pkg/validator"
-	"io"
+
+	"github.com/labstack/echo/v4"
 )
 
 type DummyHandlers struct {
@@ -48,8 +46,14 @@ func NewDummyHandlers(
 
 func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
 	s := dummyGet.NewService(hs.logger, hs.DummyRepository)
+	dto := new(dummyGet.RequestDTO)
+
+	if errors := context.Bind(dto); errors != nil {
+		return context.JSON(422, errors)
+	}
+
 	s.Execute(
-		dummyGet.NewRequest(context.Param("dummy_id")),
+		dummyGet.NewRequest(dto),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -60,20 +64,14 @@ func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
 
 func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 	s := dummyCreate.NewService(hs.logger, hs.DummyRepository, hs.idCreator)
+	dto := new(dummyCreate.RequestDTO)
 
-	domain := dummy.Dummy{}
-	body, errors := io.ReadAll(context.Request().Body)
-	if errors != nil {
-		return context.JSON(422, errors)
-	}
-
-	errors = json.Unmarshal(body, &domain)
-	if errors != nil {
+	if errors := context.Bind(dto); errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		dummyCreate.NewRequest(domain, hs.validator),
+		dummyCreate.NewRequest(dto, hs.validator),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -84,20 +82,14 @@ func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 
 func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 	s := dummyEdit.NewService(hs.logger, hs.DummyRepository)
+	dto := new(dummyEdit.RequestDTO)
 
-	domain := dummy.Dummy{}
-	body, errors := io.ReadAll(context.Request().Body)
-	if errors != nil {
-		return context.JSON(422, errors)
-	}
-
-	errors = json.Unmarshal(body, &domain)
-	if errors != nil {
+	if errors := context.Bind(dto); errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		dummyEdit.NewRequest(domain, context.Param("dummy_id"), hs.validator),
+		dummyEdit.NewRequest(dto, hs.validator),
 	)
 
 	response, err := s.GetResponse()
@@ -121,8 +113,14 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 
 func (hs *DummyHandlers) HandleDeleteDummy(context echo.Context) error {
 	s := dummyDelete.NewService(hs.logger, hs.DummyRepository)
+	dto := new(dummyDelete.RequestDTO)
+
+	if errors := context.Bind(dto); errors != nil {
+		return context.JSON(422, errors)
+	}
+
 	s.Execute(
-		dummyDelete.NewRequest(context.Param("dummy_id")),
+		dummyDelete.NewRequest(dto),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

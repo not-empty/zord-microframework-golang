@@ -1,19 +1,20 @@
 package routes
 
 import (
-	"github.com/labstack/echo/v4"
 	"go-skeleton/cmd/http/handlers"
 	"go-skeleton/pkg"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Auth struct {
-	hand handlers.AuthHandlers
+	hand *handlers.AuthHandlers
 }
 
-func NewAuthRoute(
-	deps map[string]pkg.Bootable,
-) *Auth {
-	return &Auth{}
+func NewAuthRoute(deps map[string]pkg.Bootable) *Auth {
+	return &Auth{
+		hand: handlers.NewAuthHandlers(deps),
+	}
 }
 
 func (hs *Auth) DeclareRoutes(server *echo.Group) {

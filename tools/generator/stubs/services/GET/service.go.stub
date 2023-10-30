@@ -27,16 +27,16 @@ func (s *Service) Execute(request Request) {
 		s.BadRequest(request, err)
 		return
 	}
-	s.produceResponseRule(request.{{domainPascalCase}}.{{domainPascalCase}}Id)
+	s.produceResponseRule(request.DTO)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(id string) {
+func (s *Service) produceResponseRule(dto *RequestDTO) {
 	s.Logger.Debug("ProduceResponseRule")
-	{{domain}}Data, err := s.repository.Get(id)
+	{{domain}}Data, err := s.repository.Get(dto.{{domainPascalCase}}Id)
 	if err != nil {
 			s.Error = &services.Error{
 					Status:  400,

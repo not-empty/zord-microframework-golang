@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"errors"
 	"go-skeleton/application/services"
 	"io/fs"
 	"os"
@@ -59,6 +60,12 @@ func (cg *CodeGenerator) WalkProcess(name string, stub Stubs, replacers map[stri
 func (cg *CodeGenerator) Handler(args []string) {
 	stubs := GetStubsConfig(cg.Logger, cg.config, cg.domainType)
 	replacers := GetReplacersConfig(cg.Logger, cg.config, cg.domainType, args)
+
+	domain := args[0]
+	if FileExists("application/domain/" + domain + "/" + domain + ".go") {
+		cg.Logger.Error(errors.New("domain already exists"))
+		return
+	}
 
 	for name, stub := range stubs {
 		if !stub.IsGenerated {

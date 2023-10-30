@@ -5,18 +5,18 @@ import (
 	{{validatorImport}}
 )
 
-type RequestDTO struct {
+type Data struct {
 	{{domainPascalCase}}Id string `param:"{{domain}}_id"`
 }
 
 type Request struct {
-	DTO *RequestDTO
+	Data *Data
 	{{validator}}
 }
 
-func NewRequest(dto *RequestDTO{{,validator}}) Request {
+func NewRequest(data *Data{{,validator}}) Request {
 	return Request{
-		DTO: dto,
+		Data: data,
 		{{validatorInject}}
 	}
 }
@@ -30,7 +30,7 @@ func (r *Request) Validate() error {
 }
 
 func (r *Request) {{domain}}IdRule() error {
-	if r.DTO.{{domainPascalCase}}Id == `""` {
+	if r.Data.{{domainPascalCase}}Id == `""` {
 		return errors.New("invalid_argument")
 	}
 	return nil

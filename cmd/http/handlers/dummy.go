@@ -46,14 +46,14 @@ func NewDummyHandlers(
 
 func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
 	s := dummyGet.NewService(hs.logger, hs.DummyRepository)
-	dto := new(dummyGet.RequestDTO)
+	data := new(dummyGet.Data)
 
-	if errors := context.Bind(dto); errors != nil {
+	if errors := context.Bind(data); errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		dummyGet.NewRequest(dto),
+		dummyGet.NewRequest(data),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -64,14 +64,14 @@ func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
 
 func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 	s := dummyCreate.NewService(hs.logger, hs.DummyRepository, hs.idCreator)
-	dto := new(dummyCreate.RequestDTO)
+	data := new(dummyCreate.Data)
 
-	if errors := context.Bind(dto); errors != nil {
+	if errors := context.Bind(data); errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		dummyCreate.NewRequest(dto, hs.validator),
+		dummyCreate.NewRequest(data, hs.validator),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -82,14 +82,14 @@ func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 
 func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 	s := dummyEdit.NewService(hs.logger, hs.DummyRepository)
-	dto := new(dummyEdit.RequestDTO)
+	data := new(dummyEdit.Data)
 
-	if errors := context.Bind(dto); errors != nil {
+	if errors := context.Bind(data); errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		dummyEdit.NewRequest(dto, hs.validator),
+		dummyEdit.NewRequest(data, hs.validator),
 	)
 
 	response, err := s.GetResponse()
@@ -113,14 +113,14 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 
 func (hs *DummyHandlers) HandleDeleteDummy(context echo.Context) error {
 	s := dummyDelete.NewService(hs.logger, hs.DummyRepository)
-	dto := new(dummyDelete.RequestDTO)
+	data := new(dummyDelete.Data)
 
-	if errors := context.Bind(dto); errors != nil {
+	if errors := context.Bind(data); errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		dummyDelete.NewRequest(dto),
+		dummyDelete.NewRequest(data),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

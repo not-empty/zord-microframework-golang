@@ -5,19 +5,19 @@ import (
 	"go-skeleton/application/services"
 )
 
-type RequestDTO struct {
+type Data struct {
 	DummyId   string `param:"dummy_id"`
 	DummyName string `json:"dummy_name"`
 }
 
 type Request struct {
-	DTO       *RequestDTO
+	Data      *Data
 	validator services.Validator
 }
 
-func NewRequest(dto *RequestDTO, validator services.Validator) Request {
+func NewRequest(data *Data, validator services.Validator) Request {
 	return Request{
-		DTO:       dto,
+		Data:      data,
 		validator: validator,
 	}
 }
@@ -26,7 +26,7 @@ func (r *Request) Validate() error {
 	if err := r.dummyIdRule(); err != nil {
 		return err
 	}
-	errs := r.validator.ValidateStruct(r.DTO)
+	errs := r.validator.ValidateStruct(r.Data)
 	for _, err := range errs {
 		if err != nil {
 			return err
@@ -36,7 +36,7 @@ func (r *Request) Validate() error {
 }
 
 func (r *Request) dummyIdRule() error {
-	if r.DTO.DummyId == `""` {
+	if r.Data.DummyId == `""` {
 		return errors.New("invalid_argument")
 	}
 	return nil

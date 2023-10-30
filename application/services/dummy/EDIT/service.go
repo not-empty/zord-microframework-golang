@@ -28,17 +28,17 @@ func (s *Service) Execute(request Request) {
 		return
 	}
 
-	s.produceResponseRule(request.DTO)
+	s.produceResponseRule(request.Data)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(dto *RequestDTO) {
+func (s *Service) produceResponseRule(data *Data) {
 	dummy := dummy.Dummy{
-		DummyId:   dto.DummyId,
-		DummyName: dto.DummyName,
+		DummyId:   data.DummyId,
+		DummyName: data.DummyName,
 	}
 
 	err := s.repository.Edit(&dummy)

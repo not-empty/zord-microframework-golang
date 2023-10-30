@@ -9,7 +9,7 @@ domainPascalCase = "{{domainPascalCase}}"
 "{{validatorInject}}" = "	validator: validator,"
 "{{hsValidator}}" = "hs.validator"
 "{{,hsValidator}}" = ", hs.validator"
-"{{validatorRule}}" = """errs := r.validator.ValidateStruct(r.DTO)
+"{{validatorRule}}" = """errs := r.validator.ValidateStruct(r.Data)
 	for _, err := range errs {
 		if err != nil {
 			return err

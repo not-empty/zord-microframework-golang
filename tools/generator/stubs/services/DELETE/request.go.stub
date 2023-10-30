@@ -4,18 +4,18 @@ import (
 	{{validatorImport}}
 )
 
-type RequestDTO struct {
+type Data struct {
 	{{domainPascalCase}}Id string `param:"{{domain}}_id"`
 }
 
 type Request struct {
-	DTO *RequestDTO
+	Data *Data
 	err error
 }
 
-func NewRequest(dto *RequestDTO{{,validator}}) Request {
+func NewRequest(data *Data{{,validator}}) Request {
 	return Request{
-		DTO: dto,
+		Data: data,
 	}
 }
 

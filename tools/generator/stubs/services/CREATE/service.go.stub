@@ -31,17 +31,17 @@ func (s *Service) Execute(request Request) {
 		return
 	}
 
-	request.DTO.{{domainPascalCase}}Id = s.idCreator.Create()
-	s.produceResponseRule(request.DTO)
+	request.Data.{{domainPascalCase}}Id = s.idCreator.Create()
+	s.produceResponseRule(request.Data)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(dto *RequestDTO) {
+func (s *Service) produceResponseRule(data *Data) {
 	{{domain}} := {{domain}}.{{domainPascalCase}}{
-		{{domainPascalCase}}Id:   dto.{{domainPascalCase}}Id,
+		{{domainPascalCase}}Id:   data.{{domainPascalCase}}Id,
 	}
 
 	err := s.repository.Create(&{{domain}})

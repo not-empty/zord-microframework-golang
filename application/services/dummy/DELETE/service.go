@@ -27,18 +27,18 @@ func (s *Service) Execute(request Request) {
 		s.BadRequest(request, err)
 		return
 	}
-	s.produceResponseRule(request.DTO)
+	s.produceResponseRule(request.Data)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(dto *RequestDTO) {
+func (s *Service) produceResponseRule(data *Data) {
 	s.Logger.Debug("ProduceResponseRule")
 
 	dummy := dummy.Dummy{
-		DummyId: dto.DummyId,
+		DummyId: data.DummyId,
 	}
 
 	err := s.repository.Delete(&dummy)

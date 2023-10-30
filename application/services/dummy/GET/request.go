@@ -4,18 +4,18 @@ import (
 	"errors"
 )
 
-type RequestDTO struct {
+type Data struct {
 	DummyId string `param:"dummy_id"`
 }
 
 type Request struct {
-	DTO *RequestDTO
-	Err error
+	Data *Data
+	Err  error
 }
 
-func NewRequest(dto *RequestDTO) Request {
+func NewRequest(data *Data) Request {
 	return Request{
-		DTO: dto,
+		Data: data,
 	}
 }
 
@@ -27,7 +27,7 @@ func (r *Request) Validate() error {
 }
 
 func (r *Request) dummyIdRule() error {
-	if r.DTO.DummyId == `""` {
+	if r.Data.DummyId == `""` {
 		return errors.New("invalid_argument")
 	}
 	return nil

@@ -10,7 +10,6 @@ import (
 	dummyGet "go-skeleton/application/services/dummy/GET"
 	dummyList "go-skeleton/application/services/dummy/LIST"
 	"go-skeleton/pkg"
-	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
 	dummyRepository "go-skeleton/pkg/repositories/dummy"
@@ -19,7 +18,6 @@ import (
 )
 
 type DummyHandlers struct {
-	Environment     string
 	DummyRepository *dummyRepository.DummyRepository
 
 	logger    *logger.Logger
@@ -27,22 +25,14 @@ type DummyHandlers struct {
 	validator *validator.Validator
 }
 
-func NewDummyHandlers(
-	environment string,
-	deps map[string]pkg.Bootable,
-) *DummyHandlers {
-	l := deps["logger"].(*logger.Logger)
-	m := deps["mysql"].(*database.MySql)
-	i := deps["IdCreator"].(*idCreator.IdCreator)
-	v := deps["validator"].(*validator.Validator)
-	repository := dummyRepository.NewBaseRepository(m)
+func NewDummyHandlers() *DummyHandlers {
+	repository := dummyRepository.NewBaseRepository(pkg.Mysql)
 
 	return &DummyHandlers{
-		Environment:     environment,
 		DummyRepository: repository,
-		logger:          l,
-		idCreator:       i,
-		validator:       v,
+		logger:          pkg.Logger,
+		idCreator:       pkg.IdCreator,
+		validator:       pkg.Validator,
 	}
 }
 

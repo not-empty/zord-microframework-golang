@@ -37,7 +37,7 @@ func NewMysql(
 	}
 }
 
-func (m *MySql) Boot() {
+func (m *MySql) Connect() {
 	dsn := "%s:%s@tcp(%s:%s)/%s"
 	dsn = fmt.Sprintf(
 		dsn,

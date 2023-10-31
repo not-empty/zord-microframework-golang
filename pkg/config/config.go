@@ -21,9 +21,6 @@ func NewConfig() *Config {
 	return &config
 }
 
-func (c *Config) Boot() {
-}
-
 func (c *Config) ReadConfig(Key string) string {
 	env := os.Getenv(Key)
 	if env == "" {

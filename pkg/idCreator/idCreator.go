@@ -9,9 +9,6 @@ func NewIdCreator() *IdCreator {
 	return &IdCreator{}
 }
 
-func (*IdCreator) Boot() {
-}
-
 func (*IdCreator) Create() string {
 	return ulid.Make().String()
 }

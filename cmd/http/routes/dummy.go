@@ -3,15 +3,14 @@ package routes
 import (
 	"github.com/labstack/echo/v4"
 	"go-skeleton/cmd/http/handlers"
-	"go-skeleton/pkg"
 )
 
 type DummyRoutes struct {
 	hand *handlers.DummyHandlers
 }
 
-func NewDummyRoutes(env string, deps map[string]pkg.Bootable) *DummyRoutes {
-	hand := handlers.NewDummyHandlers(env, deps)
+func NewDummyRoutes() *DummyRoutes {
+	hand := handlers.NewDummyHandlers()
 	return &DummyRoutes{
 		hand: hand,
 	}

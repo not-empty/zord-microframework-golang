@@ -6,7 +6,6 @@ import (
 	"go-skeleton/application/domain/auth"
 	login "go-skeleton/application/services/auth/LOGIN"
 	"go-skeleton/pkg"
-	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/logger"
 	"io"
 )
@@ -20,16 +19,14 @@ type AuthHandlers struct {
 	AccessToken   []string
 }
 
-func NewAuthHandlers(deps map[string]pkg.Bootable) *AuthHandlers {
-	config := deps["config"].(*config.Config)
-
+func NewAuthHandlers() *AuthHandlers {
 	return &AuthHandlers{
-		logger:        deps["logger"].(*logger.Logger),
-		Secret:        config.ReadConfig("JWT_SECRET"),
-		JwtExpiration: config.ReadNumberConfig("JWT_EXPIRATION"),
-		AccessSecret:  config.ReadArrayConfig("ACCESS_SECRET"),
-		AccessContext: config.ReadArrayConfig("ACCESS_CONTEXT"),
-		AccessToken:   config.ReadArrayConfig("ACCESS_TOKEN"),
+		logger:        pkg.Logger,
+		Secret:        pkg.Config.ReadConfig("JWT_SECRET"),
+		JwtExpiration: pkg.Config.ReadNumberConfig("JWT_EXPIRATION"),
+		AccessSecret:  pkg.Config.ReadArrayConfig("ACCESS_SECRET"),
+		AccessContext: pkg.Config.ReadArrayConfig("ACCESS_CONTEXT"),
+		AccessToken:   pkg.Config.ReadArrayConfig("ACCESS_TOKEN"),
 	}
 }
 

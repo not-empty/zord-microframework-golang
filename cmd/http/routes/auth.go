@@ -1,19 +1,17 @@
 package routes
 
 import (
-	"go-skeleton/cmd/http/handlers"
-	"go-skeleton/pkg"
-
 	"github.com/labstack/echo/v4"
+	"go-skeleton/cmd/http/handlers"
 )
 
 type Auth struct {
 	hand *handlers.AuthHandlers
 }
 
-func NewAuthRoute(deps map[string]pkg.Bootable) *Auth {
+func NewAuthRoute() *Auth {
 	return &Auth{
-		hand: handlers.NewAuthHandlers(deps),
+		hand: handlers.NewAuthHandlers(),
 	}
 }
 

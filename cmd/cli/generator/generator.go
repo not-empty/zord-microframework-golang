@@ -2,7 +2,6 @@ package generator
 
 import (
 	"errors"
-	"fmt"
 	"go-skeleton/application/services"
 	"go-skeleton/pkg"
 	"go-skeleton/tools/generator"
@@ -78,10 +77,7 @@ func (g *Generator) DestroyDomain(_ *cobra.Command, args []string) {
 }
 
 func (g *Generator) BootGenerator(_ *cobra.Command, _ []string) {
-	for index, dep := range pkg.CliDependencies {
-		dep.Boot()
-		pkg.Logger.Info(fmt.Sprintf("[generator.generator] Booting %s", index))
-	}
+	pkg.Logger.Boot()
 }
 
 func (g *Generator) initFlags(cmd *cobra.Command) {

@@ -1,19 +1,23 @@
 package dummy
 
 import (
-	domain "go-skeleton/application/domain/dummy"
 	"go-skeleton/application/services"
 )
 
+type Data struct {
+	DummyId   string
+	DummyName string `validate:"required,min=3,max=32" json:"dummy_name"`
+}
+
 type Request struct {
-	Dummy     domain.Dummy
+	Data      *Data
 	Err       error
 	validator services.Validator
 }
 
-func NewRequest(dummy domain.Dummy, validator services.Validator) Request {
+func NewRequest(data *Data, validator services.Validator) Request {
 	return Request{
-		Dummy:     dummy,
+		Data:      data,
 		validator: validator,
 	}
 }
@@ -22,7 +26,7 @@ func (r *Request) Validate() error {
 	if err := r.dummyCreateRule(); err != nil {
 		return err
 	}
-	errs := r.validator.ValidateStruct(r.Dummy)
+	errs := r.validator.ValidateStruct(r.Data)
 	for _, err := range errs {
 		if err != nil {
 			return err

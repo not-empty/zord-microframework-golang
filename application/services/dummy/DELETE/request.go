@@ -1,19 +1,17 @@
 package dummy
 
-import (
-	domain "go-skeleton/application/domain/dummy"
-)
-
-type Request struct {
-	Err   error
-	dummy domain.Dummy
+type Data struct {
+	DummyId string `param:"dummy_id"`
 }
 
-func NewRequest(dummyId string) Request {
+type Request struct {
+	Data *Data
+	Err  error
+}
+
+func NewRequest(data *Data) Request {
 	return Request{
-		dummy: domain.Dummy{
-			DummyId: dummyId,
-		},
+		Data: data,
 	}
 }
 

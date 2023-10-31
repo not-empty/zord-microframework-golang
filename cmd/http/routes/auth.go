@@ -6,11 +6,13 @@ import (
 )
 
 type Auth struct {
-	hand handlers.AuthHandlers
+	hand *handlers.AuthHandlers
 }
 
 func NewAuthRoute() *Auth {
-	return &Auth{}
+	return &Auth{
+		hand: handlers.NewAuthHandlers(),
+	}
 }
 
 func (hs *Auth) DeclareRoutes(server *echo.Group) {

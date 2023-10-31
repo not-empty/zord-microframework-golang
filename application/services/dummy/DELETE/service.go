@@ -27,16 +27,21 @@ func (s *Service) Execute(request Request) {
 		s.BadRequest(request, err)
 		return
 	}
-	s.produceResponseRule(request.dummy)
+	s.produceResponseRule(request.Data)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(d dummy.Dummy) {
+func (s *Service) produceResponseRule(data *Data) {
 	s.Logger.Debug("ProduceResponseRule")
-	err := s.repository.Delete(&d)
+
+	dummy := dummy.Dummy{
+		DummyId: data.DummyId,
+	}
+
+	err := s.repository.Delete(&dummy)
 	if err != nil {
 		s.Error = &services.Error{
 			Status:  400,

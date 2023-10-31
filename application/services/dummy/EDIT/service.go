@@ -28,15 +28,20 @@ func (s *Service) Execute(request Request) {
 		return
 	}
 
-	s.produceResponseRule(&request.Dummy)
+	s.produceResponseRule(request.Data)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(dummy *dummy.Dummy) {
-	err := s.repository.Edit(dummy)
+func (s *Service) produceResponseRule(data *Data) {
+	dummy := dummy.Dummy{
+		DummyId:   data.DummyId,
+		DummyName: data.DummyName,
+	}
+
+	err := s.repository.Edit(&dummy)
 	if err != nil {
 		s.Error = &services.Error{
 			Status:  400,

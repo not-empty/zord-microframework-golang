@@ -2,19 +2,20 @@ package dummy
 
 import (
 	"errors"
-	domain "go-skeleton/application/domain/dummy"
 )
 
-type Request struct {
-	Dummy domain.Dummy
-	Err   error
+type Data struct {
+	DummyId string `param:"dummy_id"`
 }
 
-func NewRequest(dummyId string) Request {
+type Request struct {
+	Data *Data
+	Err  error
+}
+
+func NewRequest(data *Data) Request {
 	return Request{
-		Dummy: domain.Dummy{
-			DummyId: dummyId,
-		},
+		Data: data,
 	}
 }
 
@@ -26,7 +27,7 @@ func (r *Request) Validate() error {
 }
 
 func (r *Request) dummyIdRule() error {
-	if r.Dummy.DummyId == `""` {
+	if r.Data.DummyId == `""` {
 		return errors.New("invalid_argument")
 	}
 	return nil

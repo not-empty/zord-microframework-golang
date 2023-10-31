@@ -31,15 +31,19 @@ func (s *Service) Execute(request Request) {
 		return
 	}
 
-	request.Dummy.DummyId = s.idCreator.Create()
-	s.produceResponseRule(request.Dummy)
+	request.Data.DummyId = s.idCreator.Create()
+	s.produceResponseRule(request.Data)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(dummy dummy.Dummy) {
+func (s *Service) produceResponseRule(data *Data) {
+	dummy := dummy.Dummy{
+		DummyId:   data.DummyId,
+		DummyName: data.DummyName,
+	}
 	err := s.repository.Create(&dummy)
 	if err != nil {
 		s.Error = &services.Error{

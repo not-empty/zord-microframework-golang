@@ -13,7 +13,6 @@ import (
 type Server struct {
 	config *config.Config
 	logger *logger.Logger
-	deps   map[string]pkg.Bootable
 }
 
 func NewServer() *Server {

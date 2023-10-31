@@ -1,20 +1,21 @@
 package {{domain}}
 
 import (
-	domain "go-skeleton/application/domain/{{domain}}"
 	{{validatorImport}}
 )
 
-type Request struct {
-	{{domainPascalCase}} domain.{{domainPascalCase}}
-	err   error
+type Data struct {
+	{{domainPascalCase}}Id string `param:"{{domain}}_id"`
 }
 
-func NewRequest({{domain}}Id string{{,validator}}) Request {
+type Request struct {
+	Data *Data
+	err error
+}
+
+func NewRequest(data *Data{{,validator}}) Request {
 	return Request{
-		{{domainPascalCase}}: domain.{{domainPascalCase}}{
-			{{domainPascalCase}}Id: {{domain}}Id,
-		},
+		Data: data,
 	}
 }
 

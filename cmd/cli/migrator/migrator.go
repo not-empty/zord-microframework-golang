@@ -1,10 +1,8 @@
 package migrator
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
 	"go-skeleton/pkg"
-	"go-skeleton/pkg/database"
 	"go-skeleton/tools/migrator"
 )
 
@@ -27,13 +25,10 @@ func (m *Migrator) DeclareCommands(cmd *cobra.Command) {
 }
 
 func (m *Migrator) Migrate(_ *cobra.Command, _ []string) {
-	migratorInstance := migrator.NewMigrator(pkg.MigratorDependencies["mysql"].(*database.MySql))
+	migratorInstance := migrator.NewMigrator(pkg.Mysql)
 	migratorInstance.MigrateAllDomains()
 }
 
 func (m *Migrator) BootMigrator(_ *cobra.Command, _ []string) {
-	for index, dep := range pkg.MigratorDependencies {
-		dep.Boot()
-		pkg.Logger.Info(fmt.Sprintf("[migrator.Migrator] Booting %s", index))
-	}
+	pkg.Mysql.Connect()
 }

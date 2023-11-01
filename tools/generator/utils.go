@@ -2,7 +2,7 @@ package generator
 
 import (
 	"errors"
-	"go-skeleton/application/services"
+	"go-skeleton/internal/application/services"
 	"os"
 	"strings"
 

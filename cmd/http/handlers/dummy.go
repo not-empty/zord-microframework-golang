@@ -1,15 +1,15 @@
 package handlers
 
 import (
-	dummyCreate "go-skeleton/application/services/dummy/CREATE"
-	dummyDelete "go-skeleton/application/services/dummy/DELETE"
-	dummyEdit "go-skeleton/application/services/dummy/EDIT"
-	dummyGet "go-skeleton/application/services/dummy/GET"
-	dummyList "go-skeleton/application/services/dummy/LIST"
+	dummy5 "go-skeleton/internal/application/services/dummy/CREATE"
+	dummy4 "go-skeleton/internal/application/services/dummy/DELETE"
+	dummy2 "go-skeleton/internal/application/services/dummy/EDIT"
+	"go-skeleton/internal/application/services/dummy/GET"
+	dummy3 "go-skeleton/internal/application/services/dummy/LIST"
+	"go-skeleton/internal/repositories/dummy"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
-	dummyRepository "go-skeleton/pkg/repositories/dummy"
 	"go-skeleton/pkg/validator"
 
 	"github.com/labstack/echo/v4"
@@ -35,15 +35,15 @@ func NewDummyHandlers() *DummyHandlers {
 }
 
 func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
-	s := dummyGet.NewService(hs.logger, hs.DummyRepository)
-	data := new(dummyGet.Data)
+	s := dummy.NewService(hs.logger, hs.DummyRepository)
+	data := new(dummy.Data)
 
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		dummyGet.NewRequest(data),
+		dummy.NewRequest(data),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -53,15 +53,15 @@ func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
 }
 
 func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
-	s := dummyCreate.NewService(hs.logger, hs.DummyRepository, hs.idCreator)
-	data := new(dummyCreate.Data)
+	s := dummy5.NewService(hs.logger, hs.DummyRepository, hs.idCreator)
+	data := new(dummy5.Data)
 
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		dummyCreate.NewRequest(data, hs.validator),
+		dummy5.NewRequest(data, hs.validator),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -71,15 +71,15 @@ func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 }
 
 func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
-	s := dummyEdit.NewService(hs.logger, hs.DummyRepository)
-	data := new(dummyEdit.Data)
+	s := dummy2.NewService(hs.logger, hs.DummyRepository)
+	data := new(dummy2.Data)
 
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		dummyEdit.NewRequest(data, hs.validator),
+		dummy2.NewRequest(data, hs.validator),
 	)
 
 	response, err := s.GetResponse()
@@ -90,9 +90,9 @@ func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 }
 
 func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
-	s := dummyList.NewService(hs.logger, hs.DummyRepository)
+	s := dummy3.NewService(hs.logger, hs.DummyRepository)
 	s.Execute(
-		dummyList.NewRequest(),
+		dummy3.NewRequest(),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -102,15 +102,15 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 }
 
 func (hs *DummyHandlers) HandleDeleteDummy(context echo.Context) error {
-	s := dummyDelete.NewService(hs.logger, hs.DummyRepository)
-	data := new(dummyDelete.Data)
+	s := dummy4.NewService(hs.logger, hs.DummyRepository)
+	data := new(dummy4.Data)
 
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		dummyDelete.NewRequest(data),
+		dummy4.NewRequest(data),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

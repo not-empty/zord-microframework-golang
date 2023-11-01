@@ -2,9 +2,9 @@ package cli
 
 import (
 	"github.com/spf13/cobra"
-	"go-skeleton/application/services"
 	"go-skeleton/cmd/cli/generator"
 	"go-skeleton/cmd/cli/migrator"
+	"go-skeleton/internal/application/services"
 	"go-skeleton/pkg"
 )
 

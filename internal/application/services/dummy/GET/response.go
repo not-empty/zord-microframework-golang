@@ -1,6 +1,8 @@
 package dummy
 
-import "go-skeleton/application/domain/dummy"
+import (
+	"go-skeleton/internal/application/domain/dummy"
+)
 
 type Response struct {
 	Status int          `json:"status,omitempty"`

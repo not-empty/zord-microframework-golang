@@ -1,7 +1,7 @@
 package generator
 
 import (
-	"go-skeleton/application/services"
+	"go-skeleton/internal/application/services"
 	"os"
 )
 

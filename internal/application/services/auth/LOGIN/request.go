@@ -2,7 +2,7 @@ package auth
 
 import (
 	"errors"
-	"go-skeleton/application/domain/auth"
+	"go-skeleton/internal/application/domain/auth"
 )
 
 type Request struct {

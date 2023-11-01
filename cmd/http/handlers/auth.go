@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/labstack/echo/v4"
 	"go-skeleton/internal/application/domain/auth"
-	auth2 "go-skeleton/internal/application/services/auth/LOGIN"
+	authLogin "go-skeleton/internal/application/services/auth/LOGIN"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/logger"
 	"io"
@@ -43,7 +43,7 @@ func (hs *AuthHandlers) HandleLogin(c echo.Context) error {
 		return c.JSON(422, errors)
 	}
 
-	s := auth2.NewService(
+	s := authLogin.NewService(
 		hs.logger,
 		hs.Secret,
 		hs.JwtExpiration,
@@ -52,7 +52,7 @@ func (hs *AuthHandlers) HandleLogin(c echo.Context) error {
 		hs.AccessToken,
 	)
 	s.Execute(
-		auth2.NewRequest(domain),
+		authLogin.NewRequest(domain),
 	)
 
 	response, err := s.GetResponse()

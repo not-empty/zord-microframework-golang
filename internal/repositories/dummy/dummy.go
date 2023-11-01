@@ -1,7 +1,7 @@
 package dummyRepository
 
 import (
-	"go-skeleton/application/domain/dummy"
+	"go-skeleton/internal/application/domain/dummy"
 	"go-skeleton/pkg/database"
 )
 

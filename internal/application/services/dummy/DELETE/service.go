@@ -1,8 +1,8 @@
 package dummy
 
 import (
-	"go-skeleton/application/domain/dummy"
-	"go-skeleton/application/services"
+	"go-skeleton/internal/application/domain/dummy"
+	"go-skeleton/internal/application/services"
 	"net/http"
 )
 
@@ -22,7 +22,7 @@ func NewService(log services.Logger, repository dummy.Repository) *Service {
 }
 
 func (s *Service) Execute(request Request) {
-	s.Logger.Debug("Hello Im Dummy Server!")
+	s.Logger.Debug("Deleting dummy!")
 	if err := request.Validate(); err != nil {
 		s.BadRequest(request, err)
 		return
@@ -36,7 +36,12 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 
 func (s *Service) produceResponseRule(data *Data) {
 	s.Logger.Debug("ProduceResponseRule")
-	dummyData, err := s.repository.Get(data.DummyId)
+
+	dummy := dummy.Dummy{
+		DummyId: data.DummyId,
+	}
+
+	err := s.repository.Delete(&dummy)
 	if err != nil {
 		s.Error = &services.Error{
 			Status:  400,
@@ -45,8 +50,9 @@ func (s *Service) produceResponseRule(data *Data) {
 		}
 		return
 	}
+
 	s.response = &Response{
 		Status: http.StatusOK,
-		Data:   dummyData,
 	}
+
 }

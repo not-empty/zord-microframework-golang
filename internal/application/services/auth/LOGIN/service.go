@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"go-skeleton/application/domain/auth"
-	"go-skeleton/application/services"
+	"go-skeleton/internal/application/domain/auth"
+	"go-skeleton/internal/application/services"
 	"net/http"
 	"time"
 

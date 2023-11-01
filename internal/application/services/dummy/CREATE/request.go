@@ -1,17 +1,17 @@
 package dummy
 
 import (
-	"errors"
-	"go-skeleton/application/services"
+	"go-skeleton/internal/application/services"
 )
 
 type Data struct {
-	DummyId   string `param:"dummy_id"`
-	DummyName string `json:"dummy_name"`
+	DummyId   string
+	DummyName string `validate:"required,min=3,max=32" json:"dummy_name"`
 }
 
 type Request struct {
 	Data      *Data
+	Err       error
 	validator services.Validator
 }
 
@@ -23,7 +23,7 @@ func NewRequest(data *Data, validator services.Validator) Request {
 }
 
 func (r *Request) Validate() error {
-	if err := r.dummyIdRule(); err != nil {
+	if err := r.dummyCreateRule(); err != nil {
 		return err
 	}
 	errs := r.validator.ValidateStruct(r.Data)
@@ -35,9 +35,6 @@ func (r *Request) Validate() error {
 	return nil
 }
 
-func (r *Request) dummyIdRule() error {
-	if r.Data.DummyId == `""` {
-		return errors.New("invalid_argument")
-	}
+func (r *Request) dummyCreateRule() error {
 	return nil
 }

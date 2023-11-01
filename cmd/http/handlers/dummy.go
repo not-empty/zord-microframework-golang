@@ -1,15 +1,15 @@
 package handlers
 
 import (
-	dummyCreate "go-skeleton/application/services/dummy/CREATE"
-	dummyDelete "go-skeleton/application/services/dummy/DELETE"
-	dummyEdit "go-skeleton/application/services/dummy/EDIT"
-	dummyGet "go-skeleton/application/services/dummy/GET"
-	dummyList "go-skeleton/application/services/dummy/LIST"
+	dummyCreate "go-skeleton/internal/application/services/dummy/CREATE"
+	dummyDelete "go-skeleton/internal/application/services/dummy/DELETE"
+	dummyEdit "go-skeleton/internal/application/services/dummy/EDIT"
+	dummyGet "go-skeleton/internal/application/services/dummy/GET"
+	dummyList "go-skeleton/internal/application/services/dummy/LIST"
+	"go-skeleton/internal/repositories/dummy"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
-	dummyRepository "go-skeleton/pkg/repositories/dummy"
 	"go-skeleton/pkg/validator"
 
 	"github.com/labstack/echo/v4"

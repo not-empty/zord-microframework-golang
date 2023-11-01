@@ -3,8 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/labstack/echo/v4"
-	"go-skeleton/application/domain/auth"
-	login "go-skeleton/application/services/auth/LOGIN"
+	"go-skeleton/internal/application/domain/auth"
+	authLogin "go-skeleton/internal/application/services/auth/LOGIN"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/logger"
 	"io"
@@ -43,7 +43,7 @@ func (hs *AuthHandlers) HandleLogin(c echo.Context) error {
 		return c.JSON(422, errors)
 	}
 
-	s := login.NewService(
+	s := authLogin.NewService(
 		hs.logger,
 		hs.Secret,
 		hs.JwtExpiration,
@@ -52,7 +52,7 @@ func (hs *AuthHandlers) HandleLogin(c echo.Context) error {
 		hs.AccessToken,
 	)
 	s.Execute(
-		login.NewRequest(domain),
+		authLogin.NewRequest(domain),
 	)
 
 	response, err := s.GetResponse()

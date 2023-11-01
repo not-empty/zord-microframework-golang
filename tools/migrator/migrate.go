@@ -1,7 +1,7 @@
 package migrator
 
 import (
-	"go-skeleton/application/domain/dummy"
+	"go-skeleton/internal/application/domain/dummy"
 
 	//{{codeGen3}}
 	"go-skeleton/pkg/database"

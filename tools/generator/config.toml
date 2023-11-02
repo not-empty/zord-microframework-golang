@@ -1,8 +1,8 @@
 [replacers.crud]
 ".stub" = ""
-domain = "{{domain}}"
-domainCamelCase = "{{domainCamelCase}}"
-domainPascalCase = "{{domainPascalCase}}"
+crud = "{{domain}}"
+crudCamelCase = "{{domainCamelCase}}"
+crudPascalCase = "{{domainPascalCase}}"
 "{{validatorImport}}" = "\n	\"go-skeleton/application/services\""
 "{{validator}}" = "\n	validator services.Validator"
 "{{,validator}}" = ", validator services.Validator"
@@ -63,8 +63,8 @@ deletePatterns = [
 usecase = "{{usecase}}"
 usecaseCamelCase = "{{usecaseCamelCase}}"
 usecasePascalCase = "{{usecasePascalCase}}"
-"//{{codeGen1}}" = "{{usecaseCamelCase}}ListRoutes := New{{usecasePascalCase}}Routes(Env, deps)\n	$repeat$"
-"//{{codeGen2}}" = "\"{{usecase}}\": {{usecaseCamelCase}}ListRoutes,\n		$repeat$"
+"//{{codeGen1}}" = "{{usecaseCamelCase}}Route := New{{usecasePascalCase}}Routes()\n	$repeat$"
+"//{{codeGen2}}" = "\"{{usecase}}\": {{usecaseCamelCase}}Route,\n		$repeat$"
 
 [stubs.usecase.services]
 toPath = "internal/application/services/{{usecase}}/"

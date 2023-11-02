@@ -4,14 +4,14 @@ import (
 	"github.com/spf13/cobra"
 	"go-skeleton/cmd/cli/generator"
 	"go-skeleton/cmd/cli/migrator"
-	"go-skeleton/internal/application/services"
 	"go-skeleton/pkg"
+	"go-skeleton/pkg/logger"
 )
 
 type Cli struct {
 	Environment string
 	Cmd         *cobra.Command
-	logger      services.Logger
+	logger      *logger.Logger
 }
 
 func NewCli(cmd *cobra.Command) *Cli {

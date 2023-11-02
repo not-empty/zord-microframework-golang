@@ -2,7 +2,7 @@ package generator
 
 import (
 	"errors"
-	"go-skeleton/internal/application/services"
+	"go-skeleton/pkg/logger"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -13,13 +13,13 @@ var (
 )
 
 type CodeGenerator struct {
-	Logger     services.Logger
+	Logger     *logger.Logger
 	config     *Config
 	validator  bool
 	domainType string
 }
 
-func NewCodeGenerator(logger services.Logger, validator bool, domainType string) *CodeGenerator {
+func NewCodeGenerator(logger *logger.Logger, validator bool, domainType string) *CodeGenerator {
 	return &CodeGenerator{
 		Logger:     logger,
 		config:     GetConfig(logger),
@@ -28,7 +28,7 @@ func NewCodeGenerator(logger services.Logger, validator bool, domainType string)
 	}
 }
 
-func GetConfig(l services.Logger) *Config {
+func GetConfig(l *logger.Logger) *Config {
 	c, err := GetTomlConfig(configPath)
 	if err != nil {
 		l.Error(err)
@@ -59,11 +59,15 @@ func (cg *CodeGenerator) WalkProcess(name string, stub Stubs, replacers map[stri
 
 func (cg *CodeGenerator) Handler(args []string) {
 	stubs := GetStubsConfig(cg.Logger, cg.config, cg.domainType)
-	replacers := GetReplacersConfig(cg.Logger, cg.config, cg.domainType, args)
-
+	replacers := GetReplacersConfig(cg.config, cg.domainType, args)
 	domain := args[0]
-	if FileExists("application/domain/" + domain + "/" + domain + ".go") {
+	if FileExists("application/domain/"+domain+"/"+domain+".go") && cg.domainType == "crud" {
 		cg.Logger.Error(errors.New("domain already exists"))
+		return
+	}
+
+	if FileExists("application/services/"+domain+"service.go") && cg.domainType == "usecase" {
+		cg.Logger.Error(errors.New("service already exists"))
 		return
 	}
 

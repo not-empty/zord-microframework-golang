@@ -11,9 +11,11 @@ type Declarable interface {
 func GetProtectedRoutes() map[string]Declarable {
 
 	dummyListRoutes := NewDummyRoutes()
+	testeListRoutes := NewTesteRoutes(Env, deps)
 	//{{codeGen1}}
 	domains := map[string]Declarable{
 		"dummy": dummyListRoutes,
+		"teste": testeListRoutes,
 		//{{codeGen2}}
 	}
 	return domains

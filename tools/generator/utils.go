@@ -2,7 +2,7 @@ package generator
 
 import (
 	"errors"
-	"go-skeleton/internal/application/services"
+	"go-skeleton/pkg/logger"
 	"os"
 	"strings"
 
@@ -63,6 +63,7 @@ func ProcessFile(fromPath string, toPath string, replacers map[string]string) er
 
 func ProcessFolder(folderPath string, replacers map[string]string) error {
 	replPath := Replacer(folderPath, replacers)
+
 	if _, err := os.Stat(replPath); os.IsNotExist(err) {
 		err := os.Mkdir(replPath, 0755)
 		if err != nil {
@@ -112,24 +113,25 @@ func DefineFromToReplaceVariables(vars map[string]string, args []string, replace
 	return replaced
 }
 
-func GetStubsConfig(l services.Logger, c *Config, domainType string) map[string]Stubs {
+func GetStubsConfig(l *logger.Logger, c *Config, domainType string) map[string]Stubs {
 	stubs, ok := c.Stubs[domainType]
+
 	if !ok {
 		l.Error(errors.New("invalid domain type"))
 	}
 	return stubs
 }
 
-func GetReplacersConfig(l services.Logger, c *Config, domainType string, args []string) map[string]string {
+func GetReplacersConfig(c *Config, domainType string, args []string) map[string]string {
 	replacers, ok := c.Replacers[domainType]
 	if !ok {
 		return map[string]string{}
 	}
 
 	vars := map[string]string{
-		"domain":           args[0],
-		"domainPascalCase": PascalCase(args[0]),
-		"domainCamelCase":  CamelCase(args[0]),
+		domainType:                args[0],
+		domainType + "PascalCase": PascalCase(args[0]),
+		domainType + "CamelCase":  CamelCase(args[0]),
 	}
 
 	replacers = DefineFromToReplaceVariables(vars, args, replacers)

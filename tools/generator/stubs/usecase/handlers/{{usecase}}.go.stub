@@ -1,0 +1,37 @@
+package handlers
+
+import (
+	"github.com/labstack/echo/v4"
+	"go-skeleton/internal/application/services/{{usecase}}"
+	"go-skeleton/pkg"
+	"go-skeleton/pkg/logger"
+)
+
+type {{usecasePascalCase}}Handlers struct {
+	logger    *logger.Logger
+}
+
+func New{{usecasePascalCase}}Handlers() *{{usecasePascalCase}}Handlers {
+	return &{{usecasePascalCase}}Handlers{
+		logger:          pkg.Logger,
+	}
+}
+
+
+func (hs *{{usecasePascalCase}}Handlers) Handle{{usecasePascalCase}}(context echo.Context) error {
+	s := {{usecase}}.NewService(hs.logger)
+
+    data := new({{usecase}}.Data)
+    if errors := context.Bind(data); errors != nil {
+        return context.JSON(422, errors)
+    }
+
+	s.Execute(
+		{{usecase}}.NewRequest(data),
+	)
+	response, err := s.GetResponse()
+	if err != nil {
+		return context.JSON(422, err)
+	}
+	return context.JSON(200, response)
+}

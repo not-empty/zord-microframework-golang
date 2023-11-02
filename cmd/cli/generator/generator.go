@@ -2,15 +2,15 @@ package generator
 
 import (
 	"errors"
-	"go-skeleton/internal/application/services"
 	"go-skeleton/pkg"
+	"go-skeleton/pkg/logger"
 	"go-skeleton/tools/generator"
 
 	"github.com/spf13/cobra"
 )
 
 type Generator struct {
-	Logger services.Logger
+	Logger *logger.Logger
 	Flags  Flags
 }
 
@@ -20,7 +20,7 @@ type Flags struct {
 	domain     string
 }
 
-func NewGenerator(l services.Logger) *Generator {
+func NewGenerator(l *logger.Logger) *Generator {
 	return &Generator{
 		Logger: l,
 	}
@@ -44,6 +44,8 @@ func (g *Generator) DeclareCommands(cmd *cobra.Command) {
 		PreRun: g.BootGenerator,
 		Run:    g.DestroyDomain,
 	}
+
+	destroyDomain.Flags().StringVar(&g.Flags.domainType, "type", "crud", "Define domain type: ['crud'|'<custom>']")
 
 	cmd.AddCommand(
 		createDomain,

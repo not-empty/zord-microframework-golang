@@ -23,22 +23,22 @@ domainPascalCase = "{{domainPascalCase}}"
 
 [stubs.crud.domain]
 toPath = "application/domain/{{domain}}/"
-fromPath = "tools/generator/stubs/domain/"
+fromPath = "tools/generator/stubs/crud/domain/"
 isGenerated = true
 
 [stubs.crud.services]
 toPath = "application/services/{{domain}}/"
-fromPath = "tools/generator/stubs/services/"
+fromPath = "tools/generator/stubs/crud/services/"
 isGenerated = true
 
 [stubs.crud.repositories]
 toPath = "pkg/repositories/{{domain}}/"
-fromPath = "tools/generator/stubs/repositories/"
+fromPath = "tools/generator/stubs/crud/repositories/"
 isGenerated = true
 
 [stubs.crud.routes]
 toPath = "cmd/http/routes/"
-fromPath = "tools/generator/stubs/routes/"
+fromPath = "tools/generator/stubs/crud/routes/"
 isGenerated = true
 uniqueDelete = "cmd/http/routes/{{domain}}.go"
 
@@ -56,4 +56,37 @@ isGenerated = false
 deletePatterns = [
 	"\"go-skeleton/application/domain/{{domain}}",
 	"&{{domain}}.{{domainPascalCase}}{}"
+]
+
+[replacers.usecase]
+".stub" = ""
+usecase = "{{usecase}}"
+usecaseCamelCase = "{{usecaseCamelCase}}"
+usecasePascalCase = "{{usecasePascalCase}}"
+"//{{codeGen1}}" = "{{usecaseCamelCase}}ListRoutes := New{{usecasePascalCase}}Routes(Env, deps)\n	$repeat$"
+"//{{codeGen2}}" = "\"{{usecase}}\": {{usecaseCamelCase}}ListRoutes,\n		$repeat$"
+
+[stubs.usecase.services]
+toPath = "internal/application/services/{{usecase}}/"
+fromPath = "tools/generator/stubs/usecase/services/"
+isGenerated = true
+
+[stubs.usecase.routes]
+toPath = "cmd/http/routes/"
+fromPath = "tools/generator/stubs/usecase/routes/"
+isGenerated = true
+uniqueDelete = "cmd/http/routes/{{usecase}}.go"
+
+[stubs.usecase.handlers]
+toPath = "cmd/http/handlers/"
+fromPath = "tools/generator/stubs/usecase/handlers/"
+isGenerated = true
+uniqueDelete = "cmd/http/handlers/{{usecase}}.go"
+
+[stubs.usecase.declarable]
+toPath = "cmd/http/routes/declarable.go"
+isGenerated = false
+deletePatterns = [
+	"New{{usecasePascalCase}}Routes",
+	"\"{{usecase}}\": "
 ]

@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/labstack/echo/v4"
-	"go-skeleton/internal/application/services/{{usecase}}"
+	"go-skeleton/internal/internal/application/services/{{usecase}}"
 	"go-skeleton/pkg"
 	"go-skeleton/pkg/logger"
 )

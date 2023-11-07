@@ -1,7 +1,7 @@
 package {{usecase}}
 
 import (
-	"go-skeleton/internal/application/services"
+	"go-skeleton/internal/internal/application/services"
 )
 
 type Service struct {

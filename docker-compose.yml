@@ -8,7 +8,7 @@ services:
     env_file:
       - .env
     ports:
-      - 1323:1323
+      - 1000:1000
     command: air http
     depends_on:
       mysql:

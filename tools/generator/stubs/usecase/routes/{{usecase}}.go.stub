@@ -1,0 +1,21 @@
+package routes
+
+import (
+	"go-skeleton/cmd/http/handlers"
+	"github.com/labstack/echo/v4"
+)
+
+type {{usecasePascalCase}}Routes struct {
+	hand *handlers.{{usecasePascalCase}}Handlers
+}
+
+func New{{usecasePascalCase}}Routes() *{{usecasePascalCase}}Routes {
+	hand := handlers.New{{usecasePascalCase}}Handlers()
+	return &{{usecasePascalCase}}Routes{
+		hand: hand,
+	}
+}
+
+func (hs *{{usecasePascalCase}}Routes) DeclareRoutes(server *echo.Group) {
+	server.GET("/v1/{{usecase}}", hs.hand.Handle{{usecasePascalCase}})
+}

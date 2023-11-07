@@ -1,17 +1,17 @@
 package generator
 
 import (
-	"go-skeleton/internal/application/services"
+	"go-skeleton/pkg/logger"
 	"os"
 )
 
 type CodeDestroy struct {
-	Logger     services.Logger
+	Logger     *logger.Logger
 	config     *Config
 	domainType string
 }
 
-func NewCodeDestroy(l services.Logger, domainType string) *CodeDestroy {
+func NewCodeDestroy(l *logger.Logger, domainType string) *CodeDestroy {
 	return &CodeDestroy{
 		Logger:     l,
 		config:     GetConfig(l),
@@ -21,7 +21,7 @@ func NewCodeDestroy(l services.Logger, domainType string) *CodeDestroy {
 
 func (cd *CodeDestroy) Handler(args []string) {
 	stubs := GetStubsConfig(cd.Logger, cd.config, cd.domainType)
-	replacers := GetReplacersConfig(cd.Logger, cd.config, cd.domainType, args)
+	replacers := GetReplacersConfig(cd.config, cd.domainType, args)
 
 	for _, stub := range stubs {
 		path := Replacer(stub.ToPath, replacers)

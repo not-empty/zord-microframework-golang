@@ -1,9 +1,5 @@
 package {{domain}}
 
-import (
-	{{validatorImport}}
-)
-
 type Data struct {
 	{{domainPascalCase}}Id string `param:"{{domain}}_id"`
 }
@@ -13,7 +9,7 @@ type Request struct {
 	err error
 }
 
-func NewRequest(data *Data{{,validator}}) Request {
+func NewRequest(data *Data) Request {
 	return Request{
 		Data: data,
 	}

@@ -1,8 +1,8 @@
 package {{domain}}
 
 import (
-	"go-skeleton/application/domain/{{domain}}"
-	"go-skeleton/application/services"
+	"go-skeleton/internal/application/domain/{{domain}}"
+	"go-skeleton/internal/application/services"
 	"net/http"
 )
 

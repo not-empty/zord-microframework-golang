@@ -1,133 +1,25 @@
 package routes
 
 import (
-	"encoding/json"
-	"go-skeleton/application/domain/{{domain}}"
-	{{domain}}Create "go-skeleton/application/services/{{domain}}/CREATE"
-	{{domain}}Delete "go-skeleton/application/services/{{domain}}/DELETE"
-	{{domain}}Edit "go-skeleton/application/services/{{domain}}/EDIT"
-	{{domain}}Get "go-skeleton/application/services/{{domain}}/GET"
-	{{domain}}List "go-skeleton/application/services/{{domain}}/LIST"
-	"go-skeleton/pkg/database"
-	"go-skeleton/pkg/logger"
-	"go-skeleton/pkg/idCreator"{{validatorImport}}
-	{{domain}}Repository "go-skeleton/pkg/repositories/{{domain}}"
-	"io"
-
 	"github.com/labstack/echo/v4"
+	"go-skeleton/cmd/http/handlers"
 )
 
 type {{domainPascalCase}}Routes struct {
-	Environment     string
-	{{domainPascalCase}}Repository *{{domain}}Repository.{{domainPascalCase}}Repository
-
-	// config *config.Config
-	logger *logger.Logger
-	idCreator *idCreator.IdCreator{{validator}}
+	hand *handlers.{{domainPascalCase}}Handlers
 }
 
-func New{{domainPascalCase}}Routes(logger *logger.Logger, Environment string, mysql *database.MySql, idCreator *idCreator.IdCreator{{,validator}}) *{{domainPascalCase}}Routes {
-	repository := &{{domain}}Repository.{{domainPascalCase}}Repository{
-		Mysql: mysql,
-	}
+func New{{domainPascalCase}}Routes() *{{domainPascalCase}}Routes {
+	hand := handlers.New{{domainPascalCase}}Handlers()
 	return &{{domainPascalCase}}Routes{
-		logger:          logger,
-		Environment:     Environment,
-		{{domainPascalCase}}Repository: repository,
-		idCreator:       idCreator,
-		{{validatorInject}}
+		hand: hand,
 	}
 }
 
 func (hs *{{domainPascalCase}}Routes) DeclareRoutes(server *echo.Group) {
-	server.GET("/v1/{{domain}}", hs.HandleList{{domainPascalCase}})
-	server.GET("/v1/{{domain}}/:{{domain}}_id", hs.HandleGet{{domainPascalCase}})
-	server.POST("/v1/{{domain}}", hs.HandleCreate{{domainPascalCase}})
-	server.PUT("/v1/{{domain}}/:{{domain}}_id", hs.HandleEdit{{domainPascalCase}})
-	server.DELETE("/v1/{{domain}}/:{{domain}}_id", hs.HandleDelete{{domainPascalCase}})
-}
-
-func (hs *{{domainPascalCase}}Routes) HandleGet{{domainPascalCase}}(context echo.Context) error {
-	s := {{domain}}Get.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
-	s.Execute(
-		{{domain}}Get.NewRequest(context.Param("{{domain}}_id")),
-	)
-	response, err := s.GetResponse()
-	if err != nil {
-		return context.JSON(err.Status, err)
-	}
-	return context.JSON(response.Status, response)
-}
-
-func (hs *{{domainPascalCase}}Routes) HandleCreate{{domainPascalCase}}(context echo.Context) error {
-	s := {{domain}}Create.NewService(hs.logger, hs.{{domainPascalCase}}Repository, hs.idCreator)
-
-	domain := {{domain}}.{{domainPascalCase}}{}
-	body, errors := io.ReadAll(context.Request().Body)
-	if errors != nil {
-		return context.JSON(422, errors)
-	}
-
-	errors = json.Unmarshal(body, &domain)
-	if errors != nil {
-		return context.JSON(422, errors)
-	}
-
-	s.Execute(
-		{{domain}}Create.NewRequest(domain{{,hsValidator}}),
-	)
-	response, err := s.GetResponse()
-	if err != nil {
-		return context.JSON(err.Status, err)
-	}
-	return context.JSON(response.Status, response)
-}
-
-func (hs *{{domainPascalCase}}Routes) HandleEdit{{domainPascalCase}}(context echo.Context) error {
-	s := {{domain}}Edit.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
-
-	domain := {{domain}}.{{domainPascalCase}}{}
-	body, errors := io.ReadAll(context.Request().Body)
-	if errors != nil {
-		return context.JSON(422, errors)
-	}
-
-	errors = json.Unmarshal(body, &domain)
-	if errors != nil {
-		return context.JSON(422, errors)
-	}
-
-	s.Execute(
-		{{domain}}Edit.NewRequest(domain, context.Param("{{domain}}_id"){{,hsValidator}}),
-	)
-
-	response, err := s.GetResponse()
-	if err != nil {
-		return context.JSON(err.Status, err)
-	}
-	return context.JSON(response.Status, response)
-}
-
-func (hs *{{domainPascalCase}}Routes) HandleList{{domainPascalCase}}(context echo.Context) error {
-	s := {{domain}}List.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
-	s.Execute(
-		{{domain}}List.NewRequest(),
-	)
-	response, err := s.GetResponse()
-	if err != nil {
-		return context.JSON(err.Status, err)
-	}
-	return context.JSON(response.Status, response)
-}
-
-func (hs *{{domainPascalCase}}Routes) HandleDelete{{domainPascalCase}}(context echo.Context) error {
-	s := {{domain}}Delete.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
-	s.Execute(
-		{{domain}}Delete.NewRequest(context.Param("{{domain}}_id"){{,hsValidator}}),
-	)
-	response, err := s.GetResponse()
-	if err != nil {
-		return context.JSON(err.Status, err)
-	}
-	return context.JSON(response.Status, response)
+	server.GET("/v1/{{domainCamelCase}}", hs.hand.HandleList{{domainPascalCase}})
+	server.GET("/v1/{{domainCamelCase}}/:{{domain}}_id", hs.hand.HandleGet{{domainPascalCase}})
+	server.POST("/v1/{{domainCamelCase}}", hs.hand.HandleCreate{{domainPascalCase}})
+	server.PUT("/v1/{{domainCamelCase}}/:{{domain}}_id", hs.hand.HandleEdit{{domainPascalCase}})
+	server.DELETE("/v1/{{domainCamelCase}}/:{{domain}}_id", hs.hand.HandleDelete{{domainPascalCase}})
 }

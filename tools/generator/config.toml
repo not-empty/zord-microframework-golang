@@ -3,7 +3,7 @@
 crud = "{{domain}}"
 crudCamelCase = "{{domainCamelCase}}"
 crudPascalCase = "{{domainPascalCase}}"
-"{{validatorImport}}" = "\n	\"go-skeleton/application/services\""
+"{{validatorImport}}" = "\n	\"go-skeleton/internal/application/services\""
 "{{validator}}" = "\n	validator services.Validator"
 "{{,validator}}" = ", validator services.Validator"
 "{{validatorInject}}" = "	validator: validator,"
@@ -16,23 +16,23 @@ crudPascalCase = "{{domainPascalCase}}"
 		}
 	}
 """
-"//{{codeGen1}}" = "{{domainCamelCase}}ListRoutes := New{{domainPascalCase}}Routes(Env, deps)\n	$repeat$"
+"//{{codeGen1}}" = "{{domainCamelCase}}ListRoutes := New{{domainPascalCase}}Routes()\n	$repeat$"
 "//{{codeGen2}}" = "\"{{domain}}\": {{domainCamelCase}}ListRoutes,\n		$repeat$"
-"//{{codeGen3}}" = "\"go-skeleton/application/domain/{{domain}}\"\n	$repeat$"
+"//{{codeGen3}}" = "\"go-skeleton/internal/application/domain/{{domain}}\"\n	$repeat$"
 "//{{codeGen4}}" = "m.db.Db.Migrator().CreateTable(&{{domain}}.{{domainPascalCase}}{})\n	$repeat$"
 
 [stubs.crud.domain]
-toPath = "application/domain/{{domain}}/"
+toPath = "internal/application/domain/{{domain}}/"
 fromPath = "tools/generator/stubs/crud/domain/"
 isGenerated = true
 
 [stubs.crud.services]
-toPath = "application/services/{{domain}}/"
+toPath = "internal/application/services/{{domain}}/"
 fromPath = "tools/generator/stubs/crud/services/"
 isGenerated = true
 
 [stubs.crud.repositories]
-toPath = "pkg/repositories/{{domain}}/"
+toPath = "internal/repositories/{{domain}}/"
 fromPath = "tools/generator/stubs/crud/repositories/"
 isGenerated = true
 
@@ -41,6 +41,12 @@ toPath = "cmd/http/routes/"
 fromPath = "tools/generator/stubs/crud/routes/"
 isGenerated = true
 uniqueDelete = "cmd/http/routes/{{domain}}.go"
+
+[stubs.crud.handlers]
+toPath = "cmd/http/handlers/"
+fromPath = "tools/generator/stubs/crud/handlers/"
+isGenerated = true
+uniqueDelete = "cmd/http/handlers/{{domain}}.go"
 
 [stubs.crud.declarable]
 toPath = "cmd/http/routes/declarable.go"
@@ -54,7 +60,7 @@ deletePatterns = [
 toPath = "tools/migrator/migrate.go"
 isGenerated = false
 deletePatterns = [
-	"\"go-skeleton/application/domain/{{domain}}",
+	"\"go-skeleton/internal/application/domain/{{domain}}",
 	"&{{domain}}.{{domainPascalCase}}{}"
 ]
 

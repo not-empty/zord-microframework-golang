@@ -23,7 +23,8 @@ func NewRequest(data *Data, validator services.Validator) Request {
 }
 
 func (r *Request) Validate() error {
-	if err := r.dummyCreateRule(); err != nil {
+	err := r.dummyCreateRule()
+	if err != nil {
 		return err
 	}
 	errs := r.validator.ValidateStruct(r.Data)

@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"go-skeleton/pkg/registry"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -8,9 +10,8 @@ type Declarable interface {
 	DeclareRoutes(*echo.Group)
 }
 
-func GetProtectedRoutes() map[string]Declarable {
-
-	dummyListRoutes := NewDummyRoutes()
+func GetProtectedRoutes(reg *registry.Registry) map[string]Declarable {
+	dummyListRoutes := NewDummyRoutes(reg)
 	//{{codeGen1}}
 	domains := map[string]Declarable{
 		"dummy": dummyListRoutes,
@@ -19,9 +20,9 @@ func GetProtectedRoutes() map[string]Declarable {
 	return domains
 }
 
-func GetPublicRoutes() map[string]Declarable {
+func GetPublicRoutes(reg *registry.Registry) map[string]Declarable {
 	health := NewHealthRoute()
-	auth := NewAuthRoute()
+	auth := NewAuthRoute(reg)
 	routes := map[string]Declarable{
 		"health": health,
 		"auth":   auth,

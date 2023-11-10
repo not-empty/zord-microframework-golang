@@ -1,12 +1,16 @@
 package migrator
 
 import (
-	"github.com/spf13/cobra"
-	"go-skeleton/pkg"
+	"go-skeleton/pkg/config"
+	"go-skeleton/pkg/database"
+	"go-skeleton/pkg/logger"
 	"go-skeleton/tools/migrator"
+
+	"github.com/spf13/cobra"
 )
 
 type Migrator struct {
+	db *database.MySql
 }
 
 func NewMigrator() *Migrator {
@@ -25,10 +29,31 @@ func (m *Migrator) DeclareCommands(cmd *cobra.Command) {
 }
 
 func (m *Migrator) Migrate(_ *cobra.Command, _ []string) {
-	migratorInstance := migrator.NewMigrator(pkg.Mysql)
+	migratorInstance := migrator.NewMigrator(m.db)
 	migratorInstance.MigrateAllDomains()
 }
 
 func (m *Migrator) BootMigrator(_ *cobra.Command, _ []string) {
-	pkg.Mysql.Connect()
+	conf := config.NewConfig()
+
+	l := logger.NewLogger(
+		conf.ReadConfig("ENVIRONMENT"),
+		conf.ReadConfig("APP"),
+		conf.ReadConfig("VERSION"),
+	)
+
+	l.Boot()
+
+	db := database.NewMysql(
+		l,
+		conf.ReadConfig("DB_USER"),
+		conf.ReadConfig("DB_PASS"),
+		conf.ReadConfig("DB_URL"),
+		conf.ReadConfig("DB_PORT"),
+		conf.ReadConfig("DB_DATABASE"),
+	)
+
+	db.Connect()
+
+	m.db = db
 }

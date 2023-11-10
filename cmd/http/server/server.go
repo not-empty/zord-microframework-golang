@@ -2,23 +2,26 @@ package server
 
 import (
 	"fmt"
-	"github.com/labstack/echo/v4"
 	"go-skeleton/cmd/http/middlewares"
 	"go-skeleton/cmd/http/routes"
-	"go-skeleton/pkg"
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/logger"
+	"go-skeleton/pkg/registry"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Server struct {
-	config *config.Config
-	logger *logger.Logger
+	config   *config.Config
+	logger   *logger.Logger
+	registry *registry.Registry
 }
 
-func NewServer() *Server {
+func NewServer(reg *registry.Registry) *Server {
 	return &Server{
-		config: pkg.Config,
-		logger: pkg.Logger,
+		config:   reg.Inject("config").(*config.Config),
+		logger:   reg.Inject("logger").(*logger.Logger),
+		registry: reg,
 	}
 }
 
@@ -28,8 +31,8 @@ func (hs *Server) Start() {
 	server.HideBanner = true
 	server.HidePort = true
 
-	protectedRoutes := routes.GetProtectedRoutes()
-	publicRoutes := routes.GetPublicRoutes()
+	protectedRoutes := routes.GetProtectedRoutes(hs.registry)
+	publicRoutes := routes.GetPublicRoutes(hs.registry)
 
 	public := server.Group("")
 	protected := server.Group("", middlewares.AuthMiddleware(hs.config.ReadConfig("JWT_SECRET")))

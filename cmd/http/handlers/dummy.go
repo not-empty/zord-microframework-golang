@@ -6,10 +6,10 @@ import (
 	dummyEdit "go-skeleton/internal/application/services/dummy/EDIT"
 	dummyGet "go-skeleton/internal/application/services/dummy/GET"
 	dummyList "go-skeleton/internal/application/services/dummy/LIST"
-	"go-skeleton/internal/repositories/dummy"
-	"go-skeleton/pkg"
+	dummyRepository "go-skeleton/internal/repositories/dummy"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
+	"go-skeleton/pkg/registry"
 	"go-skeleton/pkg/validator"
 
 	"github.com/labstack/echo/v4"
@@ -23,14 +23,12 @@ type DummyHandlers struct {
 	validator *validator.Validator
 }
 
-func NewDummyHandlers() *DummyHandlers {
-	repository := dummyRepository.NewBaseRepository(pkg.Mysql)
-
+func NewDummyHandlers(reg *registry.Registry) *DummyHandlers {
 	return &DummyHandlers{
-		DummyRepository: repository,
-		logger:          pkg.Logger,
-		idCreator:       pkg.IdCreator,
-		validator:       pkg.Validator,
+		DummyRepository: reg.Inject("dummyRepository").(*dummyRepository.DummyRepository),
+		logger:          reg.Inject("logger").(*logger.Logger),
+		idCreator:       reg.Inject("idCreator").(*idCreator.IdCreator),
+		validator:       reg.Inject("validator").(*validator.Validator),
 	}
 }
 

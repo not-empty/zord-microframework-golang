@@ -2,12 +2,14 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/labstack/echo/v4"
 	"go-skeleton/internal/application/domain/auth"
 	authLogin "go-skeleton/internal/application/services/auth/LOGIN"
-	"go-skeleton/pkg"
+	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/logger"
+	"go-skeleton/pkg/registry"
 	"io"
+
+	"github.com/labstack/echo/v4"
 )
 
 type AuthHandlers struct {
@@ -19,14 +21,15 @@ type AuthHandlers struct {
 	AccessToken   []string
 }
 
-func NewAuthHandlers() *AuthHandlers {
+func NewAuthHandlers(reg *registry.Registry) *AuthHandlers {
+	conf := reg.Inject("config").(*config.Config)
 	return &AuthHandlers{
-		logger:        pkg.Logger,
-		Secret:        pkg.Config.ReadConfig("JWT_SECRET"),
-		JwtExpiration: pkg.Config.ReadNumberConfig("JWT_EXPIRATION"),
-		AccessSecret:  pkg.Config.ReadArrayConfig("ACCESS_SECRET"),
-		AccessContext: pkg.Config.ReadArrayConfig("ACCESS_CONTEXT"),
-		AccessToken:   pkg.Config.ReadArrayConfig("ACCESS_TOKEN"),
+		logger:        reg.Inject("logger").(*logger.Logger),
+		Secret:        conf.ReadConfig("JWT_SECRET"),
+		JwtExpiration: conf.ReadNumberConfig("JWT_EXPIRATION"),
+		AccessSecret:  conf.ReadArrayConfig("ACCESS_SECRET"),
+		AccessContext: conf.ReadArrayConfig("ACCESS_CONTEXT"),
+		AccessToken:   conf.ReadArrayConfig("ACCESS_TOKEN"),
 	}
 }
 
@@ -51,6 +54,7 @@ func (hs *AuthHandlers) HandleLogin(c echo.Context) error {
 		hs.AccessContext,
 		hs.AccessToken,
 	)
+
 	s.Execute(
 		authLogin.NewRequest(domain),
 	)

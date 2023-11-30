@@ -1,16 +1,18 @@
 package routes
 
 import (
-	"github.com/labstack/echo/v4"
 	"go-skeleton/cmd/http/handlers"
+	"go-skeleton/pkg/registry"
+
+	"github.com/labstack/echo/v4"
 )
 
 type DummyRoutes struct {
 	hand *handlers.DummyHandlers
 }
 
-func NewDummyRoutes() *DummyRoutes {
-	hand := handlers.NewDummyHandlers()
+func NewDummyRoutes(reg *registry.Registry) *DummyRoutes {
+	hand := handlers.NewDummyHandlers(reg)
 	return &DummyRoutes{
 		hand: hand,
 	}

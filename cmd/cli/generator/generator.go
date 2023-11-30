@@ -2,7 +2,7 @@ package generator
 
 import (
 	"errors"
-	"go-skeleton/pkg"
+	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/logger"
 	"go-skeleton/tools/generator"
 
@@ -20,10 +20,8 @@ type Flags struct {
 	domain     string
 }
 
-func NewGenerator(l *logger.Logger) *Generator {
-	return &Generator{
-		Logger: l,
-	}
+func NewGenerator() *Generator {
+	return &Generator{}
 }
 
 func (g *Generator) DeclareCommands(cmd *cobra.Command) {
@@ -79,7 +77,16 @@ func (g *Generator) DestroyDomain(_ *cobra.Command, args []string) {
 }
 
 func (g *Generator) BootGenerator(_ *cobra.Command, _ []string) {
-	pkg.Logger.Boot()
+	conf := config.NewConfig()
+
+	l := logger.NewLogger(
+		conf.ReadConfig("ENVIRONMENT"),
+		conf.ReadConfig("APP"),
+		conf.ReadConfig("VERSION"),
+	)
+
+	l.Boot()
+	g.Logger = l
 }
 
 func (g *Generator) initFlags(cmd *cobra.Command) {

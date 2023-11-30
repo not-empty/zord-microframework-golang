@@ -1,30 +1,24 @@
 package cli
 
 import (
-	"github.com/spf13/cobra"
 	"go-skeleton/cmd/cli/generator"
 	"go-skeleton/cmd/cli/migrator"
-	"go-skeleton/pkg"
-	"go-skeleton/pkg/logger"
+
+	"github.com/spf13/cobra"
 )
 
 type Cli struct {
-	Environment string
-	Cmd         *cobra.Command
-	logger      *logger.Logger
+	Cmd *cobra.Command
 }
 
 func NewCli(cmd *cobra.Command) *Cli {
-
 	return &Cli{
-		Environment: pkg.Config.ReadConfig("ENVIRONMENT"),
-		Cmd:         cmd,
-		logger:      pkg.Logger,
+		Cmd: cmd,
 	}
 }
 
 func (c *Cli) Start() {
-	generatorInstance := generator.NewGenerator(c.logger)
+	generatorInstance := generator.NewGenerator()
 	generatorInstance.DeclareCommands(c.Cmd)
 	migratorInstance := migrator.NewMigrator()
 	migratorInstance.DeclareCommands(c.Cmd)

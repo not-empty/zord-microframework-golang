@@ -29,9 +29,9 @@ func (repo *DummyRepository) Create(d *dummy.Dummy) error {
 	return err
 }
 
-func (repo *DummyRepository) List() (*[]dummy.Dummy, error) {
+func (repo *DummyRepository) List(limit int, offset int) (*[]dummy.Dummy, error) {
 	var data []dummy.Dummy
-	err := repo.Mysql.Db.Limit(100).Find(&data).Error
+	err := repo.Mysql.Db.Limit(limit).Offset(offset).Find(&data).Error
 	if err != nil {
 		return nil, err
 	}
@@ -47,4 +47,13 @@ func (repo *DummyRepository) Edit(d *dummy.Dummy) error {
 func (repo *DummyRepository) Delete(d *dummy.Dummy) error {
 	err := repo.Mysql.Db.Delete(d).Error
 	return err
+}
+
+func (repo *DummyRepository) Count() (int64, error) {
+	var count int64
+	err := repo.Mysql.Db.Model(&dummy.Dummy{}).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

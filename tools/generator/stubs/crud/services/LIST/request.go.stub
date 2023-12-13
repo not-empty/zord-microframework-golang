@@ -4,13 +4,19 @@ import (
 	domain "go-skeleton/internal/application/domain/{{domain}}"
 )
 
+type Data struct {
+	Page int
+}
+
 type Request struct {
-	{{domainPascalCase}} []domain.{{domainPascalCase}}
+	Data *data
 	Err   error
 }
 
-func NewRequest() Request {
-	return Request{}
+func NewRequest(data *Data) Request {
+	return Request{
+	    Data: data,
+	}
 }
 
 func (r *Request) Validate() error {

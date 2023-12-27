@@ -35,35 +35,35 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 
 func (s *Service) produceResponseRule(page int) {
 	{{domain}}Data := &[]{{domainCamelCase}}.{{domainPascalCase}}{}
-    offset := (page - 1) * ListLimit
+	offset := (page - 1) * ListLimit
 
-    total, err := s.repository.Count()
-    if err != nil || total == 0 {
-        s.Error = &services.Error{
-            Status:  404,
-            Message: "Try again in a few minutes",
-            Error:   "data not found",
-        }
-        return
-    }
-    totalPages := math.Ceil(float64(total) / ListLimit)
+	total, err := s.repository.Count()
+	if err != nil || total == 0 {
+		s.Error = &services.Error{
+			Status:  404,
+			Message: "Try again in a few minutes",
+			Error:   "data not found",
+		}
+		return
+	}
+	totalPages := math.Ceil(float64(total) / ListLimit)
 
 	if page <= int(totalPages) {
-        {{domain}}Data, err = s.repository.List(ListLimit, offset)
-        if err != nil {
-            s.Error = &services.Error{
-                Status:  http.StatusBadRequest,
-                Message: "Try again in a few minutes",
-                Error:   "Error on request process",
-            }
-            return
-        }
-    }
+		{{domain}}Data, err = s.repository.List(ListLimit, offset)
+		if err != nil {
+			s.Error = &services.Error{
+				Status:  http.StatusBadRequest,
+				Message: "Try again in a few minutes",
+				Error:   "Error on request process",
+			}
+			return
+		}
+	}
 
-    s.response = &Response{
-        Status:      http.StatusOK,
-        CurrentPage: page,
-        TotalPages:  int64(totalPages),
-        Data:        {{domain}}Data,
-    }
+	s.response = &Response{
+		Status:      http.StatusOK,
+		CurrentPage: page,
+		TotalPages:  int64(totalPages),
+		Data:        {{domain}}Data,
+	}
 }

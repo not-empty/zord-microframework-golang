@@ -1,7 +1,6 @@
 package dummy
 
 import (
-	"errors"
 	"go-skeleton/internal/application/services"
 )
 
@@ -37,8 +36,6 @@ func (r *Request) Validate() error {
 }
 
 func (r *Request) dummyCreateRule() error {
-	if r.Data.DummyName == "samuel" {
-		return errors.New("EverOne Hates Samuca")
-	}
+	// Add specific validation...
 	return nil
 }

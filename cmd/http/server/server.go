@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"go-skeleton/cmd/http/middlewares"
 	"go-skeleton/cmd/http/routes"
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/logger"
@@ -31,21 +30,15 @@ func (hs *Server) Start() {
 	server.HideBanner = true
 	server.HidePort = true
 
-	protectedRoutes := routes.GetProtectedRoutes(hs.registry)
 	publicRoutes := routes.GetPublicRoutes(hs.registry)
 
 	public := server.Group("")
-	protected := server.Group("", middlewares.AuthMiddleware(hs.config.ReadConfig("JWT_SECRET")))
 
 	for index, route := range publicRoutes {
 		route.DeclareRoutes(public)
 		hs.logger.Info(fmt.Sprintf("[server.route] Declared %s", index))
 	}
 
-	for index, route := range protectedRoutes {
-		route.DeclareRoutes(protected)
-		hs.logger.Info(fmt.Sprintf("[server.route] Declared %s", index))
-	}
 	hs.Shutdown(server.Start(":" + hs.config.ReadConfig("HTTP_PORT")))
 }
 

@@ -91,8 +91,18 @@ func (hs *{{domainPascalCase}}Handlers) HandleEdit{{domainPascalCase}}(context e
 
 func (hs *{{domainPascalCase}}Handlers) HandleList{{domainPascalCase}}(context echo.Context) error {
 	s := {{domainCamelCase}}List.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
+	data := new({{domainCamelCase}}List.Data)
+
+	bindErr := echo.QueryParamsBinder(context).
+		Int("page", &data.Page).
+		BindError()
+
+	if bindErr != nil {
+		return context.JSON(400, bindErr)
+	}
+
 	s.Execute(
-		{{domainCamelCase}}List.NewRequest(),
+		{{domainCamelCase}}List.NewRequest(data),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

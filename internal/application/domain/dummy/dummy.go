@@ -8,7 +8,8 @@ type Dummy struct {
 type Repository interface {
 	Get(id string) (*Dummy, error)
 	Create(d *Dummy) error
-	List() (*[]Dummy, error)
+	List(limit int, offset int) (*[]Dummy, error)
 	Edit(d *Dummy) error
 	Delete(d *Dummy) error
+	Count() (int64, error)
 }

@@ -89,8 +89,18 @@ func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 
 func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 	s := dummyList.NewService(hs.logger, hs.DummyRepository)
+	data := new(dummyList.Data)
+
+	bindErr := echo.QueryParamsBinder(context).
+		Int("page", &data.Page).
+		BindError()
+
+	if bindErr != nil {
+		return context.JSON(400, bindErr)
+	}
+
 	s.Execute(
-		dummyList.NewRequest(),
+		dummyList.NewRequest(data),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

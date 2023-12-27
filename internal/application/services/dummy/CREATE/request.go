@@ -36,5 +36,6 @@ func (r *Request) Validate() error {
 }
 
 func (r *Request) dummyCreateRule() error {
+	// Add specific validation...
 	return nil
 }

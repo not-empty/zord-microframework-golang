@@ -29,9 +29,9 @@ func (repo *{{domainPascalCase}}Repository) Create(d *{{domainCamelCase}}.{{doma
 	return err
 }
 
-func (repo *{{domainPascalCase}}Repository) List() (*[]{{domainCamelCase}}.{{domainPascalCase}}, error) {
+func (repo *{{domainPascalCase}}Repository) List(limit int, offset int) (*[]{{domainCamelCase}}.{{domainPascalCase}}, error) {
 	var data []{{domainCamelCase}}.{{domainPascalCase}}
-	err := repo.Mysql.Db.Limit(100).Find(&data).Error
+	err := repo.Mysql.Db.Limit(limit).Offset(offset).Find(&data).Error
 	if err != nil {
 		return nil, err
 	}
@@ -47,4 +47,13 @@ func (repo *{{domainPascalCase}}Repository) Edit(d *{{domainCamelCase}}.{{domain
 func (repo *{{domainPascalCase}}Repository) Delete(d *{{domainCamelCase}}.{{domainPascalCase}}) error {
 	err := repo.Mysql.Db.Delete(d).Error
 	return err
+}
+
+func (repo *{{domainPascalCase}}Repository) Count() (int64, error) {
+	var count int64
+	err := repo.Mysql.Db.Model(&{{domainCamelCase}}.{{domainPascalCase}}{}).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

@@ -40,19 +40,29 @@ func (s *Service) produceResponseRule(page int) {
 	total, err := s.repository.Count()
 	if err != nil || total == 0 {
 		s.Error = &services.Error{
-			Status:  404,
+			Status:  http.StatusInternalServerError,
 			Message: "Try again in a few minutes",
 			Error:   "data not found",
 		}
 		return
 	}
+
+	if total == 0 {
+		s.Error = &services.Error{
+			Status:  http.StatusNotFound,
+			Message: "Try again in a few minutes",
+			Error:   "data not found",
+		}
+		return
+	}
+
 	totalPages := math.Ceil(float64(total) / ListLimit)
 
 	if page <= int(totalPages) {
 		{{domain}}Data, err = s.repository.List(ListLimit, offset)
 		if err != nil {
 			s.Error = &services.Error{
-				Status:  http.StatusBadRequest,
+				Status:  http.StatusInternalServerError,
 				Message: "Try again in a few minutes",
 				Error:   "Error on request process",
 			}

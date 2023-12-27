@@ -10,22 +10,12 @@ type Declarable interface {
 	DeclareRoutes(*echo.Group)
 }
 
-func GetProtectedRoutes(reg *registry.Registry) map[string]Declarable {
-	dummyListRoutes := NewDummyRoutes(reg)
-	//{{codeGen1}}
-	domains := map[string]Declarable{
-		"dummy": dummyListRoutes,
-		//{{codeGen2}}
-	}
-	return domains
-}
-
 func GetPublicRoutes(reg *registry.Registry) map[string]Declarable {
 	health := NewHealthRoute()
-	auth := NewAuthRoute(reg)
+	dummyListRoutes := NewDummyRoutes(reg)
 	routes := map[string]Declarable{
 		"health": health,
-		"auth":   auth,
+		"dummy":  dummyListRoutes,
 	}
 	return routes
 }

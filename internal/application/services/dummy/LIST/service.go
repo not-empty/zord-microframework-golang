@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-const ListLimit = 5.0
+const ListLimit = 25.0
 
 type Service struct {
 	services.BaseService
@@ -42,21 +42,30 @@ func (s *Service) produceResponseRule(page int) {
 	offset := (page - 1) * ListLimit
 
 	total, err := s.repository.Count()
-	if err != nil || total == 0 {
+	if err != nil {
 		s.Error = &services.Error{
-			Status:  404,
+			Status:  http.StatusInternalServerError,
+			Message: "Try again in a few minutes",
+			Error:   "fatal error",
+		}
+		return
+	}
+
+	if total == 0 {
+		s.Error = &services.Error{
+			Status:  http.StatusNotFound,
 			Message: "Try again in a few minutes",
 			Error:   "data not found",
 		}
 		return
 	}
-	totalPages := math.Ceil(float64(total) / ListLimit)
 
+	totalPages := math.Ceil(float64(total) / ListLimit)
 	if page <= int(totalPages) {
 		dummyData, err = s.repository.List(ListLimit, offset)
 		if err != nil {
 			s.Error = &services.Error{
-				Status:  http.StatusBadRequest,
+				Status:  http.StatusInternalServerError,
 				Message: "Try again in a few minutes",
 				Error:   "Error on request process",
 			}

@@ -16,7 +16,7 @@ crudPascalCase = "{{domainPascalCase}}"
 		}
 	}
 """
-"//{{codeGen1}}" = "{{domainCamelCase}}ListRoutes := New{{domainPascalCase}}Routes()\n	$repeat$"
+"//{{codeGen1}}" = "{{domainCamelCase}}ListRoutes := New{{domainPascalCase}}Routes(reg)\n	$repeat$"
 "//{{codeGen2}}" = "\"{{domain}}\": {{domainCamelCase}}ListRoutes,\n		$repeat$"
 "//{{codeGen3}}" = "\"go-skeleton/internal/application/domain/{{domain}}\"\n	$repeat$"
 "//{{codeGen4}}" = "m.db.Db.Migrator().CreateTable(&{{domain}}.{{domainPascalCase}}{})\n	$repeat$"

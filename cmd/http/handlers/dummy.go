@@ -11,6 +11,7 @@ import (
 	"go-skeleton/pkg/logger"
 	"go-skeleton/pkg/registry"
 	"go-skeleton/pkg/validator"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
@@ -47,7 +48,7 @@ func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
 	if err != nil {
 		return context.JSON(err.Status, err)
 	}
-	return context.JSON(response.Status, response)
+	return context.JSON(http.StatusOK, response)
 }
 
 func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
@@ -65,7 +66,7 @@ func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 	if err != nil {
 		return context.JSON(err.Status, err)
 	}
-	return context.JSON(response.Status, response)
+	return context.JSON(http.StatusCreated, response)
 }
 
 func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
@@ -84,19 +85,31 @@ func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 	if err != nil {
 		return context.JSON(err.Status, err)
 	}
-	return context.JSON(response.Status, response)
+	return context.JSON(http.StatusOK, response)
 }
 
 func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 	s := dummyList.NewService(hs.logger, hs.DummyRepository)
+	data := new(dummyList.Data)
+
+	bindErr := echo.QueryParamsBinder(context).
+		Int("page", &data.Page).
+		BindError()
+
+	if bindErr != nil {
+		return context.JSON(400, bindErr)
+	}
+
 	s.Execute(
-		dummyList.NewRequest(),
+		dummyList.NewRequest(data, hs.validator),
 	)
+
 	response, err := s.GetResponse()
 	if err != nil {
 		return context.JSON(err.Status, err)
 	}
-	return context.JSON(response.Status, response)
+
+	return context.JSON(http.StatusOK, response)
 }
 
 func (hs *DummyHandlers) HandleDeleteDummy(context echo.Context) error {
@@ -108,11 +121,11 @@ func (hs *DummyHandlers) HandleDeleteDummy(context echo.Context) error {
 	}
 
 	s.Execute(
-		dummyDelete.NewRequest(data),
+		dummyDelete.NewRequest(data, hs.validator),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
 		return context.JSON(err.Status, err)
 	}
-	return context.JSON(response.Status, response)
+	return context.JSON(http.StatusOK, response)
 }

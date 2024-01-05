@@ -44,7 +44,7 @@ func (s *Service) produceResponseRule(data *Data) {
 	err := s.repository.Delete(&dummy)
 	if err != nil {
 		s.Error = &services.Error{
-			Status:  400,
+			Status:  http.StatusInternalServerError,
 			Message: "Try again in a few minutes",
 			Error:   "Error on request process",
 		}
@@ -54,5 +54,4 @@ func (s *Service) produceResponseRule(data *Data) {
 	s.response = &Response{
 		Status: http.StatusOK,
 	}
-
 }

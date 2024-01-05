@@ -1,12 +1,12 @@
 package handlers
 
 import (
-	{{domainPascalCase}}Create "go-skeleton/internal/application/services/{{domainPascalCase}}/CREATE"
-	{{domainPascalCase}}Delete "go-skeleton/internal/application/services/{{domainPascalCase}}/DELETE"
-	{{domainPascalCase}}Edit "go-skeleton/internal/application/services/{{domainPascalCase}}/EDIT"
-	{{domainPascalCase}}Get "go-skeleton/internal/application/services/{{domainPascalCase}}/GET"
-	{{domainPascalCase}}List "go-skeleton/internal/application/services/{{domainPascalCase}}/LIST"
-	{{domainPascalCase}}Repository "go-skeleton/internal/repositories/{{domainPascalCase}}"
+	{{domainCamelCase}}Create "go-skeleton/internal/application/services/{{domainCamelCase}}/CREATE"
+	{{domainCamelCase}}Delete "go-skeleton/internal/application/services/{{domainCamelCase}}/DELETE"
+	{{domainCamelCase}}Edit "go-skeleton/internal/application/services/{{domainCamelCase}}/EDIT"
+	{{domainCamelCase}}Get "go-skeleton/internal/application/services/{{domainCamelCase}}/GET"
+	{{domainCamelCase}}List "go-skeleton/internal/application/services/{{domainCamelCase}}/LIST"
+	{{domainCamelCase}}Repository "go-skeleton/internal/repositories/{{domainCamelCase}}"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
 	"go-skeleton/pkg/registry"
@@ -16,7 +16,7 @@ import (
 )
 
 type {{domainPascalCase}}Handlers struct {
-	{{domainPascalCase}}Repository *{{domainPascalCase}}Repository.{{domainPascalCase}}Repository
+	{{domainCamelCase}}Repository *{{domainCamelCase}}Repository.{{domainPascalCase}}Repository
 
 	logger    *logger.Logger
 	idCreator *idCreator.IdCreator
@@ -25,41 +25,43 @@ type {{domainPascalCase}}Handlers struct {
 
 func New{{domainPascalCase}}Handlers(reg *registry.Registry) *{{domainPascalCase}}Handlers {
 	return &{{domainPascalCase}}Handlers{
-		{{domainPascalCase}}Repository: reg.Inject("{{domainPascalCase}}Repository").(*{{domainPascalCase}}Repository.{{domainPascalCase}}Repository),
+		{{domainCamelCase}}Repository: reg.Inject("{{domainCamelCase}}Repository").(*{{domainCamelCase}}Repository.{{domainPascalCase}}Repository),
 		logger:          reg.Inject("logger").(*logger.Logger),
 		idCreator:       reg.Inject("idCreator").(*idCreator.IdCreator),
 		validator:       reg.Inject("validator").(*validator.Validator),
 	}
 }
 
-func (hs *{{domainPascalCase}}Handlers) HandleGet{{domainPascalCase}}(context echo.Context) error {
-	s := {{domainPascalCase}}Get.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
-	data := new({{domainPascalCase}}Get.Data)
+func (hs *{{domainPascalCase}}Handlers) HandleGet{{domainCamelCase}}(context echo.Context) error {
+	s := {{domainCamelCase}}Get.NewService(hs.logger, hs.{{domainCamelCase}}Repository)
+	data := new({{domainCamelCase}}Get.Data)
 
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		{{domainPascalCase}}Get.NewRequest(data),
+		{{domainCamelCase}}Get.NewRequest(data),
 	)
+
 	response, err := s.GetResponse()
 	if err != nil {
 		return context.JSON(err.Status, err)
 	}
+
 	return context.JSON(response.Status, response)
 }
 
 func (hs *{{domainPascalCase}}Handlers) HandleCreate{{domainPascalCase}}(context echo.Context) error {
-	s := {{domainPascalCase}}Create.NewService(hs.logger, hs.{{domainPascalCase}}Repository, hs.idCreator)
-	data := new({{domainPascalCase}}Create.Data)
+	s := {{domainCamelCase}}Create.NewService(hs.logger, hs.{{domainCamelCase}}Repository, hs.idCreator)
+	data := new({{domainCamelCase}}Create.Data)
 
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		{{domainPascalCase}}Create.NewRequest(data, hs.validator),
+		{{domainCamelCase}}Create.NewRequest(data, hs.validator),
 	)
 	response, err := s.GetResponse()
 	if err != nil {
@@ -69,15 +71,15 @@ func (hs *{{domainPascalCase}}Handlers) HandleCreate{{domainPascalCase}}(context
 }
 
 func (hs *{{domainPascalCase}}Handlers) HandleEdit{{domainPascalCase}}(context echo.Context) error {
-	s := {{domainPascalCase}}Edit.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
-	data := new({{domainPascalCase}}Edit.Data)
+	s := {{domainCamelCase}}Edit.NewService(hs.logger, hs.{{domainCamelCase}}Repository)
+	data := new({{domainCamelCase}}Edit.Data)
 
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		{{domainPascalCase}}Edit.NewRequest(data, hs.validator),
+		{{domainCamelCase}}Edit.NewRequest(data, hs.validator),
 	)
 
 	response, err := s.GetResponse()
@@ -88,13 +90,8 @@ func (hs *{{domainPascalCase}}Handlers) HandleEdit{{domainPascalCase}}(context e
 }
 
 func (hs *{{domainPascalCase}}Handlers) HandleList{{domainPascalCase}}(context echo.Context) error {
-<<<<<<< Updated upstream
-	s := {{domainCamelCase}}List.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
-	s.Execute(
-		{{domainCamelCase}}List.NewRequest(),
-=======
-	s := {{domainPascalCase}}List.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
-	data := new({{domainPascalCase}}List.Data)
+	s := {{domainCamelCase}}List.NewService(hs.logger, hs.{{domainCamelCase}}Repository)
+	data := new({{domainCamelCase}}List.Data)
 
 	bindErr := echo.QueryParamsBinder(context).
 		Int("page", &data.Page).
@@ -105,9 +102,9 @@ func (hs *{{domainPascalCase}}Handlers) HandleList{{domainPascalCase}}(context e
 	}
 
 	s.Execute(
-		{{domainPascalCase}}List.NewRequest(data),
->>>>>>> Stashed changes
+		{{domainCamelCase}}List.NewRequest(data),
 	)
+
 	response, err := s.GetResponse()
 	if err != nil {
 		return context.JSON(err.Status, err)
@@ -116,15 +113,15 @@ func (hs *{{domainPascalCase}}Handlers) HandleList{{domainPascalCase}}(context e
 }
 
 func (hs *{{domainPascalCase}}Handlers) HandleDelete{{domainPascalCase}}(context echo.Context) error {
-	s := {{domainPascalCase}}Delete.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
-	data := new({{domainPascalCase}}Delete.Data)
+	s := {{domainCamelCase}}Delete.NewService(hs.logger, hs.{{domainCamelCase}}Repository)
+	data := new({{domainCamelCase}}Delete.Data)
 
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(422, errors)
 	}
 
 	s.Execute(
-		{{domainPascalCase}}Delete.NewRequest(data),
+		{{domainCamelCase}}Delete.NewRequest(data),
 	)
 	response, err := s.GetResponse()
 	if err != nil {

@@ -36,7 +36,7 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 
 func (s *Service) produceResponseRule(data *Data) {
 	s.Logger.Debug("ProduceResponseRule")
-	dummyData, err := s.repository.Get(data.DummyId)
+	dummyData, err := s.repository.Get(data.DummyId, "dummy_id")
 	if err != nil {
 		s.Error = &services.Error{
 			Status:  400,

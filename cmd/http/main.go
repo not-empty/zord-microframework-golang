@@ -52,5 +52,5 @@ func init() {
 	reg.Provide("config", conf)
 	reg.Provide("idCreator", idC)
 
-	reg.Provide("dummyRepository", dummyRepository.NewBaseRepository(db))
+	reg.Provide("dummyRepository", dummyRepository.NewDummyRepo(db))
 }

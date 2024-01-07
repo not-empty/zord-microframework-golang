@@ -23,19 +23,11 @@ func NewRequest(data *Data, validator services.Validator) Request {
 }
 
 func (r *Request) Validate() error {
-	if err := r.dummyCreateRule(); err != nil {
-		return err
-	}
 	errs := r.validator.ValidateStruct(r.Data)
 	for _, err := range errs {
 		if err != nil {
 			return err
 		}
 	}
-	return nil
-}
-
-func (r *Request) dummyCreateRule() error {
-	// Add specific validation...
 	return nil
 }

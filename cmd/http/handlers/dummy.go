@@ -88,7 +88,7 @@ func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 }
 
 func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
-	s := dummyList.NewService(hs.logger, hs.DummyRepository)
+	s := dummyList.NewService(hs.logger, hs.DummyRepository, 25)
 	data := new(dummyList.Data)
 
 	bindErr := echo.QueryParamsBinder(context).

@@ -4,7 +4,6 @@ import (
 	"go-skeleton/internal/application/domain/dummy"
 	"go-skeleton/internal/application/providers/pagination"
 	"go-skeleton/internal/application/services"
-	"net/http"
 )
 
 type Service struct {
@@ -45,7 +44,6 @@ func (s *Service) produceResponseRule(page int) {
 	}
 
 	s.response = &Response{
-		Status:      http.StatusOK,
 		CurrentPage: page,
 		TotalPages:  pagination.TotalPages,
 		Data:        pagination.Data,

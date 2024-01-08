@@ -2,7 +2,6 @@ package dummy
 
 type Request struct {
 	Data *Data
-	Err  error
 }
 
 type Data struct {

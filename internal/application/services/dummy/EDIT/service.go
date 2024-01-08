@@ -41,16 +41,26 @@ func (s *Service) produceResponseRule(data *Data) {
 		DummyName: data.DummyName,
 	}
 
-	err := s.repository.Edit(&dummy)
+	err, affectedRows := s.repository.Edit(&dummy)
 	if err != nil {
 		s.Error = &services.Error{
-			Status:  400,
+			Status:  http.StatusInternalServerError,
 			Message: "Try again in a few minutes",
 			Error:   "Error on request process",
 		}
 		return
 	}
+
+	if affectedRows < 1 {
+		s.Error = &services.Error{
+			Status:  http.StatusNotFound,
+			Message: "Try again in a few minutes",
+			Error:   "Error on request process",
+		}
+		return
+	}
+
 	s.response = &Response{
-		Status: http.StatusOK,
+		*data,
 	}
 }

@@ -6,7 +6,6 @@ type Data struct {
 
 type Request struct {
 	Data *Data
-	Err  error
 }
 
 func NewRequest(data *Data) Request {

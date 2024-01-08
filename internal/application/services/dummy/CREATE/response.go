@@ -5,6 +5,5 @@ import (
 )
 
 type Response struct {
-	Status int         `json:"status,omitempty"`
-	Data   dummy.Dummy `json:"data"`
+	Data dummy.Dummy `json:"data"`
 }

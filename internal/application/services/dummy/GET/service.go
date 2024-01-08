@@ -35,18 +35,23 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 }
 
 func (s *Service) produceResponseRule(data *Data) {
-	s.Logger.Debug("ProduceResponseRule")
 	dummyData, err := s.repository.Get(data.DummyId, "dummy_id")
+	httpStatus := http.StatusOK
+
 	if err != nil {
+		httpStatus = http.StatusInternalServerError
+		if err.Error() == "record not found" {
+			httpStatus = http.StatusNotFound
+		}
 		s.Error = &services.Error{
-			Status:  400,
+			Status:  httpStatus,
 			Message: "Try again in a few minutes",
 			Error:   "Error on request process",
 		}
 		return
 	}
+
 	s.response = &Response{
-		Status: http.StatusOK,
-		Data:   dummyData,
+		Data: dummyData,
 	}
 }

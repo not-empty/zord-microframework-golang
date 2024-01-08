@@ -7,17 +7,31 @@ import (
 	"net/http"
 )
 
+type IPaginationProvider[Row any] interface {
+	PaginationHandler(page int, limit int) (*services.Error, *Pagination[Row])
+}
+
 type Pagination[Row any] struct {
 	CurrentPage int
 	TotalPages  int64
 	Data        *[]Row
 }
 
-func PaginationProvider[Row any](repo base_repository.BaseRepository[Row], page int, limit int) (*services.Error, *Pagination[Row]) {
+type PaginationProvider[Row any] struct {
+	repo base_repository.BaseRepository[Row]
+}
+
+func NewPaginationProvider[Row any](repo base_repository.BaseRepository[Row]) *PaginationProvider[Row] {
+	return &PaginationProvider[Row]{
+		repo: repo,
+	}
+}
+
+func (pp *PaginationProvider[Row]) PaginationHandler(page int, limit int) (*services.Error, *Pagination[Row]) {
 	listData := &[]Row{}
 	offset := (page - 1) * limit
 
-	total, err := repo.Count()
+	total, err := pp.repo.Count()
 	if err != nil {
 		return &services.Error{
 			Status:  http.StatusInternalServerError,
@@ -36,7 +50,7 @@ func PaginationProvider[Row any](repo base_repository.BaseRepository[Row], page 
 
 	totalPages := math.Ceil(float64(total) / float64(limit))
 	if page <= int(totalPages) {
-		listData, err = repo.List(limit, offset)
+		listData, err = pp.repo.List(limit, offset)
 		if err != nil {
 			return &services.Error{
 				Status:  http.StatusInternalServerError,

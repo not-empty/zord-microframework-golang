@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"go-skeleton/internal/application/domain/dummy"
+	"go-skeleton/internal/application/providers/pagination"
 	dummyCreate "go-skeleton/internal/application/services/dummy/CREATE"
 	dummyDelete "go-skeleton/internal/application/services/dummy/DELETE"
 	dummyEdit "go-skeleton/internal/application/services/dummy/EDIT"
@@ -44,6 +46,7 @@ func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
 	s.Execute(
 		dummyGet.NewRequest(data),
 	)
+
 	response, err := s.GetResponse()
 	if err != nil {
 		return context.JSON(err.Status, err)
@@ -62,6 +65,7 @@ func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 	s.Execute(
 		dummyCreate.NewRequest(data, hs.validator),
 	)
+
 	response, err := s.GetResponse()
 	if err != nil {
 		return context.JSON(err.Status, err)
@@ -89,12 +93,16 @@ func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 }
 
 func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
-	s := dummyList.NewService(hs.logger, hs.DummyRepository, 25)
-	data := new(dummyList.Data)
+	s := dummyList.NewService(
+		hs.logger,
+		hs.DummyRepository,
+		pagination.NewPaginationProvider[dummy.Dummy](hs.DummyRepository),
+	)
 
+	data := new(dummyList.Data)
 	bindErr := echo.QueryParamsBinder(context).
 		Int("page", &data.Page).
-		BindError()
+		BindErrors()
 
 	if bindErr != nil {
 		return context.JSON(http.StatusBadRequest, bindErr)
@@ -103,6 +111,7 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 	s.Execute(
 		dummyList.NewRequest(data),
 	)
+
 	response, err := s.GetResponse()
 	if err != nil {
 		return context.JSON(err.Status, err)
@@ -121,6 +130,7 @@ func (hs *DummyHandlers) HandleDeleteDummy(context echo.Context) error {
 	s.Execute(
 		dummyDelete.NewRequest(data),
 	)
+
 	response, err := s.GetResponse()
 	if err != nil {
 		return context.JSON(err.Status, err)

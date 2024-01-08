@@ -5,7 +5,7 @@ type Request struct {
 }
 
 type Data struct {
-	Page int
+	Page int `validate:"required"`
 }
 
 func NewRequest(data *Data) Request {

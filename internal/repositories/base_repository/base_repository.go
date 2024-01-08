@@ -8,7 +8,7 @@ type BaseRepository[Row any] interface {
 	Get(id string, field string) (*Row, error)
 	Create(*Row) error
 	List(limit int, offset int) (*[]Row, error)
-	Edit(*Row) (error, int)
+	Edit(*Row) (int, error)
 	Delete(*Row) error
 	Count() (int64, error)
 }
@@ -46,9 +46,9 @@ func (repo *BaseRepo[Row]) List(limit int, offset int) (*[]Row, error) {
 	return &data, nil
 }
 
-func (repo *BaseRepo[Row]) Edit(d *Row) (error, int) {
+func (repo *BaseRepo[Row]) Edit(d *Row) (int, error) {
 	exec := repo.Mysql.Db.Updates(d)
-	return exec.Error, int(exec.RowsAffected)
+	return int(exec.RowsAffected), exec.Error
 }
 
 func (repo *BaseRepo[Row]) Delete(d *Row) error {

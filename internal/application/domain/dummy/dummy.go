@@ -1,6 +1,9 @@
 package dummy
 
-import "go-skeleton/internal/repositories/base_repository"
+import (
+	"go-skeleton/internal/application/providers/pagination"
+	"go-skeleton/internal/repositories/base_repository"
+)
 
 type Dummy struct {
 	DummyId   string `gorm:"type:char(26);primarykey" json:"dummy_id"`
@@ -9,4 +12,8 @@ type Dummy struct {
 
 type Repository interface {
 	base_repository.BaseRepository[Dummy]
+}
+
+type PaginationProvider interface {
+	pagination.IPaginationProvider[Dummy]
 }

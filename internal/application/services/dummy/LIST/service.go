@@ -2,7 +2,6 @@ package dummy
 
 import (
 	"go-skeleton/internal/application/domain/dummy"
-	"go-skeleton/internal/application/providers/pagination"
 	"go-skeleton/internal/application/services"
 )
 
@@ -10,34 +9,37 @@ type Service struct {
 	services.BaseService
 	response   *Response
 	repository dummy.Repository
-	limit      int
+	pagProv    dummy.PaginationProvider
 }
 
-func NewService(log services.Logger, repository dummy.Repository, limit int) *Service {
+func NewService(
+	log services.Logger,
+	repository dummy.Repository,
+	pagProv dummy.PaginationProvider,
+) *Service {
 	return &Service{
 		BaseService: services.BaseService{
 			Logger: log,
 		},
 		repository: repository,
-		limit:      limit,
+		pagProv:    pagProv,
 	}
 }
 
 func (s *Service) Execute(request Request) {
-	s.Logger.Debug("Hello Im Dummy Server!")
 	if err := request.Validate(); err != nil {
 		s.BadRequest(request, err)
 		return
 	}
-	s.produceResponseRule(request.Data.Page)
+	s.produceResponseRule(request.Data.Page, 25)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(page int) {
-	err, pagination := pagination.PaginationProvider[dummy.Dummy](s.repository, page, s.limit)
+func (s *Service) produceResponseRule(page int, limit int) {
+	err, pagination := s.pagProv.PaginationHandler(page, limit)
 	if err != nil {
 		s.Error = err
 		return

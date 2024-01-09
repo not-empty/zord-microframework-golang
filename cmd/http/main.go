@@ -22,6 +22,10 @@ func main() {
 
 func init() {
 	conf := config.NewConfig()
+	err := conf.LoadEnvs()
+	if err != nil {
+		panic(err)
+	}
 
 	l := logger.NewLogger(
 		conf.ReadConfig("ENVIRONMENT"),

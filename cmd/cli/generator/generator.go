@@ -78,6 +78,10 @@ func (g *Generator) DestroyDomain(_ *cobra.Command, args []string) {
 
 func (g *Generator) BootGenerator(_ *cobra.Command, _ []string) {
 	conf := config.NewConfig()
+	err := conf.LoadEnvs()
+	if err != nil {
+		panic(err)
+	}
 
 	l := logger.NewLogger(
 		conf.ReadConfig("ENVIRONMENT"),

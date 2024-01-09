@@ -13,12 +13,7 @@ type Config struct {
 }
 
 func NewConfig() *Config {
-	config := Config{}
-	err := config.loadEnvs()
-	if err != nil {
-		panic(err)
-	}
-	return &config
+	return &Config{}
 }
 
 func (c *Config) ReadConfig(Key string) string {
@@ -50,9 +45,9 @@ func (c *Config) ReadArrayConfig(Key string) []string {
 	return config
 }
 
-func (c *Config) loadEnvs() error {
+func (c *Config) LoadEnvs() error {
 	err := godotenv.Load(".env")
-	if err != nil {
+	if err != nil && os.Getenv("ENVIRONMENT") == "development" {
 		return err
 	}
 	return nil

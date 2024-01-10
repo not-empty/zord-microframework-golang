@@ -4,9 +4,17 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 )
+
+type capturedLogs struct {
+	Logs []string
+}
+
+func (c *capturedLogs) Write(msg []byte) (int, error) {
+	c.Logs = append(c.Logs, string(msg))
+	return len(msg), nil
+}
 
 func TestNewLogger(t *testing.T) {
 	logger := NewLogger("testing", "zord_app", "1.0.0")
@@ -28,39 +36,14 @@ func TestDebug(t *testing.T) {
 	logger := NewLogger("production", "myApp", "1.0.0")
 	logger.Boot()
 	logger.SetLogService("myService")
-
 	logger.Debug("Debug message", "context1", "context2")
 
-	// Act
+	logs := &capturedLogs{}
+	logger.logger = logger.logger.Output(logs)
 	logger.Debug("Debug message", "context1", "context2")
+	expectedLog := `"message":"Debug message"`
 
-	// Assert
-	// 	loggedEntry := captureLastLogEntry(logger.logger)
-	// 	assert.NotNil(t, loggedEntry)
-	// 	assert.Equal(t, zerolog.DebugLevel, loggedEntry.Level())
-	// 	assert.Contains(t, loggedEntry.Message().Str, "Debug message")
-	// 	assert.Equal(t, "myService", loggedEntry.Str("service"))
-	// 	assert.ElementsMatch(t, []string{"context1", "context2"}, loggedEntry.Strs("context"))
-}
-
-// Helper function to capture the last log entry
-// func captureLastLogEntry(logger zerolog.Logger) *zerolog.Event {
-// 	// logger.With().Logger()
-// 	// logger.With().Logger().Hook()
-// 	events := logger.WithContext(logger.With().Logger(nil)).Hook(&captureHook{}).With().Logger().Out.(*captureHook).entries
-// 	if len(events) > 0 {
-// 		return events[len(events)-1]
-// 	}
-// 	return nil
-// }
-
-// Helper captureHook to capture log entries
-type captureHook struct {
-	entries []*zerolog.Event
-}
-
-func (h *captureHook) Run(e *zerolog.Event, level zerolog.Level, message string) {
-	h.entries = append(h.entries, e)
+	assert.Contains(t, logs.Logs[0], expectedLog)
 }
 
 func TestInfo(t *testing.T) {
@@ -68,7 +51,11 @@ func TestInfo(t *testing.T) {
 	logger.Boot()
 	logger.SetLogService("myService")
 
+	logs := &capturedLogs{}
+	logger.logger = logger.logger.Output(logs)
 	logger.Info("Info message", "context1", "context2")
+	expectedLog := `"message":"Info message"`
+	assert.Contains(t, logs.Logs[0], expectedLog)
 }
 
 func TestWarning(t *testing.T) {
@@ -76,7 +63,12 @@ func TestWarning(t *testing.T) {
 	logger.Boot()
 	logger.SetLogService("myService")
 
+	logs := &capturedLogs{}
+	logger.logger = logger.logger.Output(logs)
 	logger.Warning("Warning message", "context1", "context2")
+
+	expectedLog := `"message":"Warning message"`
+	assert.Contains(t, logs.Logs[0], expectedLog)
 }
 
 func TestError(t *testing.T) {
@@ -84,8 +76,13 @@ func TestError(t *testing.T) {
 	logger.Boot()
 	logger.SetLogService("myService")
 
+	logs := &capturedLogs{}
+	logger.logger = logger.logger.Output(logs)
 	err := errors.New("Some error")
 	logger.Error(err, "context1", "context2")
+
+	expectedLog := `"message":"Some error"`
+	assert.Contains(t, logs.Logs[0], expectedLog)
 }
 
 func TestCritical(t *testing.T) {
@@ -94,5 +91,12 @@ func TestCritical(t *testing.T) {
 	logger.SetLogService("myService")
 
 	err := errors.New("Critical error")
-	logger.Critical(err, "context1", "context2")
+
+	go func() {
+		defer func() {
+			r := recover()
+			assert.Contains(t, r, "Critical error")
+		}()
+		logger.Critical(err, "context1", "context2")
+	}()
 }

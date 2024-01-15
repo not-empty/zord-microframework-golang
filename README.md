@@ -105,6 +105,21 @@ sudo chown $USER:$USER -R .
 
 if you have a group name different from username change the command accordingly
 
+#### Run tests
+Run all tests:
+``` SHELL
+go test ./...
+```
+
+Verify code coverage:
+``` SHELL
+// Generate coverage output
+go test ./... -coverprofile=coverage.out
+
+// Generate HTML file
+go tool cover -html=coverage.out
+```
+
 ### Development
 
 Want to contribute? Great!

@@ -2,6 +2,7 @@ package logger
 
 import (
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,6 +10,7 @@ import (
 
 type capturedLogs struct {
 	Logs []string
+	io.Writer
 }
 
 func (c *capturedLogs) Write(msg []byte) (int, error) {

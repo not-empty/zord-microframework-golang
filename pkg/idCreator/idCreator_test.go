@@ -9,7 +9,7 @@ import (
 func TestCreate(t *testing.T) {
 	idGenerator := NewIdCreator()
 	ulidString := idGenerator.Create()
-	assert.NotEmpty(t, ulidString, "Generated ULID should not be empty")
+	assert.NotEmpty(t, ulidString)
 }
 
 func TestCreateUnique(t *testing.T) {
@@ -20,6 +20,6 @@ func TestCreateUnique(t *testing.T) {
 		ulidString := idGenerator.Create()
 
 		_, exists := ulidMap[ulidString]
-		assert.False(t, exists, "Generated ULID should be unique")
+		assert.False(t, exists)
 	}
 }

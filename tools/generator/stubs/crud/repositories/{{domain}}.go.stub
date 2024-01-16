@@ -1,59 +1,17 @@
-package {{domainCamelCase}}Repository
+package {{domainPascalCase}}Repository
 
 import (
-	"go-skeleton/internal/application/domain/{{domainCamelCase}}"
+	"go-skeleton/internal/application/domain/{{domain}}"
+	"go-skeleton/internal/repositories/base_repository"
 	"go-skeleton/pkg/database"
 )
 
 type {{domainPascalCase}}Repository struct {
-	Mysql *database.MySql
+	base_repository.BaseRepository[{{domainCamelCase}}.{{domainPascalCase}}]
 }
 
-func NewBaseRepository(mysql *database.MySql) *{{domainPascalCase}}Repository {
+func New{{domainPascalCase}}Repo(mysql *database.MySql) *{{domainPascalCase}}Repository {
 	return &{{domainPascalCase}}Repository{
-		Mysql: mysql,
+		BaseRepository: base_repository.NewBaseRepository[{{domainCamelCase}}.{{domainPascalCase}}](mysql),
 	}
-}
-
-func (repo *{{domainPascalCase}}Repository) Get(id string) (*{{domainCamelCase}}.{{domainPascalCase}}, error) {
-	var Data {{domainCamelCase}}.{{domainPascalCase}}
-	err := repo.Mysql.Db.First(&Data, "{{domain}}_id = ?", id).Error
-	if err != nil {
-		return nil, err
-	}
-	return &Data, nil
-}
-
-func (repo *{{domainPascalCase}}Repository) Create(d *{{domainCamelCase}}.{{domainPascalCase}}) error {
-	err := repo.Mysql.Db.Create(d).Error
-	return err
-}
-
-func (repo *{{domainPascalCase}}Repository) List(limit int, offset int) (*[]{{domainCamelCase}}.{{domainPascalCase}}, error) {
-	var data []{{domainCamelCase}}.{{domainPascalCase}}
-	err := repo.Mysql.Db.Limit(limit).Offset(offset).Find(&data).Error
-	if err != nil {
-		return nil, err
-	}
-	return &data, nil
-}
-
-func (repo *{{domainPascalCase}}Repository) Edit(d *{{domainCamelCase}}.{{domainPascalCase}}) error {
-	err := repo.Mysql.Db.Updates(d).Error
-	return err
-
-}
-
-func (repo *{{domainPascalCase}}Repository) Delete(d *{{domainCamelCase}}.{{domainPascalCase}}) error {
-	err := repo.Mysql.Db.Delete(d).Error
-	return err
-}
-
-func (repo *{{domainPascalCase}}Repository) Count() (int64, error) {
-	var count int64
-	err := repo.Mysql.Db.Model(&{{domainCamelCase}}.{{domainPascalCase}}{}).Count(&count).Error
-	if err != nil {
-		return 0, err
-	}
-	return count, nil
 }

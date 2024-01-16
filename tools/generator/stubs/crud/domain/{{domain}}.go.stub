@@ -1,14 +1,18 @@
-package {{domain}}
+package {{domainCamelCase}}
+
+import (
+	"go-skeleton/internal/application/providers/pagination"
+	"go-skeleton/internal/repositories/base_repository"
+)
 
 type {{domainPascalCase}} struct {
-	{{domainPascalCase}}Id   string `gorm:"type:char(26);primarykey"`
+	{{domainPascalCase}}Id   string `gorm:"type:char(26);primarykey" json:"{{domainCamelCase}}_id"`
 }
 
 type Repository interface {
-	Get(id string) (*{{domainPascalCase}}, error)
-	Create(*{{domainPascalCase}}) error
-	List(limit int, offset int) (*[]{{domainPascalCase}}, error)
-	Edit(*{{domainPascalCase}}) error
-	Delete(*{{domainPascalCase}}) error
-	Count() (int64, error)
+	base_repository.BaseRepository[{{domainPascalCase}}]
+}
+
+type PaginationProvider interface {
+	pagination.IPaginationProvider[{{domainPascalCase}}]
 }

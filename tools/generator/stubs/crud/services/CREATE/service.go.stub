@@ -3,7 +3,6 @@ package {{domain}}
 import (
 	"go-skeleton/internal/application/domain/{{domain}}"
 	"go-skeleton/internal/application/services"
-	"net/http"
 )
 
 type Service struct {
@@ -54,7 +53,6 @@ func (s *Service) produceResponseRule(data *Data) {
 		return
 	}
 	s.response = &Response{
-		Status: http.StatusOK,
 		Data:   {{domain}},
 	}
 }

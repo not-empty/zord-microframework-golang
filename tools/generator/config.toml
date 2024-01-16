@@ -16,10 +16,12 @@ crudPascalCase = "{{domainPascalCase}}"
 		}
 	}
 """
-"//{{codeGen1}}" = "{{domainCamelCase}}ListRoutes := New{{domainPascalCase}}Routes()\n	$repeat$"
+"//{{codeGen1}}" = "{{domainCamelCase}}ListRoutes := New{{domainPascalCase}}Routes(reg)\n	$repeat$"
 "//{{codeGen2}}" = "\"{{domain}}\": {{domainCamelCase}}ListRoutes,\n		$repeat$"
 "//{{codeGen3}}" = "\"go-skeleton/internal/application/domain/{{domain}}\"\n	$repeat$"
 "//{{codeGen4}}" = "m.db.Db.Migrator().CreateTable(&{{domain}}.{{domainPascalCase}}{})\n	$repeat$"
+"//{{codeGen5}}" = "{{domainCamelCase}}Repository \"go-skeleton/internal/repositories/{{domain}}\"\n	$repeat$"
+"//{{codeGen6}}" = "reg.Provide(\"{{domain}}Repository\", {{domain}}Repository.New{{domainPascalCase}}Repo(db))\n	$repeat$"
 
 [stubs.crud.domain]
 toPath = "internal/application/domain/{{domain}}/"
@@ -56,6 +58,14 @@ deletePatterns = [
 	"\"{{domain}}\": "
 ]
 
+[stubs.crud.main]
+toPath = "cmd/http/main.go"
+isGenerated = false
+deletePatterns = [
+	"New{{domainPascalCase}}Repo",
+	"go-skeleton/internal/repositories/{{domain}}"
+]
+
 [stubs.crud.migrator]
 toPath = "tools/migrator/migrate.go"
 isGenerated = false
@@ -69,7 +79,7 @@ deletePatterns = [
 usecase = "{{usecase}}"
 usecaseCamelCase = "{{usecaseCamelCase}}"
 usecasePascalCase = "{{usecasePascalCase}}"
-"//{{codeGen1}}" = "{{usecaseCamelCase}}Route := New{{usecasePascalCase}}Routes()\n	$repeat$"
+"//{{codeGen1}}" = "{{usecaseCamelCase}}Route := New{{usecasePascalCase}}Routes(reg)\n	$repeat$"
 "//{{codeGen2}}" = "\"{{usecase}}\": {{usecaseCamelCase}}Route,\n		$repeat$"
 
 [stubs.usecase.services]

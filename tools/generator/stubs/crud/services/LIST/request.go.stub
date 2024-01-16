@@ -1,21 +1,16 @@
 package {{domain}}
 
-import (
-	domain "go-skeleton/internal/application/domain/{{domain}}"
-)
-
-type Data struct {
-	Page int
+type Request struct {
+	Data *Data
 }
 
-type Request struct {
-	Data *data
-	Err   error
+type Data struct {
+	Page int `validate:"required"`
 }
 
 func NewRequest(data *Data) Request {
 	return Request{
-	    Data: data,
+		Data: data,
 	}
 }
 

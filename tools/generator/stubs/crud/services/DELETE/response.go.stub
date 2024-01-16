@@ -1,5 +1,3 @@
 package {{domain}}
 
-type Response struct {
-	Status int
-}
+type Response struct {}

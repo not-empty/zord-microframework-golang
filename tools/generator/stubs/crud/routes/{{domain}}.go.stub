@@ -1,16 +1,18 @@
 package routes
 
 import (
-	"github.com/labstack/echo/v4"
 	"go-skeleton/cmd/http/handlers"
+	"go-skeleton/pkg/registry"
+
+	"github.com/labstack/echo/v4"
 )
 
 type {{domainPascalCase}}Routes struct {
 	hand *handlers.{{domainPascalCase}}Handlers
 }
 
-func New{{domainPascalCase}}Routes() *{{domainPascalCase}}Routes {
-	hand := handlers.New{{domainPascalCase}}Handlers()
+func New{{domainPascalCase}}Routes(reg *registry.Registry) *{{domainPascalCase}}Routes {
+	hand := handlers.New{{domainPascalCase}}Handlers(reg)
 	return &{{domainPascalCase}}Routes{
 		hand: hand,
 	}
@@ -18,8 +20,8 @@ func New{{domainPascalCase}}Routes() *{{domainPascalCase}}Routes {
 
 func (hs *{{domainPascalCase}}Routes) DeclareRoutes(server *echo.Group) {
 	server.GET("/v1/{{domainCamelCase}}", hs.hand.HandleList{{domainPascalCase}})
-	server.GET("/v1/{{domainCamelCase}}/:{{domain}}_id", hs.hand.HandleGet{{domainPascalCase}})
+	server.GET("/v1/{{domainCamelCase}}/:{{domainCamelCase}}_id", hs.hand.HandleGet{{domainPascalCase}})
 	server.POST("/v1/{{domainCamelCase}}", hs.hand.HandleCreate{{domainPascalCase}})
-	server.PUT("/v1/{{domainCamelCase}}/:{{domain}}_id", hs.hand.HandleEdit{{domainPascalCase}})
-	server.DELETE("/v1/{{domainCamelCase}}/:{{domain}}_id", hs.hand.HandleDelete{{domainPascalCase}})
+	server.PUT("/v1/{{domainCamelCase}}/:{{domainCamelCase}}_id", hs.hand.HandleEdit{{domainPascalCase}})
+	server.DELETE("/v1/{{domainCamelCase}}/:{{domainCamelCase}}_id", hs.hand.HandleDelete{{domainPascalCase}})
 }

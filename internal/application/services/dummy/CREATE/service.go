@@ -24,8 +24,6 @@ func NewService(log services.Logger, repository dummy.Repository, idCreator serv
 }
 
 func (s *Service) Execute(request Request) {
-	s.Logger.Debug("Creating new dummy")
-
 	if err := request.Validate(); err != nil {
 		s.BadRequest(request, err)
 		return

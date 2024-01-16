@@ -3,6 +3,8 @@ package main
 import (
 	"go-skeleton/cmd/http/server"
 	dummyRepository "go-skeleton/internal/repositories/dummy"
+	userRepository "go-skeleton/internal/repositories/user"
+	//{{codeGen5}}
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/idCreator"
@@ -57,4 +59,6 @@ func init() {
 	reg.Provide("idCreator", idC)
 
 	reg.Provide("dummyRepository", dummyRepository.NewDummyRepo(db))
+	reg.Provide("userRepository", userRepository.NewUserRepo(db))
+	//{{codeGen6}}
 }

@@ -2,11 +2,10 @@ package dummy
 
 type Request struct {
 	Data *Data
-	Err  error
 }
 
 type Data struct {
-	Page int
+	Page int `validate:"required"`
 }
 
 func NewRequest(data *Data) Request {

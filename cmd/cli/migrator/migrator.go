@@ -35,6 +35,10 @@ func (m *Migrator) Migrate(_ *cobra.Command, _ []string) {
 
 func (m *Migrator) BootMigrator(_ *cobra.Command, _ []string) {
 	conf := config.NewConfig()
+	err := conf.LoadEnvs()
+	if err != nil {
+		panic(err)
+	}
 
 	l := logger.NewLogger(
 		conf.ReadConfig("ENVIRONMENT"),

@@ -56,24 +56,14 @@ type Validator struct {
 }
 
 func NewValidator() *Validator {
-	validate := validator.New()
-
 	return &Validator{
-		validate:           validate,
+		validate:           validator.New(),
 		validationMessages: validationMessages,
 	}
 }
 
 func (v *Validator) Boot() {
-	v.validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
-		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
-
-		if name == "-" {
-			return ""
-		}
-
-		return name
-	})
+	v.validate.RegisterTagNameFunc(tagNameFunc)
 }
 
 func (v *Validator) ValidateStruct(modelData any) []error {
@@ -106,4 +96,14 @@ func (v *Validator) translateError(errorData *ErrorResponse) error {
 	message = strings.Replace(message, ":values", errorData.Value, 1)
 	erro := errors.New(message)
 	return erro
+}
+
+func tagNameFunc(fld reflect.StructField) string {
+	name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
+
+	if name == "-" {
+		return ""
+	}
+
+	return name
 }

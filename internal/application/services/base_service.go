@@ -48,7 +48,6 @@ func (bs *BaseService) ErrorHandler() {
 	if rec != nil {
 		bs.InternalServerError(rec)
 	}
-
 }
 
 func (bs *BaseService) InternalServerError(_ any) {

@@ -6,7 +6,6 @@ type Data struct {
 
 type Request struct {
 	Data *Data
-	Err  error
 }
 
 func NewRequest(data *Data) Request {
@@ -16,12 +15,5 @@ func NewRequest(data *Data) Request {
 }
 
 func (r *Request) Validate() error {
-	if err := r.dummyIdRule(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *Request) dummyIdRule() error {
 	return nil
 }

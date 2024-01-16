@@ -22,6 +22,10 @@ func main() {
 
 func init() {
 	conf := config.NewConfig()
+	err := conf.LoadEnvs()
+	if err != nil {
+		panic(err)
+	}
 
 	l := logger.NewLogger(
 		conf.ReadConfig("ENVIRONMENT"),
@@ -52,5 +56,5 @@ func init() {
 	reg.Provide("config", conf)
 	reg.Provide("idCreator", idC)
 
-	reg.Provide("dummyRepository", dummyRepository.NewBaseRepository(db))
+	reg.Provide("dummyRepository", dummyRepository.NewDummyRepo(db))
 }

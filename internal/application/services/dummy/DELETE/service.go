@@ -22,7 +22,6 @@ func NewService(log services.Logger, repository dummy.Repository) *Service {
 }
 
 func (s *Service) Execute(request Request) {
-	s.Logger.Debug("Deleting dummy!")
 	if err := request.Validate(); err != nil {
 		s.BadRequest(request, err)
 		return
@@ -35,8 +34,6 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 }
 
 func (s *Service) produceResponseRule(data *Data) {
-	s.Logger.Debug("ProduceResponseRule")
-
 	dummy := dummy.Dummy{
 		DummyId: data.DummyId,
 	}
@@ -44,15 +41,12 @@ func (s *Service) produceResponseRule(data *Data) {
 	err := s.repository.Delete(&dummy)
 	if err != nil {
 		s.Error = &services.Error{
-			Status:  400,
+			Status:  http.StatusInternalServerError,
 			Message: "Try again in a few minutes",
 			Error:   "Error on request process",
 		}
 		return
 	}
 
-	s.response = &Response{
-		Status: http.StatusOK,
-	}
-
+	s.response = &Response{}
 }

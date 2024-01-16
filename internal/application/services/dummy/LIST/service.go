@@ -12,11 +12,7 @@ type Service struct {
 	pagProv    dummy.PaginationProvider
 }
 
-func NewService(
-	log services.Logger,
-	repository dummy.Repository,
-	pagProv dummy.PaginationProvider,
-) *Service {
+func NewService(log services.Logger, repository dummy.Repository, pagProv dummy.PaginationProvider) *Service {
 	return &Service{
 		BaseService: services.BaseService{
 			Logger: log,

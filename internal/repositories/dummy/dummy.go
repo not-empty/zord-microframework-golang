@@ -7,11 +7,11 @@ import (
 )
 
 type DummyRepository struct {
-	base_repository.BaseRepository[dummy.Dummy]
+	*base_repository.BaseRepo[dummy.Dummy]
 }
 
 func NewDummyRepo(mysql *database.MySql) *DummyRepository {
 	return &DummyRepository{
-		BaseRepository: base_repository.NewBaseRepository[dummy.Dummy](mysql),
+		BaseRepo: base_repository.NewBaseRepository[dummy.Dummy](mysql),
 	}
 }

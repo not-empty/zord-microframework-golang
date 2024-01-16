@@ -7,11 +7,11 @@ import (
 )
 
 type {{domainPascalCase}}Repository struct {
-	base_repository.BaseRepository[{{domainCamelCase}}.{{domainPascalCase}}]
+	*base_repository.BaseRepo[{{domainCamelCase}}.{{domainPascalCase}}]
 }
 
 func New{{domainPascalCase}}Repo(mysql *database.MySql) *{{domainPascalCase}}Repository {
 	return &{{domainPascalCase}}Repository{
-		BaseRepository: base_repository.NewBaseRepository[{{domainCamelCase}}.{{domainPascalCase}}](mysql),
+		BaseRepo: base_repository.NewBaseRepository[{{domainCamelCase}}.{{domainPascalCase}}](mysql),
 	}
 }

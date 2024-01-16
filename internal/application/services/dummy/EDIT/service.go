@@ -22,7 +22,6 @@ func NewService(log services.Logger, repository dummy.Repository) *Service {
 }
 
 func (s *Service) Execute(request Request) {
-	s.Logger.Debug("Hello Im Dummy Server!")
 	if err := request.Validate(); err != nil {
 		s.BadRequest(request, err)
 		return
@@ -61,6 +60,6 @@ func (s *Service) produceResponseRule(data *Data) {
 	}
 
 	s.response = &Response{
-		*data,
+		Data: data,
 	}
 }

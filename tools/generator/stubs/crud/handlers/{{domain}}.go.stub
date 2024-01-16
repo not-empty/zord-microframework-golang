@@ -1,16 +1,19 @@
 package handlers
 
 import (
-	{{domainCamelCase}}Create "go-skeleton/internal/application/services/{{domain}}/CREATE"
-	{{domainCamelCase}}Delete "go-skeleton/internal/application/services/{{domain}}/DELETE"
-	{{domainCamelCase}}Edit "go-skeleton/internal/application/services/{{domain}}/EDIT"
-	{{domainCamelCase}}Get "go-skeleton/internal/application/services/{{domain}}/GET"
-	{{domainCamelCase}}List "go-skeleton/internal/application/services/{{domain}}/LIST"
-	"go-skeleton/internal/repositories/{{domain}}"
-	"go-skeleton/pkg"
+	"go-skeleton/internal/application/domain/{{domainCamelCase}}"
+	"go-skeleton/internal/application/providers/pagination"
+	{{domainCamelCase}}Create "go-skeleton/internal/application/services/{{domainCamelCase}}/CREATE"
+	{{domainCamelCase}}Delete "go-skeleton/internal/application/services/{{domainCamelCase}}/DELETE"
+	{{domainCamelCase}}Edit "go-skeleton/internal/application/services/{{domainCamelCase}}/EDIT"
+	{{domainCamelCase}}Get "go-skeleton/internal/application/services/{{domainCamelCase}}/GET"
+	{{domainCamelCase}}List "go-skeleton/internal/application/services/{{domainCamelCase}}/LIST"
+	{{domainCamelCase}}Repository "go-skeleton/internal/repositories/{{domainCamelCase}}"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
+	"go-skeleton/pkg/registry"
 	"go-skeleton/pkg/validator"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
@@ -23,14 +26,12 @@ type {{domainPascalCase}}Handlers struct {
 	validator *validator.Validator
 }
 
-func New{{domainPascalCase}}Handlers() *{{domainPascalCase}}Handlers {
-	repository := {{domainCamelCase}}Repository.NewBaseRepository(pkg.Mysql)
-
+func New{{domainPascalCase}}Handlers(reg *registry.Registry) *{{domainPascalCase}}Handlers {
 	return &{{domainPascalCase}}Handlers{
-		{{domainPascalCase}}Repository: repository,
-		logger:          pkg.Logger,
-		idCreator:       pkg.IdCreator,
-		validator:       pkg.Validator,
+		{{domainPascalCase}}Repository: reg.Inject("{{domainCamelCase}}Repository").(*{{domainCamelCase}}Repository.{{domainPascalCase}}Repository),
+		logger:          reg.Inject("logger").(*logger.Logger),
+		idCreator:       reg.Inject("idCreator").(*idCreator.IdCreator),
+		validator:       reg.Inject("validator").(*validator.Validator),
 	}
 }
 
@@ -45,11 +46,12 @@ func (hs *{{domainPascalCase}}Handlers) HandleGet{{domainPascalCase}}(context ec
 	s.Execute(
 		{{domainCamelCase}}Get.NewRequest(data),
 	)
+
 	response, err := s.GetResponse()
 	if err != nil {
 		return context.JSON(err.Status, err)
 	}
-	return context.JSON(response.Status, response)
+	return context.JSON(http.StatusOK, response)
 }
 
 func (hs *{{domainPascalCase}}Handlers) HandleCreate{{domainPascalCase}}(context echo.Context) error {
@@ -57,17 +59,18 @@ func (hs *{{domainPascalCase}}Handlers) HandleCreate{{domainPascalCase}}(context
 	data := new({{domainCamelCase}}Create.Data)
 
 	if errors := context.Bind(data); errors != nil {
-		return context.JSON(422, errors)
+		return context.JSON(http.StatusBadRequest, errors)
 	}
 
 	s.Execute(
 		{{domainCamelCase}}Create.NewRequest(data, hs.validator),
 	)
+
 	response, err := s.GetResponse()
 	if err != nil {
 		return context.JSON(err.Status, err)
 	}
-	return context.JSON(response.Status, response)
+	return context.JSON(http.StatusCreated, response)
 }
 
 func (hs *{{domainPascalCase}}Handlers) HandleEdit{{domainPascalCase}}(context echo.Context) error {
@@ -75,7 +78,7 @@ func (hs *{{domainPascalCase}}Handlers) HandleEdit{{domainPascalCase}}(context e
 	data := new({{domainCamelCase}}Edit.Data)
 
 	if errors := context.Bind(data); errors != nil {
-		return context.JSON(422, errors)
+		return context.JSON(http.StatusBadRequest, errors)
 	}
 
 	s.Execute(
@@ -86,29 +89,34 @@ func (hs *{{domainPascalCase}}Handlers) HandleEdit{{domainPascalCase}}(context e
 	if err != nil {
 		return context.JSON(err.Status, err)
 	}
-	return context.JSON(response.Status, response)
+	return context.JSON(http.StatusOK, response)
 }
 
 func (hs *{{domainPascalCase}}Handlers) HandleList{{domainPascalCase}}(context echo.Context) error {
-	s := {{domainCamelCase}}List.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
-	data := new({{domainCamelCase}}List.Data)
+	s := {{domainCamelCase}}List.NewService(
+		hs.logger,
+		hs.{{domainPascalCase}}Repository,
+		pagination.NewPaginationProvider[{{domainCamelCase}}.{{domainPascalCase}}](hs.{{domainPascalCase}}Repository),
+	)
 
+	data := new({{domainCamelCase}}List.Data)
 	bindErr := echo.QueryParamsBinder(context).
 		Int("page", &data.Page).
-		BindError()
+		BindErrors()
 
 	if bindErr != nil {
-		return context.JSON(400, bindErr)
+		return context.JSON(http.StatusBadRequest, bindErr)
 	}
 
 	s.Execute(
 		{{domainCamelCase}}List.NewRequest(data),
 	)
+
 	response, err := s.GetResponse()
 	if err != nil {
 		return context.JSON(err.Status, err)
 	}
-	return context.JSON(response.Status, response)
+	return context.JSON(http.StatusOK, response)
 }
 
 func (hs *{{domainPascalCase}}Handlers) HandleDelete{{domainPascalCase}}(context echo.Context) error {
@@ -116,15 +124,16 @@ func (hs *{{domainPascalCase}}Handlers) HandleDelete{{domainPascalCase}}(context
 	data := new({{domainCamelCase}}Delete.Data)
 
 	if errors := context.Bind(data); errors != nil {
-		return context.JSON(422, errors)
+		return context.JSON(http.StatusBadRequest, errors)
 	}
 
 	s.Execute(
 		{{domainCamelCase}}Delete.NewRequest(data),
 	)
+
 	response, err := s.GetResponse()
 	if err != nil {
 		return context.JSON(err.Status, err)
 	}
-	return context.JSON(response.Status, response)
+	return context.JSON(http.StatusOK, response)
 }

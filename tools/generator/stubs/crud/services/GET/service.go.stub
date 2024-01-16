@@ -3,7 +3,6 @@ package {{domain}}
 import (
 	"go-skeleton/internal/application/domain/{{domain}}"
 	"go-skeleton/internal/application/services"
-	"net/http"
 )
 
 type Service struct {
@@ -36,7 +35,7 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 
 func (s *Service) produceResponseRule(data *Data) {
 	s.Logger.Debug("ProduceResponseRule")
-	{{domain}}Data, err := s.repository.Get(data.{{domainPascalCase}}Id)
+	{{domain}}Data, err := s.repository.Get(data.{{domainPascalCase}}Id, "{{domain}}_id")
 	if err != nil {
 			s.Error = &services.Error{
 					Status:  400,
@@ -46,7 +45,6 @@ func (s *Service) produceResponseRule(data *Data) {
 			return
 	}
 	s.response = &Response{
-			Status: http.StatusOK,
 			Data:   {{domain}}Data,
 	}
 }

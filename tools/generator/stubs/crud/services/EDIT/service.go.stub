@@ -3,6 +3,7 @@ package {{domain}}
 import (
 	"go-skeleton/internal/application/domain/{{domain}}"
 	"go-skeleton/internal/application/services"
+
 	"net/http"
 )
 
@@ -22,7 +23,6 @@ func NewService(log services.Logger, repository {{domain}}.Repository) *Service 
 }
 
 func (s *Service) Execute(request Request) {
-	s.Logger.Debug("Hello Im {{domainPascalCase}} Server!")
 	if err := request.Validate(); err != nil {
 		s.BadRequest(request, err)
 		return
@@ -36,22 +36,30 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 }
 
 func (s *Service) produceResponseRule(data *Data) {
-	s.Logger.Debug("ProduceResponseRule")
-
-	{{domain}} := {{domain}}.{{domainPascalCase}}{
-		{{domainPascalCase}}Id: data.{{domainPascalCase}}Id,
+	{{domain}}Data := {{domain}}.{{domainPascalCase}}{
+		{{domainPascalCase}}Id:   data.{{domainPascalCase}}Id,
 	}
 
-	err := s.repository.Edit(&{{domain}})
+	affectedRows, err := s.repository.Edit(&{{domain}}Data)
 	if err != nil {
-			s.Error = &services.Error{
-					Status:  400,
-					Message: "Try again in a few minutes",
-					Error:   "Error on request process",
-			}
-			return
+		s.Error = &services.Error{
+			Status:  http.StatusInternalServerError,
+			Message: "Try again in a few minutes",
+			Error:   "Error on request process",
+		}
+		return
 	}
+
+	if affectedRows < 1 {
+		s.Error = &services.Error{
+			Status:  http.StatusNotFound,
+			Message: "Try again in a few minutes",
+			Error:   "Error on request process",
+		}
+		return
+	}
+
 	s.response = &Response{
-			Status: http.StatusOK,
+		Data: data,
 	}
 }

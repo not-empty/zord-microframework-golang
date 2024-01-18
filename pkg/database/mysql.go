@@ -1,8 +1,6 @@
 package database
 
 import (
-	"database/sql"
-	"fmt"
 	"go-skeleton/pkg/logger"
 
 	"gorm.io/driver/mysql"
@@ -12,50 +10,30 @@ import (
 type MySql struct {
 	logger   *logger.Logger
 	Db       *gorm.DB
-	DbUser   string
-	DbPass   string
-	DbUrl    string
-	DbPort   string
-	Database string
+	DbConfig *DbConfig
 }
 
 func NewMysql(
 	l *logger.Logger,
-	DbUser string,
-	DbPass string,
-	DbUrl string,
-	DbPort string,
-	Database string,
+	DbConfig *DbConfig,
 ) *MySql {
 	return &MySql{
 		logger:   l,
-		DbUser:   DbUser,
-		DbPass:   DbPass,
-		DbUrl:    DbUrl,
-		DbPort:   DbPort,
-		Database: Database,
+		DbConfig: DbConfig,
 	}
 }
 
 func (m *MySql) Connect() {
-	dsn := "%s:%s@tcp(%s:%s)/%s"
-	dsn = fmt.Sprintf(
-		dsn,
-		m.DbUser,
-		m.DbPass,
-		m.DbUrl,
-		m.DbPort,
-		m.Database,
-	)
-	sqlDB, err := sql.Open("mysql", dsn)
-	if err != nil {
-		m.logger.Critical(err)
-	}
-	sqlDB.SetMaxOpenConns(30)
-	sqlDB.SetMaxIdleConns(20)
+	dsn := m.DbConfig.GetDsn()
+	m.DbConfig.CreateConnection(dsn)
+
+	m.DbConfig.Connection.SetMaxOpenConns(30)
+	m.DbConfig.Connection.SetMaxIdleConns(20)
+
 	dialector := mysql.New(mysql.Config{
-		Conn: sqlDB,
+		Conn: m.DbConfig.Connection,
 	})
+
 	database, err := gorm.Open(dialector, &gorm.Config{})
 	if err != nil {
 		m.logger.Critical(err)

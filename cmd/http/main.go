@@ -3,6 +3,7 @@ package main
 import (
 	"go-skeleton/cmd/http/server"
 	dummyRepository "go-skeleton/internal/repositories/dummy"
+
 	//{{codeGen5}}
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/database"
@@ -36,13 +37,19 @@ func init() {
 
 	l.Boot()
 
-	db := database.NewMysql(
-		l,
+	dbConfig := database.NewDbConfig(
 		conf.ReadConfig("DB_USER"),
 		conf.ReadConfig("DB_PASS"),
 		conf.ReadConfig("DB_URL"),
 		conf.ReadConfig("DB_PORT"),
+		conf.ReadConfig("DB_DRIVER"),
 		conf.ReadConfig("DB_DATABASE"),
+		l,
+	)
+
+	db := database.NewMysql(
+		l,
+		dbConfig,
 	)
 
 	idC := idCreator.NewIdCreator()

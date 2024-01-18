@@ -3,14 +3,15 @@ package routes
 import (
 	"go-skeleton/cmd/http/handlers"
 	"github.com/labstack/echo/v4"
+	"go-skeleton/pkg/registry"
 )
 
 type {{usecasePascalCase}}Routes struct {
 	hand *handlers.{{usecasePascalCase}}Handlers
 }
 
-func New{{usecasePascalCase}}Routes() *{{usecasePascalCase}}Routes {
-	hand := handlers.New{{usecasePascalCase}}Handlers()
+func New{{usecasePascalCase}}Routes(reg *registry.Registry) *{{usecasePascalCase}}Routes {
+	hand := handlers.New{{usecasePascalCase}}Handlers(reg)
 	return &{{usecasePascalCase}}Routes{
 		hand: hand,
 	}

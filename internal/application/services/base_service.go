@@ -42,19 +42,3 @@ func (bs *BaseService) BadRequest(_ Request, err error) {
 		Error:   err.Error(),
 	}
 }
-
-func (bs *BaseService) ErrorHandler() {
-	rec := recover()
-	if rec != nil {
-		bs.InternalServerError(rec)
-	}
-}
-
-func (bs *BaseService) InternalServerError(_ any) {
-	bs.Error = &Error{
-		Status:  http.StatusInternalServerError,
-		Message: http.StatusText(http.StatusInternalServerError),
-		Error:   "internal_server_error",
-	}
-
-}

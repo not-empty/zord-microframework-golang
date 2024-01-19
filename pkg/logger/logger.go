@@ -14,6 +14,16 @@ type Logger struct {
 	service      string
 }
 
+type ILogger interface {
+	Boot()
+	Debug(Message string, Context ...string)
+	Info(Message string, Context ...string)
+	Warning(Message string, Context ...string)
+	Error(Error error, Context ...string)
+	Critical(Error error, Context ...string)
+	SetLogService(service string)
+}
+
 func NewLogger(environment, app, version string) *Logger {
 	return &Logger{
 		env:          environment,

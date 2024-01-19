@@ -9,6 +9,13 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type IConfig interface {
+	ReadConfig(Key string) string
+	ReadNumberConfig(Key string) int
+	ReadArrayConfig(Key string) []string
+	LoadEnvs() error
+}
+
 type Config struct {
 }
 

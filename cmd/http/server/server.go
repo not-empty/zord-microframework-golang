@@ -12,37 +12,42 @@ import (
 )
 
 type Server struct {
-	config   *config.Config
-	logger   *logger.Logger
+	config   config.IConfig
+	logger   logger.ILogger
 	registry *registry.Registry
+	routes   routes.IRoutes
+	echo     IServer
 }
 
-func NewServer(reg *registry.Registry) *Server {
+type IServer interface {
+	Start(address string) error
+	Use(middleware ...echo.MiddlewareFunc)
+	Group(prefix string, m ...echo.MiddlewareFunc) (g *echo.Group)
+}
+
+func NewServer(reg *registry.Registry, echo IServer) *Server {
 	return &Server{
-		config:   reg.Inject("config").(*config.Config),
-		logger:   reg.Inject("logger").(*logger.Logger),
+		config:   reg.Inject("config").(config.IConfig),
+		logger:   reg.Inject("logger").(logger.ILogger),
+		routes:   reg.Inject("routes").(routes.IRoutes),
+		echo:     echo,
 		registry: reg,
 	}
 }
 
 func (hs *Server) Start() {
-	var server = echo.New()
+	hs.echo.Use(middleware.Recover())
 
-	server.HideBanner = true
-	server.HidePort = true
+	publicRoutes := hs.routes.GetPublicRoutes(hs.registry)
 
-	server.Use(middleware.Recover())
-
-	publicRoutes := routes.GetPublicRoutes(hs.registry)
-
-	public := server.Group("")
+	public := hs.echo.Group("")
 
 	for index, route := range publicRoutes {
 		route.DeclareRoutes(public)
 		hs.logger.Info(fmt.Sprintf("[server.route] Declared %s", index))
 	}
 
-	hs.Shutdown(server.Start(":" + hs.config.ReadConfig("HTTP_PORT")))
+	hs.Shutdown(hs.echo.Start(":" + hs.config.ReadConfig("HTTP_PORT")))
 }
 
 func (hs *Server) Shutdown(err error) {

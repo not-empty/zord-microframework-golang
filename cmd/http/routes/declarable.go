@@ -10,7 +10,18 @@ type Declarable interface {
 	DeclareRoutes(*echo.Group)
 }
 
-func GetPublicRoutes(reg *registry.Registry) map[string]Declarable {
+func NewRoutes() *Routes {
+	return &Routes{}
+}
+
+type Routes struct {
+}
+
+type IRoutes interface {
+	GetPublicRoutes(reg *registry.Registry) map[string]Declarable
+}
+
+func (r *Routes) GetPublicRoutes(reg *registry.Registry) map[string]Declarable {
 	health := NewHealthRoute()
 	dummyListRoutes := NewDummyRoutes(reg)
 	//{{codeGen1}}

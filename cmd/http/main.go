@@ -1,6 +1,7 @@
 package main
 
 import (
+	"go-skeleton/cmd/http/routes"
 	"go-skeleton/cmd/http/server"
 	dummyRepository "go-skeleton/internal/repositories/dummy"
 
@@ -11,6 +12,8 @@ import (
 	"go-skeleton/pkg/logger"
 	"go-skeleton/pkg/registry"
 	"go-skeleton/pkg/validator"
+
+	"github.com/labstack/echo/v4"
 )
 
 var (
@@ -18,7 +21,8 @@ var (
 )
 
 func main() {
-	serverInstance := server.NewServer(reg)
+	srv := echo.New()
+	serverInstance := server.NewServer(reg, srv)
 	serverInstance.Start()
 }
 
@@ -58,11 +62,13 @@ func init() {
 	db.Connect()
 	val.Boot()
 
+	route := routes.NewRoutes()
 	reg = registry.NewRegistry()
 	reg.Provide("logger", l)
 	reg.Provide("validator", val)
 	reg.Provide("config", conf)
 	reg.Provide("idCreator", idC)
+	reg.Provide("routes", route)
 
 	reg.Provide("dummyRepository", dummyRepository.NewDummyRepo(db))
 	//{{codeGen6}}

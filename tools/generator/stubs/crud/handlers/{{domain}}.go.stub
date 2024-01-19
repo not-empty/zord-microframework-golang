@@ -21,7 +21,7 @@ import (
 type {{domainPascalCase}}Handlers struct {
 	{{domainPascalCase}}Repository *{{domainCamelCase}}Repository.{{domainPascalCase}}Repository
 
-	logger    *logger.Logger
+	logger    logger.ILogger
 	idCreator *idCreator.IdCreator
 	validator *validator.Validator
 }
@@ -29,7 +29,7 @@ type {{domainPascalCase}}Handlers struct {
 func New{{domainPascalCase}}Handlers(reg *registry.Registry) *{{domainPascalCase}}Handlers {
 	return &{{domainPascalCase}}Handlers{
 		{{domainPascalCase}}Repository: reg.Inject("{{domainCamelCase}}Repository").(*{{domainCamelCase}}Repository.{{domainPascalCase}}Repository),
-		logger:          reg.Inject("logger").(*logger.Logger),
+		logger:          reg.Inject("logger").(logger.ILogger),
 		idCreator:       reg.Inject("idCreator").(*idCreator.IdCreator),
 		validator:       reg.Inject("validator").(*validator.Validator),
 	}

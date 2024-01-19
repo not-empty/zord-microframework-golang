@@ -17,7 +17,7 @@ type DbConfig struct {
 	Database   string
 	Connection *sql.DB
 	Dialector  gorm.Dialector
-	logger     *logger.Logger
+	logger     logger.ILogger
 }
 
 type IDbConfig interface {
@@ -34,7 +34,7 @@ func NewDbConfig(
 	DbPort string,
 	Driver string,
 	Database string,
-	logger *logger.Logger,
+	logger logger.ILogger,
 ) *DbConfig {
 	return &DbConfig{
 		DbUser:   DbUser,

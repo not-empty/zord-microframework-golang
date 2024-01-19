@@ -113,7 +113,7 @@ func DefineFromToReplaceVariables(vars map[string]string, args []string, replace
 	return replaced
 }
 
-func GetStubsConfig(l *logger.Logger, c *Config, domainType string) map[string]Stubs {
+func GetStubsConfig(l logger.ILogger, c *Config, domainType string) map[string]Stubs {
 	stubs, ok := c.Stubs[domainType]
 
 	if !ok {

@@ -8,12 +8,12 @@ import (
 )
 
 type {{usecasePascalCase}}Handlers struct {
-	logger    *logger.Logger
+	logger    logger.ILogger
 }
 
 func New{{usecasePascalCase}}Handlers(reg *registry.Registry) *{{usecasePascalCase}}Handlers {
 	return &{{usecasePascalCase}}Handlers{
-		logger:          reg.Inject("logger").(*logger.Logger),
+		logger:          reg.Inject("logger").(logger.ILogger),
 	}
 }
 

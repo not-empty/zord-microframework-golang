@@ -21,7 +21,7 @@ import (
 type DummyHandlers struct {
 	DummyRepository *dummyRepository.DummyRepository
 
-	logger    *logger.Logger
+	logger    logger.ILogger
 	idCreator *idCreator.IdCreator
 	validator *validator.Validator
 }
@@ -29,7 +29,7 @@ type DummyHandlers struct {
 func NewDummyHandlers(reg *registry.Registry) *DummyHandlers {
 	return &DummyHandlers{
 		DummyRepository: reg.Inject("dummyRepository").(*dummyRepository.DummyRepository),
-		logger:          reg.Inject("logger").(*logger.Logger),
+		logger:          reg.Inject("logger").(logger.ILogger),
 		idCreator:       reg.Inject("idCreator").(*idCreator.IdCreator),
 		validator:       reg.Inject("validator").(*validator.Validator),
 	}

@@ -8,13 +8,13 @@ import (
 )
 
 type MySql struct {
-	logger   *logger.Logger
+	logger   logger.ILogger
 	Db       *gorm.DB
 	DbConfig IDbConfig
 }
 
 func NewMysql(
-	l *logger.Logger,
+	l logger.ILogger,
 	DbConfig IDbConfig,
 ) *MySql {
 	return &MySql{

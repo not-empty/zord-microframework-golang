@@ -10,7 +10,7 @@ import (
 )
 
 type Generator struct {
-	Logger *logger.Logger
+	Logger logger.ILogger
 	Flags  Flags
 }
 

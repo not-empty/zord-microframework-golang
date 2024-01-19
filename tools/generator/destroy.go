@@ -6,12 +6,12 @@ import (
 )
 
 type CodeDestroy struct {
-	Logger     *logger.Logger
+	Logger     logger.ILogger
 	config     *Config
 	domainType string
 }
 
-func NewCodeDestroy(l *logger.Logger, domainType string) *CodeDestroy {
+func NewCodeDestroy(l logger.ILogger, domainType string) *CodeDestroy {
 	return &CodeDestroy{
 		Logger:     l,
 		config:     GetConfig(l),

@@ -13,13 +13,13 @@ var (
 )
 
 type CodeGenerator struct {
-	Logger     *logger.Logger
+	Logger     logger.ILogger
 	config     *Config
 	validator  bool
 	domainType string
 }
 
-func NewCodeGenerator(logger *logger.Logger, validator bool, domainType string) *CodeGenerator {
+func NewCodeGenerator(logger logger.ILogger, validator bool, domainType string) *CodeGenerator {
 	return &CodeGenerator{
 		Logger:     logger,
 		config:     GetConfig(logger),
@@ -28,7 +28,7 @@ func NewCodeGenerator(logger *logger.Logger, validator bool, domainType string) 
 	}
 }
 
-func GetConfig(l *logger.Logger) *Config {
+func GetConfig(l logger.ILogger) *Config {
 	c, err := GetTomlConfig(configPath)
 	if err != nil {
 		l.Error(err)

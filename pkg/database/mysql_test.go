@@ -158,7 +158,7 @@ func NewDbConfigMock(
 	DbPort string,
 	Driver string,
 	Database string,
-	logger *logger.Logger,
+	logger logger.ILogger,
 ) *DbConfigMock {
 	return &DbConfigMock{
 		DbConfig: DbConfig{

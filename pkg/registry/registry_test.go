@@ -12,6 +12,15 @@ func TestNewRegistry(t *testing.T) {
 	assert.NotNil(t, r.deps)
 }
 
+func TestDepsTypes(t *testing.T) {
+	r := NewRegistry()
+
+	type SampleStruct struct{}
+	r.Provide("sample", SampleStruct{})
+
+	assert.IsType(t, SampleStruct{}, r.Inject("sample"))
+}
+
 func TestProvideAndInject(t *testing.T) {
 	r := NewRegistry()
 
@@ -21,9 +30,5 @@ func TestProvideAndInject(t *testing.T) {
 	injectedDep := r.Inject("sample")
 	assert.Equal(t, dep, injectedDep)
 
-	defer func() {
-		r := recover()
-		assert.Equal(t, r, "Invalid injectable")
-	}()
-	r.Inject("nonexistent")
+	assert.Panics(t, func() { r.Inject("nonexistent") }, "Invalid injectable")
 }

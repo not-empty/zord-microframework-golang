@@ -48,13 +48,19 @@ func (m *Migrator) BootMigrator(_ *cobra.Command, _ []string) {
 
 	l.Boot()
 
-	db := database.NewMysql(
-		l,
+	dbConfig := database.NewDbConfig(
 		conf.ReadConfig("DB_USER"),
 		conf.ReadConfig("DB_PASS"),
 		conf.ReadConfig("DB_URL"),
 		conf.ReadConfig("DB_PORT"),
+		conf.ReadConfig("DB_DRIVER"),
 		conf.ReadConfig("DB_DATABASE"),
+		l,
+	)
+
+	db := database.NewMysql(
+		l,
+		dbConfig,
 	)
 
 	db.Connect()

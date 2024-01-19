@@ -55,7 +55,7 @@ func (l *Logger) Error(Error error, Context ...string) {
 }
 
 func (l *Logger) Critical(Error error, Context ...string) {
-	l.logger.Fatal().Str("service", l.service).Strs(
+	l.logger.Panic().Str("service", l.service).Strs(
 		"context", Context).
 		Caller(1).Msg(Error.Error())
 }

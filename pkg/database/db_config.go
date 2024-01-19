@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"go-skeleton/pkg/logger"
+
+	"gorm.io/gorm"
 )
 
 type DbConfig struct {
@@ -14,7 +16,15 @@ type DbConfig struct {
 	Driver     string
 	Database   string
 	Connection *sql.DB
+	Dialector  gorm.Dialector
 	logger     *logger.Logger
+}
+
+type IDbConfig interface {
+	CreateConnection(dsn string)
+	GetDsn() string
+	GetConnection() *sql.DB
+	GetGorm(dialector gorm.Dialector) *gorm.DB
 }
 
 func NewDbConfig(
@@ -39,10 +49,10 @@ func NewDbConfig(
 
 func (db *DbConfig) CreateConnection(dsn string) {
 	conn, err := sql.Open(db.Driver, dsn)
-	db.Connection = conn
 	if err != nil {
 		db.logger.Critical(err)
 	}
+	db.Connection = conn
 }
 
 func (db *DbConfig) GetDsn() string {
@@ -55,4 +65,16 @@ func (db *DbConfig) GetDsn() string {
 		db.DbPort,
 		db.Database,
 	)
+}
+
+func (db *DbConfig) GetConnection() *sql.DB {
+	return db.Connection
+}
+
+func (db *DbConfig) GetGorm(dialector gorm.Dialector) *gorm.DB {
+	database, err := gorm.Open(dialector, &gorm.Config{})
+	if err != nil {
+		db.logger.Critical(err)
+	}
+	return database
 }

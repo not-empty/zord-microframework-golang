@@ -10,12 +10,12 @@ import (
 type MySql struct {
 	logger   *logger.Logger
 	Db       *gorm.DB
-	DbConfig *DbConfig
+	DbConfig IDbConfig
 }
 
 func NewMysql(
 	l *logger.Logger,
-	DbConfig *DbConfig,
+	DbConfig IDbConfig,
 ) *MySql {
 	return &MySql{
 		logger:   l,
@@ -26,17 +26,15 @@ func NewMysql(
 func (m *MySql) Connect() {
 	dsn := m.DbConfig.GetDsn()
 	m.DbConfig.CreateConnection(dsn)
-
-	m.DbConfig.Connection.SetMaxOpenConns(30)
-	m.DbConfig.Connection.SetMaxIdleConns(20)
+	conn := m.DbConfig.GetConnection()
+	conn.SetMaxOpenConns(30)
+	conn.SetMaxIdleConns(20)
 
 	dialector := mysql.New(mysql.Config{
-		Conn: m.DbConfig.Connection,
+		Conn:                      conn,
+		SkipInitializeWithVersion: true,
 	})
 
-	database, err := gorm.Open(dialector, &gorm.Config{})
-	if err != nil {
-		m.logger.Critical(err)
-	}
+	database := m.DbConfig.GetGorm(dialector)
 	m.Db = database
 }

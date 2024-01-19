@@ -29,7 +29,6 @@ var validationMessages = map[string]string{
 	"max":                  "The :attribute may not be greater than :values.",
 	"min":                  "The :attribute must be at least :values.",
 	"numeric":              "The :attribute must be a number.",
-	"regex":                "The :attribute format is invalid.",
 	"required":             "The :attribute field is required.",
 	"required_if":          "The :attribute field is required when :other is :values.",
 	"required_unless":      "The :attribute field is required unless :other is in :values.",

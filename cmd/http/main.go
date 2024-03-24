@@ -1,8 +1,12 @@
 package main
 
 import (
+	"fmt"
+	"github.com/jmoiron/sqlx"
 	"go-skeleton/cmd/http/server"
 	dummyRepository "go-skeleton/internal/repositories/dummy"
+	"log"
+
 	//{{codeGen5}}
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/database"
@@ -57,6 +61,32 @@ func init() {
 	reg.Provide("config", conf)
 	reg.Provide("idCreator", idC)
 
-	reg.Provide("dummyRepository", dummyRepository.NewDummyRepo(db))
+	repo := dummyRepository.NewDummyRepo(db)
+
+	dsn := "%s:%s@tcp(%s:%s)/%s"
+	dsn = fmt.Sprintf(
+		dsn,
+		conf.ReadConfig("DB_USER"),
+		conf.ReadConfig("DB_PASS"),
+		conf.ReadConfig("DB_URL"),
+		conf.ReadConfig("DB_PORT"),
+		conf.ReadConfig("DB_DATABASE"),
+	)
+
+	conn, err := sqlx.Connect("mysql", dsn)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	conn.Exec(`
+		create table dummies (
+	    	id char(26) PRIMARY KEY,
+	    	name char(255)
+		);
+	`)
+
+	repo.CreateRaw(conn)
+
+	reg.Provide("dummyRepository", repo)
 	//{{codeGen6}}
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"go-skeleton/cmd/http/server"
+	dummy2 "go-skeleton/internal/application/domain/dummy"
 	dummyRepository "go-skeleton/internal/repositories/dummy"
 	"log"
 
@@ -61,8 +62,6 @@ func init() {
 	reg.Provide("config", conf)
 	reg.Provide("idCreator", idC)
 
-	repo := dummyRepository.NewDummyRepo(db)
-
 	dsn := "%s:%s@tcp(%s:%s)/%s"
 	dsn = fmt.Sprintf(
 		dsn,
@@ -85,7 +84,13 @@ func init() {
 		);
 	`)
 
-	repo.CreateRaw(conn)
+	repo := dummyRepository.NewDummyRepo(conn)
+
+	err = repo.Edit(dummy2.Dummy{
+		DummyName: "Levy Sampaio",
+	}, "id", "123")
+
+	fmt.Println(err)
 
 	reg.Provide("dummyRepository", repo)
 	//{{codeGen6}}

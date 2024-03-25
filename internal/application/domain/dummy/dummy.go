@@ -6,8 +6,12 @@ import (
 )
 
 type Dummy struct {
-	DummyId   string `gorm:"type:char(26);primarykey" json:"dummy_id"`
-	DummyName string `validate:"required,min=3,max=32" json:"dummy_name"`
+	DummyId   string `db:"id"`
+	DummyName string `db:"name"`
+}
+
+func (d Dummy) Schema() string {
+	return "dummies"
 }
 
 type Repository interface {

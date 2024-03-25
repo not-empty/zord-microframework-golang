@@ -47,6 +47,7 @@ func (m *MySql) Connect() {
 		m.DbPort,
 		m.Database,
 	)
+	fmt.Println(dsn)
 	sqlDB, err := sql.Open("mysql", dsn)
 	if err != nil {
 		m.logger.Critical(err)

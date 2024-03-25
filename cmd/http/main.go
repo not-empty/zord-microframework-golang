@@ -9,8 +9,8 @@ import (
 	"log"
 
 	//{{codeGen5}}
+	_ "github.com/go-sql-driver/mysql"
 	"go-skeleton/pkg/config"
-	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
 	"go-skeleton/pkg/registry"
@@ -41,19 +41,19 @@ func init() {
 
 	l.Boot()
 
-	db := database.NewMysql(
-		l,
-		conf.ReadConfig("DB_USER"),
-		conf.ReadConfig("DB_PASS"),
-		conf.ReadConfig("DB_URL"),
-		conf.ReadConfig("DB_PORT"),
-		conf.ReadConfig("DB_DATABASE"),
-	)
+	//db := database.NewMysql(
+	//	l,
+	//	conf.ReadConfig("DB_USER"),
+	//	conf.ReadConfig("DB_PASS"),
+	//	conf.ReadConfig("DB_URL"),
+	//	conf.ReadConfig("DB_PORT"),
+	//	conf.ReadConfig("DB_DATABASE"),
+	//)
 
 	idC := idCreator.NewIdCreator()
 	val := validator.NewValidator()
 
-	db.Connect()
+	//db.Connect()
 	val.Boot()
 
 	reg = registry.NewRegistry()
@@ -72,23 +72,17 @@ func init() {
 		conf.ReadConfig("DB_DATABASE"),
 	)
 
-	conn, err := sqlx.Connect("mysql", dsn)
+	conn, err := sqlx.Open("mysql", dsn)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	conn.Exec(`
-		create table dummies (
-	    	id char(26) PRIMARY KEY,
-	    	name char(255)
-		);
-	`)
-
 	repo := dummyRepository.NewDummyRepo(conn)
 
 	err = repo.Edit(dummy2.Dummy{
+		DummyId:   "123",
 		DummyName: "Levy Sampaio",
-	}, "id", "123")
+	}, "id", "123sdsd")
 
 	fmt.Println(err)
 

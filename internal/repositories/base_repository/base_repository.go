@@ -127,12 +127,20 @@ func (repo *BaseRepo[Row]) List(limit int, offset int) (*[]Row, error) {
 func (repo *BaseRepo[Row]) Edit(d Row, field string, value string) error {
 	tx, err := repo.Mysql.Beginx()
 	if err != nil {
+		fmt.Println(1)
+		fmt.Println(err)
+		err := tx.Rollback()
+		if err != nil {
+			fmt.Println(2)
+			fmt.Println(err)
+			return err
+		}
 		return err
 	}
 
 	namedValues := []string{}
 	for _, field := range repo.fields {
-		namedValues = append(namedValues, field+" = :"+field)
+		namedValues = append(namedValues, field+" = ':"+field+"'")
 	}
 	res, err := tx.NamedExec(
 		fmt.Sprintf(
@@ -142,7 +150,10 @@ func (repo *BaseRepo[Row]) Edit(d Row, field string, value string) error {
 			field,
 			value,
 		),
-		d,
+		map[string]interface{}{
+			"id":   "123",
+			"name": "Samuel da Silva",
+		},
 	)
 
 	fmt.Println(fmt.Sprintf(
@@ -153,14 +164,32 @@ func (repo *BaseRepo[Row]) Edit(d Row, field string, value string) error {
 		value,
 	))
 	if err != nil {
+		fmt.Println(3)
+		fmt.Println(err)
+		err := tx.Rollback()
+		if err != nil {
+			return err
+		}
 		return err
 	}
 	affected, err := res.RowsAffected()
 	if affected < 1 {
+		fmt.Println(4)
+		fmt.Println(err)
+		err := tx.Rollback()
+		if err != nil {
+			return err
+		}
 		return errors.New("erro ao editar registro")
 	}
 	err = tx.Commit()
 	if err != nil {
+		fmt.Println(5)
+		fmt.Println(err)
+		err := tx.Rollback()
+		if err != nil {
+			return err
+		}
 		return err
 	}
 	return nil

@@ -203,6 +203,6 @@ func (repo *BaseRepo[Row]) Delete(field string, value string) error {
 func (repo *BaseRepo[Row]) Count() (int64, error) {
 	var count int64
 	var data Row
-	err := repo.Mysql.Get(&count, "SELECT count(1) FROM"+data.Schema())
+	err := repo.Mysql.Get(&count, "SELECT count(1) FROM "+data.Schema())
 	return count, err
 }

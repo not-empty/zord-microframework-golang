@@ -17,11 +17,11 @@ type Pagination[Row any] struct {
 	Data        *[]Row
 }
 
-type PaginationProvider[Row any] struct {
+type PaginationProvider[Row base_repository.Domain] struct {
 	repo base_repository.BaseRepository[Row]
 }
 
-func NewPaginationProvider[Row any](repo base_repository.BaseRepository[Row]) *PaginationProvider[Row] {
+func NewPaginationProvider[Row base_repository.Domain](repo base_repository.BaseRepository[Row]) *PaginationProvider[Row] {
 	return &PaginationProvider[Row]{
 		repo: repo,
 	}

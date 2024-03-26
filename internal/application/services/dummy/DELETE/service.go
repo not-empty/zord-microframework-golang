@@ -34,11 +34,7 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 }
 
 func (s *Service) produceResponseRule(data *Data) {
-	dummy := dummy.Dummy{
-		DummyId: data.DummyId,
-	}
-
-	err := s.repository.Delete(dummy)
+	err := s.repository.Delete("id", data.DummyId)
 	if err != nil {
 		s.Error = &services.Error{
 			Status:  http.StatusInternalServerError,

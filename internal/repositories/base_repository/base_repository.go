@@ -13,7 +13,7 @@ type BaseRepository[dom Domain] interface {
 	Create(data dom) error
 	List(limit int, offset int) (*[]dom, error)
 	Edit(data dom, field string, value string) error
-	Delete(data dom) error
+	Delete(field string, values string) error
 	Count() (int64, error)
 }
 
@@ -127,12 +127,8 @@ func (repo *BaseRepo[Row]) List(limit int, offset int) (*[]Row, error) {
 func (repo *BaseRepo[Row]) Edit(d Row, field string, value string) error {
 	tx, err := repo.Mysql.Beginx()
 	if err != nil {
-		fmt.Println(1)
-		fmt.Println(err)
 		err := tx.Rollback()
 		if err != nil {
-			fmt.Println(2)
-			fmt.Println(err)
 			return err
 		}
 		return err
@@ -140,32 +136,25 @@ func (repo *BaseRepo[Row]) Edit(d Row, field string, value string) error {
 
 	namedValues := []string{}
 	for _, field := range repo.fields {
-		namedValues = append(namedValues, field+" = ':"+field+"'")
+		namedValues = append(namedValues, "`"+field+"`"+" = :"+field)
 	}
-	res, err := tx.NamedExec(
+	query, args, err := tx.BindNamed(
 		fmt.Sprintf(
-			`UPDATE %s SET %s WHERE %s = %s`,
+			`UPDATE %s SET %s WHERE %s = '%s'`,
 			d.Schema(),
 			strings.Join(namedValues, ", "),
 			field,
 			value,
 		),
-		map[string]interface{}{
-			"id":   "123",
-			"name": "Samuel da Silva",
-		},
+		&d,
 	)
 
-	fmt.Println(fmt.Sprintf(
-		`UPDATE %s SET %s WHERE %s = '%s'`,
-		d.Schema(),
-		strings.Join(namedValues, ", "),
-		field,
-		value,
-	))
+	res, err := repo.Mysql.Exec(query, args...)
 	if err != nil {
-		fmt.Println(3)
-		fmt.Println(err)
+		return err
+	}
+
+	if err != nil {
 		err := tx.Rollback()
 		if err != nil {
 			return err
@@ -174,8 +163,6 @@ func (repo *BaseRepo[Row]) Edit(d Row, field string, value string) error {
 	}
 	affected, err := res.RowsAffected()
 	if affected < 1 {
-		fmt.Println(4)
-		fmt.Println(err)
 		err := tx.Rollback()
 		if err != nil {
 			return err
@@ -184,8 +171,6 @@ func (repo *BaseRepo[Row]) Edit(d Row, field string, value string) error {
 	}
 	err = tx.Commit()
 	if err != nil {
-		fmt.Println(5)
-		fmt.Println(err)
 		err := tx.Rollback()
 		if err != nil {
 			return err
@@ -195,16 +180,29 @@ func (repo *BaseRepo[Row]) Edit(d Row, field string, value string) error {
 	return nil
 }
 
-func (repo *BaseRepo[Row]) Delete(d Row) error {
-	//err := repo.Mysql.Db.Delete(d).Error
-	return nil
+func (repo *BaseRepo[Row]) Delete(field string, value string) error {
+	var data Row
+	exec, err := repo.Mysql.Exec(
+		fmt.Sprintf(
+			`DELETE FROM %s WHERE %s = '%s'`,
+			data.Schema(),
+			field,
+			value,
+		),
+	)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := exec.RowsAffected()
+	if rowsAffected < 1 {
+		return errors.New("nothing deleted")
+	}
+	return err
 }
 
 func (repo *BaseRepo[Row]) Count() (int64, error) {
-	//var count int64
-	//err := repo.Mysql.Db.Model(new(Row)).Count(&count).Error
-	//if err != nil {
-	//	return 0, err
-	//}
-	return 0, nil
+	var count int64
+	var data Row
+	err := repo.Mysql.Get(&count, "SELECT count(1) FROM"+data.Schema())
+	return count, err
 }

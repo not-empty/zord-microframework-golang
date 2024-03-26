@@ -1,13 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"github.com/jmoiron/sqlx"
 	"go-skeleton/cmd/http/server"
-	dummy2 "go-skeleton/internal/application/domain/dummy"
 	dummyRepository "go-skeleton/internal/repositories/dummy"
-	"log"
-
+	"go-skeleton/pkg/database"
 	//{{codeGen5}}
 	_ "github.com/go-sql-driver/mysql"
 	"go-skeleton/pkg/config"
@@ -41,19 +37,19 @@ func init() {
 
 	l.Boot()
 
-	//db := database.NewMysql(
-	//	l,
-	//	conf.ReadConfig("DB_USER"),
-	//	conf.ReadConfig("DB_PASS"),
-	//	conf.ReadConfig("DB_URL"),
-	//	conf.ReadConfig("DB_PORT"),
-	//	conf.ReadConfig("DB_DATABASE"),
-	//)
+	db := database.NewMysql(
+		l,
+		conf.ReadConfig("DB_USER"),
+		conf.ReadConfig("DB_PASS"),
+		conf.ReadConfig("DB_URL"),
+		conf.ReadConfig("DB_PORT"),
+		conf.ReadConfig("DB_DATABASE"),
+	)
 
 	idC := idCreator.NewIdCreator()
 	val := validator.NewValidator()
 
-	//db.Connect()
+	db.Connect()
 	val.Boot()
 
 	reg = registry.NewRegistry()
@@ -62,29 +58,7 @@ func init() {
 	reg.Provide("config", conf)
 	reg.Provide("idCreator", idC)
 
-	dsn := "%s:%s@tcp(%s:%s)/%s"
-	dsn = fmt.Sprintf(
-		dsn,
-		conf.ReadConfig("DB_USER"),
-		conf.ReadConfig("DB_PASS"),
-		conf.ReadConfig("DB_URL"),
-		conf.ReadConfig("DB_PORT"),
-		conf.ReadConfig("DB_DATABASE"),
-	)
-
-	conn, err := sqlx.Open("mysql", dsn)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	repo := dummyRepository.NewDummyRepo(conn)
-
-	err = repo.Edit(dummy2.Dummy{
-		DummyId:   "123",
-		DummyName: "Levy Sampaio",
-	}, "id", "123sdsd")
-
-	fmt.Println(err)
+	repo := dummyRepository.NewDummyRepo(db.Db)
 
 	reg.Provide("dummyRepository", repo)
 	//{{codeGen6}}

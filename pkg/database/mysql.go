@@ -1,17 +1,15 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
+	"github.com/jmoiron/sqlx"
 	"go-skeleton/pkg/logger"
-
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
+	"log"
 )
 
 type MySql struct {
 	logger   *logger.Logger
-	Db       *gorm.DB
+	Db       *sqlx.DB
 	DbUser   string
 	DbPass   string
 	DbUrl    string
@@ -47,19 +45,12 @@ func (m *MySql) Connect() {
 		m.DbPort,
 		m.Database,
 	)
-	fmt.Println(dsn)
-	sqlDB, err := sql.Open("mysql", dsn)
+
+	conn, err := sqlx.Open("mysql", dsn)
+	conn.SetMaxOpenConns(30)
+	conn.SetMaxIdleConns(20)
 	if err != nil {
-		m.logger.Critical(err)
+		log.Fatalln(err)
 	}
-	sqlDB.SetMaxOpenConns(30)
-	sqlDB.SetMaxIdleConns(20)
-	dialector := mysql.New(mysql.Config{
-		Conn: sqlDB,
-	})
-	database, err := gorm.Open(dialector, &gorm.Config{})
-	if err != nil {
-		m.logger.Critical(err)
-	}
-	m.Db = database
+	m.Db = conn
 }

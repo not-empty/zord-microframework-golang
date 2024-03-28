@@ -1,6 +1,7 @@
 package dummy
 
 import (
+	"fmt"
 	"go-skeleton/internal/application/domain/dummy"
 	"go-skeleton/internal/application/services"
 	"net/http"
@@ -43,6 +44,8 @@ func (s *Service) produceResponseRule(data *Data) {
 		DummyName: data.DummyName,
 	}
 	err := s.repository.Create(dummy)
+
+	fmt.Println(err)
 	if err != nil {
 		s.Error = &services.Error{
 			Status:  http.StatusInternalServerError,

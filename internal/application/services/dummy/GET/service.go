@@ -34,7 +34,7 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 }
 
 func (s *Service) produceResponseRule(data *Data) {
-	dummyData, err := s.repository.Get(data.DummyId, "dummy_id")
+	dummyData, err := s.repository.Get("id", data.DummyId)
 	httpStatus := http.StatusOK
 
 	if err != nil {

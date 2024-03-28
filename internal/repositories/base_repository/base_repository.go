@@ -41,7 +41,7 @@ func NewBaseRepository[dom Domain](mysql *sqlx.DB) *BaseRepo[dom] {
 	}
 }
 
-func (repo *BaseRepo[Domain]) Get(value string, field string) (*Domain, error) {
+func (repo *BaseRepo[Domain]) Get(field string, value string) (*Domain, error) {
 	var Data Domain
 	row := repo.Mysql.QueryRowx(
 		fmt.Sprintf(
@@ -83,7 +83,7 @@ func (repo *BaseRepo[Row]) Create(d Row) error {
 	}
 	affected, err := res.RowsAffected()
 	if affected < 1 {
-		return errors.New("erro ao inserir registro")
+		return errors.New("error on create, rows not affected")
 	}
 	if err != nil {
 		return err

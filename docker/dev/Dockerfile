@@ -8,8 +8,6 @@ COPY . .
 
 RUN apk add curl
 RUN curl -sSf https://atlasgo.sh | sh
-RUN cd tools/atlas && \
-    make schema_apply
 
 RUN go mod download
 RUN go install github.com/cosmtrek/air@latest

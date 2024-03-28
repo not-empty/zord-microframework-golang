@@ -1,8 +1,8 @@
 package migrator
 
 import (
+	"fmt"
 	"go-skeleton/pkg/config"
-	"go-skeleton/pkg/database"
 	"go-skeleton/pkg/logger"
 	"go-skeleton/tools/migrator"
 
@@ -10,7 +10,7 @@ import (
 )
 
 type Migrator struct {
-	db *database.MySql
+	dsn string
 }
 
 func NewMigrator() *Migrator {
@@ -21,7 +21,7 @@ func (m *Migrator) DeclareCommands(cmd *cobra.Command) {
 	cmd.AddCommand(
 		&cobra.Command{
 			Use:    "migrate",
-			Short:  "Migrate Gorm Database",
+			Short:  "migrate HCL description database Database",
 			PreRun: m.BootMigrator,
 			Run:    m.Migrate,
 		},
@@ -29,7 +29,7 @@ func (m *Migrator) DeclareCommands(cmd *cobra.Command) {
 }
 
 func (m *Migrator) Migrate(_ *cobra.Command, _ []string) {
-	migratorInstance := migrator.NewMigrator(m.db)
+	migratorInstance := migrator.NewMigrator(m.dsn)
 	migratorInstance.MigrateAllDomains()
 }
 
@@ -40,16 +40,9 @@ func (m *Migrator) BootMigrator(_ *cobra.Command, _ []string) {
 		panic(err)
 	}
 
-	l := logger.NewLogger(
-		conf.ReadConfig("ENVIRONMENT"),
-		conf.ReadConfig("APP"),
-		conf.ReadConfig("VERSION"),
-	)
-
-	l.Boot()
-
-	db := database.NewMysql(
-		l,
+	dsn := "%s:%s@%s:%s/%s"
+	m.dsn = fmt.Sprintf(
+		dsn,
 		conf.ReadConfig("DB_USER"),
 		conf.ReadConfig("DB_PASS"),
 		conf.ReadConfig("DB_URL"),
@@ -57,7 +50,11 @@ func (m *Migrator) BootMigrator(_ *cobra.Command, _ []string) {
 		conf.ReadConfig("DB_DATABASE"),
 	)
 
-	db.Connect()
+	l := logger.NewLogger(
+		conf.ReadConfig("ENVIRONMENT"),
+		conf.ReadConfig("APP"),
+		conf.ReadConfig("VERSION"),
+	)
 
-	m.db = db
+	l.Boot()
 }

@@ -5,5 +5,5 @@ import (
 )
 
 type Response struct {
-	Data *dummy.Dummy `json:"data"`
+	Data *dummy.Dummy
 }

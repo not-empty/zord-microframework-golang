@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"go-skeleton/internal/application/domain/dummy"
 	"go-skeleton/internal/application/providers/pagination"
 	dummyCreate "go-skeleton/internal/application/services/dummy/CREATE"
@@ -58,10 +59,13 @@ func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 	s := dummyCreate.NewService(hs.logger, hs.DummyRepository, hs.idCreator)
 	data := new(dummyCreate.Data)
 
+	fmt.Println("CREATE")
+
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(http.StatusBadRequest, errors)
 	}
 
+	fmt.Println()
 	s.Execute(
 		dummyCreate.NewRequest(data, hs.validator),
 	)

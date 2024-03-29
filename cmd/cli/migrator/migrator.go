@@ -10,7 +10,8 @@ import (
 )
 
 type Migrator struct {
-	dsn string
+	dsn     string
+	dsnTest string
 }
 
 func NewMigrator() *Migrator {
@@ -29,7 +30,7 @@ func (m *Migrator) DeclareCommands(cmd *cobra.Command) {
 }
 
 func (m *Migrator) Migrate(_ *cobra.Command, _ []string) {
-	migratorInstance := migrator.NewMigrator(m.dsn)
+	migratorInstance := migrator.NewMigrator(m.dsn, m.dsnTest)
 	migratorInstance.MigrateAllDomains()
 }
 
@@ -48,6 +49,15 @@ func (m *Migrator) BootMigrator(_ *cobra.Command, _ []string) {
 		conf.ReadConfig("DB_URL"),
 		conf.ReadConfig("DB_PORT"),
 		conf.ReadConfig("DB_DATABASE"),
+	)
+
+	m.dsnTest = fmt.Sprintf(
+		dsn,
+		conf.ReadConfig("DB_USER"),
+		conf.ReadConfig("DB_PASS"),
+		conf.ReadConfig("DB_URL"),
+		conf.ReadConfig("DB_PORT"),
+		conf.ReadConfig("DB_TEST_DATABASE"),
 	)
 
 	l := logger.NewLogger(

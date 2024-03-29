@@ -4,15 +4,18 @@ import (
 	"ariga.io/atlas-go-sdk/atlasexec"
 	"context"
 	"fmt"
+	"strings"
 )
 
 type Migrator struct {
-	dsn string
+	dsn     string
+	dsnTest string
 }
 
-func NewMigrator(dsn string) *Migrator {
+func NewMigrator(dsn string, dsnTest string) *Migrator {
 	return &Migrator{
-		dsn: dsn,
+		dsn:     dsn,
+		dsnTest: dsnTest,
 	}
 }
 
@@ -24,25 +27,23 @@ func (m *Migrator) MigrateAllDomains() {
 		fmt.Printf("failed to load working directory: %v", err)
 		return
 	}
-	defer func(workdir *atlasexec.WorkingDir) {
-		err := workdir.Close()
-		if err != nil {
-			fmt.Printf("failed to load working directory: %v", err)
-		}
-	}(workdir)
+	defer workdir.Close()
 
-	client, err := atlasexec.NewClient("tools/migrator", "atlas")
+	client, err := atlasexec.NewClient(workdir.Path(), "atlas")
 	if err != nil {
 		fmt.Printf("failed to initialize client: %v", err)
 		return
 	}
 
-	res, err := client.MigrateApply(context.Background(), &atlasexec.MigrateApplyParams{
-		URL: "mysql://" + m.dsn,
+	res, err := client.SchemaApply(context.Background(), &atlasexec.SchemaApplyParams{
+		DevURL: "mysql://" + m.dsnTest,
+		To:     "file://" + workdir.Path(),
+		URL:    "mysql://" + m.dsn,
 	})
 	if err != nil {
 		fmt.Printf("failed to apply migrations: %v", err)
 		return
 	}
-	fmt.Printf("Applied %d migrations\n", len(res.Applied))
+	fmt.Printf("Applied %d changes:\n", len(res.Changes.Applied))
+	fmt.Println(strings.Join(res.Changes.Applied, "\n"))
 }

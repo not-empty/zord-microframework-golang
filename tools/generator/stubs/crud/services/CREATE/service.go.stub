@@ -30,7 +30,7 @@ func (s *Service) Execute(request Request) {
 		return
 	}
 
-	request.Data.{{domainPascalCase}}Id = s.idCreator.Create()
+	request.Data.ID = s.idCreator.Create()
 	s.produceResponseRule(request.Data)
 }
 
@@ -39,11 +39,11 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 }
 
 func (s *Service) produceResponseRule(data *Data) {
-	{{domain}} := {{domain}}.{{domainPascalCase}}{
-		{{domainPascalCase}}Id:   data.{{domainPascalCase}}Id,
+	new{{domain}} := {{domain}}.{{domainPascalCase}}{
+		ID:   data.ID,
 	}
 
-	err := s.repository.Create(&{{domain}})
+	err := s.repository.Create(&new{{domain}})
 	if err != nil {
 		s.Error = &services.Error{
 			Status:  400,
@@ -53,6 +53,6 @@ func (s *Service) produceResponseRule(data *Data) {
 		return
 	}
 	s.response = &Response{
-		Data:   {{domain}},
+		Data:   new{{domain}},
 	}
 }

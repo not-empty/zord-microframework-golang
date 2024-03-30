@@ -42,7 +42,8 @@ func (s *Service) produceResponseRule(data *Data) {
 		DummyId:   data.DummyId,
 		DummyName: data.DummyName,
 	}
-	err := s.repository.Create(&dummy)
+	err := s.repository.Create(dummy)
+
 	if err != nil {
 		s.Error = &services.Error{
 			Status:  http.StatusInternalServerError,

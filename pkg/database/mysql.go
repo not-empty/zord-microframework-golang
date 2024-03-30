@@ -1,17 +1,16 @@
 package database
 
 import (
-	"database/sql"
-	"fmt"
 	"go-skeleton/pkg/logger"
+	"log"
 
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
+	"github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 )
 
 type MySql struct {
 	logger   *logger.Logger
-	Db       *gorm.DB
+	Db       *sqlx.DB
 	DbUser   string
 	DbPass   string
 	DbUrl    string
@@ -38,27 +37,20 @@ func NewMysql(
 }
 
 func (m *MySql) Connect() {
-	dsn := "%s:%s@tcp(%s:%s)/%s"
-	dsn = fmt.Sprintf(
-		dsn,
-		m.DbUser,
-		m.DbPass,
-		m.DbUrl,
-		m.DbPort,
-		m.Database,
-	)
-	sqlDB, err := sql.Open("mysql", dsn)
-	if err != nil {
-		m.logger.Critical(err)
+	config := mysql.Config{
+		User:      m.DbUser,
+		Passwd:    m.DbPass,
+		Addr:      m.DbUrl + ":" + m.DbPort,
+		Net:       "tcp",
+		DBName:    m.Database,
+		ParseTime: true,
 	}
-	sqlDB.SetMaxOpenConns(30)
-	sqlDB.SetMaxIdleConns(20)
-	dialector := mysql.New(mysql.Config{
-		Conn: sqlDB,
-	})
-	database, err := gorm.Open(dialector, &gorm.Config{})
+
+	conn, err := sqlx.Open("mysql", config.FormatDSN())
+	conn.SetMaxOpenConns(30)
+	conn.SetMaxIdleConns(20)
 	if err != nil {
-		m.logger.Critical(err)
+		log.Fatalln(err)
 	}
-	m.Db = database
+	m.Db = conn
 }

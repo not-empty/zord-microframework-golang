@@ -3,9 +3,10 @@ package base_repository
 import (
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/fatih/structs"
 	"github.com/jmoiron/sqlx"
-	"strings"
 )
 
 type BaseRepository[dom Domain] interface {

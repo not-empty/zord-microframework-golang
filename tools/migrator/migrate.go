@@ -1,11 +1,12 @@
 package migrator
 
 import (
-	"ariga.io/atlas-go-sdk/atlasexec"
 	"context"
 	"fmt"
 	"os"
 	"strings"
+
+	"ariga.io/atlas-go-sdk/atlasexec"
 )
 
 type Migrator struct {

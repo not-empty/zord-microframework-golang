@@ -32,6 +32,12 @@ func (m *Migrator) DeclareCommands(cmd *cobra.Command) {
 			PreRun: m.BootMigrator,
 			Run:    m.Inspect,
 		},
+		&cobra.Command{
+			Use:    "generate",
+			Short:  "generate HCL from database",
+			PreRun: m.BootMigrator,
+			Run:    m.Generate,
+		},
 	)
 }
 
@@ -39,9 +45,15 @@ func (m *Migrator) Migrate(_ *cobra.Command, _ []string) {
 	migratorInstance := migrator.NewMigrator(m.dsn, m.dsnTest)
 	migratorInstance.MigrateAllDomains()
 }
+
 func (m *Migrator) Inspect(_ *cobra.Command, _ []string) {
 	migratorInstance := migrator.NewMigrator(m.dsn, m.dsnTest)
 	migratorInstance.Inspect()
+}
+
+func (m *Migrator) Generate(_ *cobra.Command, _ []string) {
+	migratorInstance := migrator.NewMigrator(m.dsn, m.dsnTest)
+	migratorInstance.Generate()
 }
 
 func (m *Migrator) BootMigrator(_ *cobra.Command, _ []string) {

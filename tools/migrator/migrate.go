@@ -4,6 +4,7 @@ import (
 	"ariga.io/atlas-go-sdk/atlasexec"
 	"context"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -73,4 +74,35 @@ func (m *Migrator) Inspect() {
 		return
 	}
 	fmt.Println(res)
+}
+
+func (m *Migrator) Generate() {
+	workdir, err := atlasexec.NewWorkingDir(
+		atlasexec.WithAtlasHCLPath("tools/migrator/schema/schema.my.hcl"),
+	)
+	if err != nil {
+		fmt.Printf("failed to load working directory: %v", err)
+		return
+	}
+	defer workdir.Close()
+
+	client, err := atlasexec.NewClient(workdir.Path(), "atlas")
+	if err != nil {
+		fmt.Printf("failed to initialize client: %v", err)
+		return
+	}
+
+	res, err := client.SchemaInspect(context.Background(), &atlasexec.SchemaInspectParams{
+		DevURL: "mysql://" + m.dsnTest,
+		URL:    "mysql://" + m.dsn,
+	})
+	if err != nil {
+		fmt.Printf("failed to inspect schema: %v", err)
+		return
+	}
+	err = os.WriteFile("tools/migrator/generated/database.hcl", []byte(res), 0755)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }

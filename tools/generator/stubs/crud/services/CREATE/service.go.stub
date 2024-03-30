@@ -26,7 +26,7 @@ func (s *Service) Execute(request Request) {
 	s.Logger.Debug("Creating new {{domain}}")
 
 	if err := request.Validate(); err != nil {
-		s.BadRequest(request, err)
+		s.BadRequest(err.Error())
 		return
 	}
 

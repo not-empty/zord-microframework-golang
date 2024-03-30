@@ -23,7 +23,7 @@ func NewService(log services.Logger, repository dummy.Repository) *Service {
 
 func (s *Service) Execute(request Request) {
 	if err := request.Validate(); err != nil {
-		s.BadRequest(request, err)
+		s.BadRequest(err.Error())
 		return
 	}
 
@@ -36,11 +36,11 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 
 func (s *Service) produceResponseRule(data *Data) {
 	dummy := dummy.Dummy{
-		DummyId:   data.DummyId,
+		ID:        data.ID,
 		DummyName: data.DummyName,
 	}
 
-	err := s.repository.Edit(dummy, "id", data.DummyId)
+	err := s.repository.Edit(dummy, "id", data.ID)
 	if err != nil {
 		s.Error = &services.Error{
 			Status:  http.StatusInternalServerError,

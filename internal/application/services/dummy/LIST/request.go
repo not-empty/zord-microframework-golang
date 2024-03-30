@@ -1,11 +1,15 @@
 package dummy
 
+import (
+	"errors"
+)
+
 type Request struct {
 	Data *Data
 }
 
 type Data struct {
-	Page int `validate:"required"`
+	Page int
 }
 
 func NewRequest(data *Data) Request {
@@ -15,5 +19,8 @@ func NewRequest(data *Data) Request {
 }
 
 func (r *Request) Validate() error {
+	if r.Data.Page <= 0 {
+		return errors.New("invalid page")
+	}
 	return nil
 }

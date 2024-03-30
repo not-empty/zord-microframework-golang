@@ -21,9 +21,9 @@ type Validator interface {
 }
 
 type Error struct {
-	Status  int    `json:"-"`
-	Message string `json:"-"`
-	Error   string `json:"error"`
+	Status  int         `json:"-"`
+	Message interface{} `json:"message"`
+	Error   string      `json:"error"`
 }
 
 type BaseService struct {
@@ -35,26 +35,26 @@ type BaseService struct {
 type Request interface {
 }
 
-func (bs *BaseService) BadRequest(_ Request, err error) {
+func (bs *BaseService) errorHandler(httpStatus int, errMsg interface{}) {
 	bs.Error = &Error{
-		Status:  http.StatusBadRequest,
-		Message: http.StatusText(http.StatusBadRequest),
-		Error:   err.Error(),
+		Status:  httpStatus,
+		Message: errMsg,
+		Error:   http.StatusText(httpStatus),
 	}
 }
 
-func (bs *BaseService) ErrorHandler() {
-	rec := recover()
-	if rec != nil {
-		bs.InternalServerError(rec)
-	}
+func (bs *BaseService) CustomError(status int, err interface{}) {
+	bs.errorHandler(status, err)
 }
 
-func (bs *BaseService) InternalServerError(_ any) {
-	bs.Error = &Error{
-		Status:  http.StatusInternalServerError,
-		Message: http.StatusText(http.StatusInternalServerError),
-		Error:   "internal_server_error",
-	}
+func (bs *BaseService) InternalServerError(errMsg string) {
+	bs.errorHandler(http.StatusInternalServerError, errMsg)
+}
 
+func (bs *BaseService) NotFound(errMsg string) {
+	bs.errorHandler(http.StatusNotFound, errMsg)
+}
+
+func (bs *BaseService) BadRequest(errMsg string) {
+	bs.errorHandler(http.StatusBadRequest, errMsg)
 }

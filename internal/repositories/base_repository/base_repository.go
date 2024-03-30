@@ -10,7 +10,7 @@ import (
 )
 
 type BaseRepository[dom Domain] interface {
-	Get(id string, field string) (*dom, error)
+	Get(field string, value string) (*dom, error)
 	Create(data dom) error
 	List(limit int, offset int) (*[]dom, error)
 	Edit(data dom, field string, value string) error

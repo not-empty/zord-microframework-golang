@@ -24,7 +24,7 @@ func NewService(log services.Logger, repository {{domain}}.Repository) *Service 
 
 func (s *Service) Execute(request Request) {
 	if err := request.Validate(); err != nil {
-		s.BadRequest(request, err)
+		s.BadRequest(err.Error())
 		return
 	}
 

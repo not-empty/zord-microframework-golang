@@ -6,7 +6,7 @@ import (
 )
 
 type Dummy struct {
-	DummyId   string `db:"id"`
+	ID        string `db:"id"`
 	DummyName string `db:"name"`
 }
 

@@ -1,7 +1,7 @@
 package dummy
 
 type Data struct {
-	DummyId string `param:"dummy_id"`
+	ID string `param:"id"`
 }
 
 type Request struct {

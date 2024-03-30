@@ -58,3 +58,7 @@ func (bs *BaseService) NotFound(errMsg string) {
 func (bs *BaseService) BadRequest(errMsg string) {
 	bs.errorHandler(http.StatusBadRequest, errMsg)
 }
+
+func (bs *BaseService) UnprocessableEntity(errMsg string) {
+	bs.errorHandler(http.StatusUnprocessableEntity, errMsg)
+}

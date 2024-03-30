@@ -44,7 +44,7 @@ func (s *Service) produceResponseRule(data *Data) {
 
 	err := s.repository.Create(dummy)
 	if err != nil {
-		s.InternalServerError(err.Error())
+		s.InternalServerError("error on create")
 		return
 	}
 

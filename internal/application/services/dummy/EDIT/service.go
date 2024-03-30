@@ -3,7 +3,6 @@ package dummy
 import (
 	"go-skeleton/internal/application/domain/dummy"
 	"go-skeleton/internal/application/services"
-	"net/http"
 )
 
 type Service struct {
@@ -40,13 +39,14 @@ func (s *Service) produceResponseRule(data *Data) {
 		DummyName: data.DummyName,
 	}
 
-	err := s.repository.Edit(dummy, "id", data.ID)
+	affected, err := s.repository.Edit(dummy, "id", data.ID)
 	if err != nil {
-		s.Error = &services.Error{
-			Status:  http.StatusInternalServerError,
-			Message: "Try again in a few minutes",
-			Error:   "Error on request process",
-		}
+		s.InternalServerError("error on edit")
+		return
+	}
+
+	if affected < 1 {
+		s.UnprocessableEntity("same data or invalid id")
 		return
 	}
 

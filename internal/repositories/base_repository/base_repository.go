@@ -13,7 +13,7 @@ type BaseRepository[dom Domain] interface {
 	Get(field string, value string) (*dom, error)
 	Create(data dom) error
 	List(limit int, offset int) (*[]dom, error)
-	Edit(data dom, field string, value string) error
+	Edit(data dom, field string, value string) (int, error)
 	Delete(field string, values string) error
 	Count() (int64, error)
 }
@@ -40,6 +40,22 @@ func NewBaseRepository[dom Domain](mysql *sqlx.DB) *BaseRepo[dom] {
 		Mysql:  mysql,
 		fields: listFields,
 	}
+}
+
+func (repo *BaseRepo[Domain]) Commit(tx *sqlx.Tx) error {
+	err := tx.Commit()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo *BaseRepo[Domain]) Rollback(tx *sqlx.Tx, err error) error {
+	rollbErr := tx.Rollback()
+	if rollbErr != nil {
+		return rollbErr
+	}
+	return err
 }
 
 func (repo *BaseRepo[Domain]) Get(field string, value string) (*Domain, error) {
@@ -125,21 +141,18 @@ func (repo *BaseRepo[Row]) List(limit int, offset int) (*[]Row, error) {
 	return &data, nil
 }
 
-func (repo *BaseRepo[Row]) Edit(d Row, field string, value string) error {
+func (repo *BaseRepo[Row]) Edit(d Row, field string, value string) (int, error) {
 	tx, err := repo.Mysql.Beginx()
 	if err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return err
-		}
-		return err
+		return 0, err
 	}
 
 	namedValues := []string{}
 	for _, field := range repo.fields {
 		namedValues = append(namedValues, "`"+field+"`"+" = :"+field)
 	}
-	query, args, err := tx.BindNamed(
+
+	query, args, bindErr := tx.BindNamed(
 		fmt.Sprintf(
 			`UPDATE %s SET %s WHERE %s = '%s'`,
 			d.Schema(),
@@ -150,35 +163,31 @@ func (repo *BaseRepo[Row]) Edit(d Row, field string, value string) error {
 		&d,
 	)
 
-	res, err := repo.Mysql.Exec(query, args...)
-	if err != nil {
-		return err
+	if bindErr != nil {
+		return 0, repo.Rollback(tx, bindErr)
 	}
 
-	if err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return err
-		}
-		return err
+	res, execErr := repo.Mysql.Exec(query, args...)
+	if execErr != nil {
+		return 0, repo.Rollback(tx, execErr)
 	}
-	affected, err := res.RowsAffected()
+
+	affected, rowsAffErr := res.RowsAffected()
+	if rowsAffErr != nil {
+		return int(affected), repo.Rollback(tx, rowsAffErr)
+	}
+
 	if affected < 1 {
-		err := tx.Rollback()
-		if err != nil {
-			return err
-		}
-		return errors.New("erro ao editar registro")
+		repo.Rollback(tx, errors.New("ROWS_NOT_AFFECTED"))
+		return int(affected), nil
 	}
-	err = tx.Commit()
-	if err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return err
-		}
-		return err
+
+	commitErr := repo.Commit(tx)
+	if commitErr != nil {
+		return int(affected), repo.Rollback(tx, commitErr)
 	}
-	return nil
+
+	return int(affected), nil
 }
 
 func (repo *BaseRepo[Row]) Delete(field string, value string) error {

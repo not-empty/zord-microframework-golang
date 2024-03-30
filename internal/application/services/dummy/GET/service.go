@@ -38,9 +38,9 @@ func (s *Service) produceResponseRule(data *Data) {
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
 			s.NotFound("data not found")
-		} else {
-			s.InternalServerError(err.Error())
+			return
 		}
+		s.InternalServerError("error on get data")
 		return
 	}
 

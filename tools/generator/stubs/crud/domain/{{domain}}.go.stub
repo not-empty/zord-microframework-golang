@@ -6,7 +6,11 @@ import (
 )
 
 type {{domainPascalCase}} struct {
-	{{domainPascalCase}}Id   string `gorm:"type:char(26);primarykey" json:"{{domainCamelCase}}_id"`
+	ID   string string `db:"id"`
+}
+
+func (d Dummy) Schema() string {
+	return "{{domain}}"
 }
 
 type Repository interface {

@@ -24,7 +24,7 @@ func NewService(log services.Logger, repository dummy.Repository, pagProv dummy.
 
 func (s *Service) Execute(request Request) {
 	if err := request.Validate(); err != nil {
-		s.BadRequest(request, err)
+		s.BadRequest(err.Error())
 		return
 	}
 	s.produceResponseRule(request.Data.Page, 25)
@@ -37,7 +37,7 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 func (s *Service) produceResponseRule(page int, limit int) {
 	err, pagination := s.pagProv.PaginationHandler(page, limit)
 	if err != nil {
-		s.Error = err
+		s.CustomError(err.Status, err.Message)
 		return
 	}
 

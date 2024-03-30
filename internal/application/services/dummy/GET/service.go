@@ -3,7 +3,6 @@ package dummy
 import (
 	"go-skeleton/internal/application/domain/dummy"
 	"go-skeleton/internal/application/services"
-	"net/http"
 )
 
 type Service struct {
@@ -23,7 +22,7 @@ func NewService(log services.Logger, repository dummy.Repository) *Service {
 
 func (s *Service) Execute(request Request) {
 	if err := request.Validate(); err != nil {
-		s.BadRequest(request, err)
+		s.BadRequest(err.Error())
 		return
 	}
 	s.produceResponseRule(request.Data)
@@ -34,19 +33,14 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 }
 
 func (s *Service) produceResponseRule(data *Data) {
-	dummyData, err := s.repository.Get("id", data.DummyId)
-	httpStatus := http.StatusOK
+	dummyData, err := s.repository.Get("id", data.ID)
 
 	if err != nil {
-		httpStatus = http.StatusInternalServerError
-		if err.Error() == "record not found" {
-			httpStatus = http.StatusNotFound
+		if err.Error() == "sql: no rows in result set" {
+			s.NotFound("data not found")
+			return
 		}
-		s.Error = &services.Error{
-			Status:  httpStatus,
-			Message: "Try again in a few minutes",
-			Error:   "Error on request process",
-		}
+		s.InternalServerError("error on get data")
 		return
 	}
 

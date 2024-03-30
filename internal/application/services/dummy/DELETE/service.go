@@ -3,7 +3,6 @@ package dummy
 import (
 	"go-skeleton/internal/application/domain/dummy"
 	"go-skeleton/internal/application/services"
-	"net/http"
 )
 
 type Service struct {
@@ -23,7 +22,7 @@ func NewService(log services.Logger, repository dummy.Repository) *Service {
 
 func (s *Service) Execute(request Request) {
 	if err := request.Validate(); err != nil {
-		s.BadRequest(request, err)
+		s.BadRequest(err.Error())
 		return
 	}
 	s.produceResponseRule(request.Data)
@@ -34,15 +33,13 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 }
 
 func (s *Service) produceResponseRule(data *Data) {
-	err := s.repository.Delete("id", data.DummyId)
+	err := s.repository.Delete("id", data.ID)
 	if err != nil {
-		s.Error = &services.Error{
-			Status:  http.StatusInternalServerError,
-			Message: "Try again in a few minutes",
-			Error:   "Error on request process",
-		}
+		s.InternalServerError("error on delete")
 		return
 	}
 
-	s.response = &Response{}
+	s.response = &Response{
+		Message: "OK",
+	}
 }

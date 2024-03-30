@@ -35,17 +35,16 @@ func (pp *PaginationProvider[Row]) PaginationHandler(page int, limit int) (*serv
 	if err != nil {
 		return &services.Error{
 			Status:  http.StatusInternalServerError,
-			Message: "Try again in a few minutes",
-			Error:   "fatal error",
+			Message: "error on pagination count",
 		}, nil
 	}
 
 	if total == 0 {
-		return &services.Error{
-			Status:  http.StatusNotFound,
-			Message: "Try again in a few minutes",
-			Error:   "data not found",
-		}, nil
+		return nil, &Pagination[Row]{
+			CurrentPage: page,
+			TotalPages:  0,
+			Data:        listData,
+		}
 	}
 
 	totalPages := math.Ceil(float64(total) / float64(limit))
@@ -54,8 +53,7 @@ func (pp *PaginationProvider[Row]) PaginationHandler(page int, limit int) (*serv
 		if err != nil {
 			return &services.Error{
 				Status:  http.StatusInternalServerError,
-				Message: "Try again in a few minutes",
-				Error:   "Error on request process",
+				Message: "error on data list",
 			}, nil
 		}
 	}

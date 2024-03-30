@@ -40,7 +40,8 @@ func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
 	data := new(dummyGet.Data)
 
 	if errors := context.Bind(data); errors != nil {
-		return context.JSON(422, errors)
+		s.CustomError(http.StatusBadRequest, errors)
+		return context.JSON(s.Error.Status, s.Error)
 	}
 
 	s.Execute(
@@ -59,7 +60,8 @@ func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 	data := new(dummyCreate.Data)
 
 	if errors := context.Bind(data); errors != nil {
-		return context.JSON(http.StatusBadRequest, errors)
+		s.CustomError(http.StatusBadRequest, errors)
+		return context.JSON(s.Error.Status, s.Error)
 	}
 
 	s.Execute(
@@ -78,7 +80,8 @@ func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 	data := new(dummyEdit.Data)
 
 	if errors := context.Bind(data); errors != nil {
-		return context.JSON(http.StatusBadRequest, errors)
+		s.CustomError(http.StatusBadRequest, errors)
+		return context.JSON(s.Error.Status, s.Error)
 	}
 
 	s.Execute(
@@ -105,7 +108,8 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 		BindErrors()
 
 	if bindErr != nil {
-		return context.JSON(http.StatusBadRequest, bindErr)
+		s.CustomError(http.StatusBadRequest, bindErr)
+		return context.JSON(http.StatusBadRequest, s.Error)
 	}
 
 	s.Execute(
@@ -124,7 +128,8 @@ func (hs *DummyHandlers) HandleDeleteDummy(context echo.Context) error {
 	data := new(dummyDelete.Data)
 
 	if errors := context.Bind(data); errors != nil {
-		return context.JSON(http.StatusBadRequest, errors)
+		s.CustomError(http.StatusBadRequest, errors)
+		return context.JSON(s.Error.Status, s.Error)
 	}
 
 	s.Execute(

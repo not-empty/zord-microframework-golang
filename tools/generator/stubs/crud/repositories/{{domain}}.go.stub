@@ -1,16 +1,16 @@
-package {{domainPascalCase}}Repository
+package {{domainCamelCase}}Repository
 
 import (
-	"go-skeleton/internal/application/domain/{{domain}}"
+	"github.com/jmoiron/sqlx"
+	"go-skeleton/internal/application/domain/dummy"
 	"go-skeleton/internal/repositories/base_repository"
-	"go-skeleton/pkg/database"
 )
 
 type {{domainPascalCase}}Repository struct {
 	*base_repository.BaseRepo[{{domainCamelCase}}.{{domainPascalCase}}]
 }
 
-func New{{domainPascalCase}}Repo(mysql *database.MySql) *{{domainPascalCase}}Repository {
+func New{{domainPascalCase}}Repo(mysql *sqlx.DB) *{{domainPascalCase}}Repository {
 	return &{{domainPascalCase}}Repository{
 		BaseRepo: base_repository.NewBaseRepository[{{domainCamelCase}}.{{domainPascalCase}}](mysql),
 	}

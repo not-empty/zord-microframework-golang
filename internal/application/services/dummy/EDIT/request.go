@@ -5,7 +5,7 @@ import (
 )
 
 type Data struct {
-	DummyId   string `param:"dummy_id"`
+	ID        string `param:"id"`
 	DummyName string `json:"dummy_name"`
 }
 

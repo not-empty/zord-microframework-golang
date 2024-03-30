@@ -47,3 +47,30 @@ func (m *Migrator) MigrateAllDomains() {
 	fmt.Printf("Applied %d changes:\n", len(res.Changes.Applied))
 	fmt.Println(strings.Join(res.Changes.Applied, "\n"))
 }
+
+func (m *Migrator) Inspect() {
+	workdir, err := atlasexec.NewWorkingDir(
+		atlasexec.WithAtlasHCLPath("tools/migrator/schema/schema.my.hcl"),
+	)
+	if err != nil {
+		fmt.Printf("failed to load working directory: %v", err)
+		return
+	}
+	defer workdir.Close()
+
+	client, err := atlasexec.NewClient(workdir.Path(), "atlas")
+	if err != nil {
+		fmt.Printf("failed to initialize client: %v", err)
+		return
+	}
+
+	res, err := client.SchemaInspect(context.Background(), &atlasexec.SchemaInspectParams{
+		DevURL: "mysql://" + m.dsnTest,
+		URL:    "mysql://" + m.dsn,
+	})
+	if err != nil {
+		fmt.Printf("failed to inspect schema: %v", err)
+		return
+	}
+	fmt.Println(res)
+}

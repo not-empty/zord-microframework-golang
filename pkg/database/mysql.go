@@ -1,10 +1,11 @@
 package database
 
 import (
-	"fmt"
-	"github.com/jmoiron/sqlx"
 	"go-skeleton/pkg/logger"
 	"log"
+
+	"github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 )
 
 type MySql struct {
@@ -36,17 +37,16 @@ func NewMysql(
 }
 
 func (m *MySql) Connect() {
-	dsn := "%s:%s@tcp(%s:%s)/%s"
-	dsn = fmt.Sprintf(
-		dsn,
-		m.DbUser,
-		m.DbPass,
-		m.DbUrl,
-		m.DbPort,
-		m.Database,
-	)
+	config := mysql.Config{
+		User:      m.DbUser,
+		Passwd:    m.DbPass,
+		Addr:      m.DbUrl + ":" + m.DbPort,
+		Net:       "tcp",
+		DBName:    m.Database,
+		ParseTime: true,
+	}
 
-	conn, err := sqlx.Open("mysql", dsn)
+	conn, err := sqlx.Open("mysql", config.FormatDSN())
 	conn.SetMaxOpenConns(30)
 	conn.SetMaxIdleConns(20)
 	if err != nil {

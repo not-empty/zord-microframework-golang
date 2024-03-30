@@ -5,6 +5,7 @@ import (
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/logger"
 	"go-skeleton/tools/migrator"
+	"net/url"
 
 	"github.com/spf13/cobra"
 )
@@ -66,9 +67,9 @@ func (m *Migrator) BootMigrator(_ *cobra.Command, _ []string) {
 	dsn := "%s:%s@%s:%s/%s"
 	m.dsn = fmt.Sprintf(
 		dsn,
-		conf.ReadConfig("DB_USER"),
-		conf.ReadConfig("DB_PASS"),
-		conf.ReadConfig("DB_URL"),
+		url.QueryEscape(conf.ReadConfig("DB_USER")),
+		url.QueryEscape(conf.ReadConfig("DB_PASS")),
+		url.QueryEscape(conf.ReadConfig("DB_URL")),
 		conf.ReadConfig("DB_PORT"),
 		conf.ReadConfig("DB_DATABASE"),
 	)

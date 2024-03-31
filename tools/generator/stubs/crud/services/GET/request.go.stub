@@ -1,13 +1,8 @@
 package {{domain}}
 
-import (
-	"errors"
-)
-
 type Data struct {
-	{{domainPascalCase}}Id string `param:"{{domain}}_id"`
+	ID string `param:"id"`
 }
-
 
 type Request struct {
 	Data *Data
@@ -21,15 +16,5 @@ func NewRequest(data *Data) Request {
 }
 
 func (r *Request) Validate() error {
-	if err := r.{{domain}}IdRule(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *Request) {{domain}}IdRule() error {
-	if r.Data.{{domainPascalCase}}Id == `""` {
-		return errors.New("invalid_argument")
-	}
 	return nil
 }

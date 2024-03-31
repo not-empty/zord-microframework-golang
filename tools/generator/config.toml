@@ -3,7 +3,7 @@
 crud = "{{domain}}"
 crudCamelCase = "{{domainCamelCase}}"
 crudPascalCase = "{{domainPascalCase}}"
-"{{validatorImport}}" = "\n	\"go-skeleton/internal/application/services\""
+"{{validatorImport}}" = "\"go-skeleton/internal/application/services\""
 "{{validator}}" = "\n	validator services.Validator"
 "{{,validator}}" = ", validator services.Validator"
 "{{validatorInject}}" = "	validator: validator,"
@@ -21,7 +21,22 @@ crudPascalCase = "{{domainPascalCase}}"
 "//{{codeGen3}}" = "\"go-skeleton/internal/application/domain/{{domain}}\"\n	$repeat$"
 "//{{codeGen4}}" = "m.db.Db.Migrator().CreateTable(&{{domain}}.{{domainPascalCase}}{})\n	$repeat$"
 "//{{codeGen5}}" = "{{domainCamelCase}}Repository \"go-skeleton/internal/repositories/{{domain}}\"\n	$repeat$"
-"//{{codeGen6}}" = "reg.Provide(\"{{domain}}Repository\", {{domain}}Repository.New{{domainPascalCase}}Repo(db))\n	$repeat$"
+"//{{codeGen6}}" = "reg.Provide(\"{{domainCamelCase}}Repository\", {{domainCamelCase}}Repository.New{{domainPascalCase}}Repository(db.Db))\n	$repeat$"
+"{{schemaName}}" = "skeleton"
+"//{{newSchema}}" = """
+table "{{domain}}" {
+  schema = schema.{{schemaName}}
+  column "id" {
+	null = false
+	type = char(26)
+  }
+  primary_key {
+	columns = [column.id]
+  }
+}
+//schemaEnd
+
+$repeat$"""
 
 [stubs.crud.domain]
 toPath = "internal/application/domain/{{domain}}/"
@@ -73,6 +88,11 @@ deletePatterns = [
 	"\"go-skeleton/internal/application/domain/{{domain}}",
 	"&{{domain}}.{{domainPascalCase}}{}"
 ]
+
+[stubs.crud.migrator_schema]
+toPath = "tools/migrator/schema/schema.my.hcl"
+isGenerated = false
+deleteRegex = "(?s)table \"{{domain}}\" {\\s*.*?\\s*}\n*//schemaEnd\n\n"
 
 [replacers.usecase]
 ".stub" = ""

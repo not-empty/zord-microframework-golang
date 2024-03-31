@@ -60,8 +60,6 @@ func init() {
 	reg.Provide("config", conf)
 	reg.Provide("idCreator", idC)
 
-	repo := dummyRepository.NewDummyRepository(db.Db)
-
-	reg.Provide("dummyRepository", repo)
+	reg.Provide("dummyRepository", dummyRepository.NewDummyRepository(db.Db))
 	//{{codeGen6}}
 }

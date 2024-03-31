@@ -5,6 +5,7 @@ type Stubs struct {
 	FromPath       string
 	IsGenerated    bool
 	UniqueDelete   string
+	DeleteRegex    string
 	DeletePatterns []string
 }
 

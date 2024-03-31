@@ -4,6 +4,7 @@ import (
 	"errors"
 	"go-skeleton/pkg/logger"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/BurntSushi/toml"
@@ -164,6 +165,19 @@ func RemoveFileLine(path string, search string) error {
 		}
 	}
 	err = os.WriteFile(path, []byte(strings.Join(lines, "\n")), 0755)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func RemoveFromRegex(path string, regex *regexp.Regexp) error {
+	data, err := GetFileData(path)
+	if err != nil {
+		return err
+	}
+	out := regex.ReplaceAllString(data, "")
+	err = os.WriteFile(path, []byte(out), 0755)
 	if err != nil {
 		return err
 	}

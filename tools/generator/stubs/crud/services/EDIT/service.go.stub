@@ -3,8 +3,6 @@ package {{domain}}
 import (
 	"go-skeleton/internal/application/domain/{{domain}}"
 	"go-skeleton/internal/application/services"
-
-	"net/http"
 )
 
 type Service struct {
@@ -36,30 +34,22 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 }
 
 func (s *Service) produceResponseRule(data *Data) {
-	{{domain}}Data := {{domain}}.{{domainPascalCase}}{
-		{{domainPascalCase}}Id:   data.{{domainPascalCase}}Id,
-	}
+    {{domainCamelCase}} := {{domain}}.{{domainPascalCase}}{
+        ID:        data.ID,
+    }
 
-	affectedRows, err := s.repository.Edit(&{{domain}}Data)
-	if err != nil {
-		s.Error = &services.Error{
-			Status:  http.StatusInternalServerError,
-			Message: "Try again in a few minutes",
-			Error:   "Error on request process",
-		}
-		return
-	}
+    affected, err := s.repository.Edit({{domainCamelCase}}, "id", data.ID)
+    if err != nil {
+        s.InternalServerError("error on edit")
+        return
+    }
 
-	if affectedRows < 1 {
-		s.Error = &services.Error{
-			Status:  http.StatusNotFound,
-			Message: "Try again in a few minutes",
-			Error:   "Error on request process",
-		}
-		return
-	}
+    if affected < 1 {
+        s.UnprocessableEntity("same data or invalid id")
+        return
+    }
 
-	s.response = &Response{
-		Data: data,
-	}
+    s.response = &Response{
+        Data: data,
+    }
 }

@@ -23,14 +23,10 @@ func NewService(log services.Logger, repository {{domain}}.Repository, idCreator
 }
 
 func (s *Service) Execute(request Request) {
-	s.Logger.Debug("Creating new {{domain}}")
-
 	if err := request.Validate(); err != nil {
 		s.BadRequest(err.Error())
 		return
 	}
-
-	request.Data.ID = s.idCreator.Create()
 	s.produceResponseRule(request.Data)
 }
 
@@ -39,20 +35,16 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 }
 
 func (s *Service) produceResponseRule(data *Data) {
-	new{{domain}} := {{domain}}.{{domainPascalCase}}{
-		ID:   data.ID,
+	{{domainCamelCase}} := {{domain}}.{{domainPascalCase}}{
+		ID:   s.idCreator.Create(),
 	}
 
-	err := s.repository.Create(&new{{domain}})
+	err := s.repository.Create({{domainCamelCase}})
 	if err != nil {
-		s.Error = &services.Error{
-			Status:  400,
-			Message: "Try again in a few minutes",
-			Error:   "Error on request process",
-		}
+		s.InternalServerError("error on create")
 		return
 	}
 	s.response = &Response{
-		Data:   new{{domain}},
+		Data:   {{domainCamelCase}},
 	}
 }

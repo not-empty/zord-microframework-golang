@@ -1,4 +1,4 @@
-package {{domainCamelCase}}
+package {{domain}}
 
 import (
 	"go-skeleton/internal/application/providers/pagination"
@@ -6,10 +6,10 @@ import (
 )
 
 type {{domainPascalCase}} struct {
-	ID   string string `db:"id"`
+	ID   string `db:"id"`
 }
 
-func (d Dummy) Schema() string {
+func (d {{domainPascalCase}}) Schema() string {
 	return "{{domain}}"
 }
 

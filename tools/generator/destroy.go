@@ -1,8 +1,10 @@
 package generator
 
 import (
+	"fmt"
 	"go-skeleton/pkg/logger"
 	"os"
+	"regexp"
 )
 
 type CodeDestroy struct {
@@ -26,6 +28,17 @@ func (cd *CodeDestroy) Handler(args []string) {
 	for _, stub := range stubs {
 		path := Replacer(stub.ToPath, replacers)
 		if !stub.IsGenerated {
+			if stub.DeleteRegex != "" {
+				fmt.Println(stub.DeleteRegex)
+				fmt.Println(path)
+				replaced := Replacer(stub.DeleteRegex, replacers)
+				pattern := regexp.MustCompile(replaced)
+				err := RemoveFromRegex(path, pattern)
+				if err != nil {
+					cd.Logger.Error(err)
+				}
+			}
+
 			for _, p := range stub.DeletePatterns {
 				deletePattern := Replacer(p, replacers)
 				err := RemoveFileLine(path, deletePattern)

@@ -1,7 +1,7 @@
 package {{domain}}
 
 type Data struct {
-	{{domainPascalCase}}Id string `param:"{{domain}}_id"`
+	ID string `param:"id"`
 }
 
 type Request struct {
@@ -16,12 +16,6 @@ func NewRequest(data *Data) Request {
 }
 
 func (r *Request) Validate() error {
-	if err := r.{{domain}}IdRule(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *Request) {{domain}}IdRule() error {
+    // Add request validations
 	return nil
 }

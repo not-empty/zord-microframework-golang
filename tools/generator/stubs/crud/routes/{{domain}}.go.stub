@@ -20,8 +20,8 @@ func New{{domainPascalCase}}Routes(reg *registry.Registry) *{{domainPascalCase}}
 
 func (hs *{{domainPascalCase}}Routes) DeclareRoutes(server *echo.Group) {
 	server.GET("/v1/{{domainCamelCase}}", hs.hand.HandleList{{domainPascalCase}})
-	server.GET("/v1/{{domainCamelCase}}/:{{domainCamelCase}}_id", hs.hand.HandleGet{{domainPascalCase}})
+	server.GET("/v1/{{domainCamelCase}}/:id", hs.hand.HandleGet{{domainPascalCase}})
 	server.POST("/v1/{{domainCamelCase}}", hs.hand.HandleCreate{{domainPascalCase}})
-	server.PUT("/v1/{{domainCamelCase}}/:{{domainCamelCase}}_id", hs.hand.HandleEdit{{domainPascalCase}})
-	server.DELETE("/v1/{{domainCamelCase}}/:{{domainCamelCase}}_id", hs.hand.HandleDelete{{domainPascalCase}})
+	server.PUT("/v1/{{domainCamelCase}}/:id", hs.hand.HandleEdit{{domainPascalCase}})
+	server.DELETE("/v1/{{domainCamelCase}}/:id", hs.hand.HandleDelete{{domainPascalCase}})
 }

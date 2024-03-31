@@ -13,7 +13,7 @@ table "dummies" {
   }
 }
 
-//{{newSchema}}
+//{{newTable}}
 
 schema "skeleton" {
   charset = "utf8mb4"

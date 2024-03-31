@@ -21,7 +21,6 @@ func NewService(log services.Logger, repository {{domain}}.Repository) *Service 
 }
 
 func (s *Service) Execute(request Request) {
-	s.Logger.Debug("Hello Im {{domainPascalCase}} Server!")
 	if err := request.Validate(); err != nil {
 		s.BadRequest(err.Error())
 		return

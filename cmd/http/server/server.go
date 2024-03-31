@@ -8,6 +8,7 @@ import (
 	"go-skeleton/pkg/registry"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type Server struct {
@@ -29,6 +30,8 @@ func (hs *Server) Start() {
 
 	server.HideBanner = true
 	server.HidePort = true
+
+	server.Use(middleware.Recover())
 
 	publicRoutes := routes.GetPublicRoutes(hs.registry)
 

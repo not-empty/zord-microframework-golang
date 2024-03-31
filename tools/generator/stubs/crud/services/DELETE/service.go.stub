@@ -33,18 +33,17 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 }
 
 func (s *Service) produceResponseRule(data *Data) {
-	{{domain}} := {{domain}}.{{domainPascalCase}}{
+	{{domainCamelCase}} := {{domain}}.{{domainPascalCase}}{
 		ID: data.ID,
 	}
 
-	err := s.repository.Delete(&{{domain}})
+	err := s.repository.Delete("id", {{domainCamelCase}}.ID)
 	if err != nil {
-			s.Error = &services.Error{
-					Status:  400,
-					Message: "Try again in a few minutes",
-					Error:   "Error on request process",
-			}
-			return
+        s.InternalServerError("error on delete")
+        return
 	}
-	s.response = &Response{}
+
+	s.response = &Response{
+        Message: "OK",
+	}
 }

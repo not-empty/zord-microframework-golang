@@ -34,12 +34,12 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 }
 
 func (s *Service) produceResponseRule(data *Data) {
-	dummy := dummy.Dummy{
+	dummyDomain := dummy.Dummy{
 		ID:        data.ID,
 		DummyName: data.DummyName,
 	}
 
-	affected, err := s.repository.Edit(dummy, "id", data.ID)
+	affected, err := s.repository.Edit(dummyDomain, "id", data.ID)
 	if err != nil {
 		s.InternalServerError("error on edit")
 		return

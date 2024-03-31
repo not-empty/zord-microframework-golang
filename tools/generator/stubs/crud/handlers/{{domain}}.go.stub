@@ -1,14 +1,14 @@
 package handlers
 
 import (
-	"go-skeleton/internal/application/domain/{{domainCamelCase}}"
+	"go-skeleton/internal/application/domain/{{domain}}"
 	"go-skeleton/internal/application/providers/pagination"
-	{{domainCamelCase}}Create "go-skeleton/internal/application/services/{{domainCamelCase}}/CREATE"
-	{{domainCamelCase}}Delete "go-skeleton/internal/application/services/{{domainCamelCase}}/DELETE"
-	{{domainCamelCase}}Edit "go-skeleton/internal/application/services/{{domainCamelCase}}/EDIT"
-	{{domainCamelCase}}Get "go-skeleton/internal/application/services/{{domainCamelCase}}/GET"
-	{{domainCamelCase}}List "go-skeleton/internal/application/services/{{domainCamelCase}}/LIST"
-	{{domainCamelCase}}Repository "go-skeleton/internal/repositories/{{domainCamelCase}}"
+	{{domainCamelCase}}Create "go-skeleton/internal/application/services/{{domain}}/CREATE"
+	{{domainCamelCase}}Delete "go-skeleton/internal/application/services/{{domain}}/DELETE"
+	{{domainCamelCase}}Edit "go-skeleton/internal/application/services/{{domain}}/EDIT"
+	{{domainCamelCase}}Get "go-skeleton/internal/application/services/{{domain}}/GET"
+	{{domainCamelCase}}List "go-skeleton/internal/application/services/{{domain}}/LIST"
+	{{domainCamelCase}}Repository "go-skeleton/internal/repositories/{{domain}}"
 	"go-skeleton/pkg/idCreator"
 	"go-skeleton/pkg/logger"
 	"go-skeleton/pkg/registry"
@@ -96,7 +96,7 @@ func (hs *{{domainPascalCase}}Handlers) HandleList{{domainPascalCase}}(context e
 	s := {{domainCamelCase}}List.NewService(
 		hs.logger,
 		hs.{{domainPascalCase}}Repository,
-		pagination.NewPaginationProvider[{{domainCamelCase}}.{{domainPascalCase}}](hs.{{domainPascalCase}}Repository),
+		pagination.NewPaginationProvider[{{domain}}.{{domainPascalCase}}](hs.{{domainPascalCase}}Repository),
 	)
 
 	data := new({{domainCamelCase}}List.Data)

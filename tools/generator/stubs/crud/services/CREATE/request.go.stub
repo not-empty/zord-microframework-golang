@@ -5,7 +5,7 @@ import (
 )
 
 type Data struct {
-	{{domainPascalCase}}Id string
+	ID string
 }
 
 type Request struct {
@@ -22,14 +22,6 @@ func NewRequest(data *Data{{,validator}}) Request {
 }
 
 func (r *Request) Validate() error {
-	if err := r.{{domain}}CreateRule(); err != nil {
-		return err
-	}
 	{{validatorRule}}
-	return nil
-}
-
-func (r *Request) {{domain}}CreateRule() error {
-	// Add validation...
 	return nil
 }

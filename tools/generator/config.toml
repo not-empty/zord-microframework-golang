@@ -3,7 +3,7 @@
 crud = "{{domain}}"
 crudCamelCase = "{{domainCamelCase}}"
 crudPascalCase = "{{domainPascalCase}}"
-"{{validatorImport}}" = "\n	\"go-skeleton/internal/application/services\""
+"{{validatorImport}}" = "\"go-skeleton/internal/application/services\""
 "{{validator}}" = "\n	validator services.Validator"
 "{{,validator}}" = ", validator services.Validator"
 "{{validatorInject}}" = "	validator: validator,"
@@ -21,7 +21,22 @@ crudPascalCase = "{{domainPascalCase}}"
 "//{{codeGen3}}" = "\"go-skeleton/internal/application/domain/{{domain}}\"\n	$repeat$"
 "//{{codeGen4}}" = "m.db.Db.Migrator().CreateTable(&{{domain}}.{{domainPascalCase}}{})\n	$repeat$"
 "//{{codeGen5}}" = "{{domainCamelCase}}Repository \"go-skeleton/internal/repositories/{{domain}}\"\n	$repeat$"
-"//{{codeGen6}}" = "reg.Provide(\"{{domain}}Repository\", {{domain}}Repository.New{{domainPascalCase}}Repo(db))\n	$repeat$"
+"//{{codeGen6}}" = "reg.Provide(\"{{domainCamelCase}}Repository\", {{domainCamelCase}}Repository.New{{domainPascalCase}}Repository(db.Db))\n	$repeat$"
+"{{schemaName}}" = "skeleton"
+"//{{newTable}}" = """
+table "{{domain}}" {
+  schema = schema.{{schemaName}}
+  column "id" {
+	null = false
+	type = char(26)
+  }
+  primary_key {
+	columns = [column.id]
+  }
+}
+//tableEnd
+
+$repeat$"""
 
 [stubs.crud.domain]
 toPath = "internal/application/domain/{{domain}}/"
@@ -53,7 +68,7 @@ uniqueDelete = "cmd/http/handlers/{{domain}}.go"
 [stubs.crud.declarable]
 toPath = "cmd/http/routes/declarable.go"
 isGenerated = false
-deletePatterns = [
+deleteLinePatterns = [
 	"New{{domainPascalCase}}Routes",
 	"\"{{domain}}\": "
 ]
@@ -61,7 +76,7 @@ deletePatterns = [
 [stubs.crud.main]
 toPath = "cmd/http/main.go"
 isGenerated = false
-deletePatterns = [
+deleteLinePatterns = [
 	"New{{domainPascalCase}}Repo",
 	"go-skeleton/internal/repositories/{{domain}}"
 ]
@@ -69,10 +84,15 @@ deletePatterns = [
 [stubs.crud.migrator]
 toPath = "tools/migrator/migrate.go"
 isGenerated = false
-deletePatterns = [
+deleteLinePatterns = [
 	"\"go-skeleton/internal/application/domain/{{domain}}",
 	"&{{domain}}.{{domainPascalCase}}{}"
 ]
+
+[stubs.crud.migrator_schema]
+toPath = "tools/migrator/schema/schema.my.hcl"
+isGenerated = false
+deleteRegex = "(?s)table \"{{domain}}\" {\\s*.*?\\s*}\n*//tableEnd\n\n"
 
 [replacers.usecase]
 ".stub" = ""
@@ -102,7 +122,7 @@ uniqueDelete = "cmd/http/handlers/{{usecase}}.go"
 [stubs.usecase.declarable]
 toPath = "cmd/http/routes/declarable.go"
 isGenerated = false
-deletePatterns = [
+deleteLinePatterns = [
 	"New{{usecasePascalCase}}Routes",
 	"\"{{usecase}}\": "
 ]

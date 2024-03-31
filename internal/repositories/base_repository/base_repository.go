@@ -178,7 +178,7 @@ func (repo *BaseRepo[Row]) Edit(d Row, field string, value string) (int, error) 
 	}
 
 	if affected < 1 {
-		repo.Rollback(tx, errors.New("ROWS_NOT_AFFECTED"))
+		repo.Rollback(tx, nil)
 		return int(affected), nil
 	}
 

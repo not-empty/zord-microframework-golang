@@ -47,7 +47,7 @@ func (hcl *HCL) SetField(body *hclwrite.Body, fieldName string, metadata []strin
 			f.Body().SetAttributeValue(split[0], cty.StringVal(split[1]))
 			continue
 		}
-		hcl.SetAdditionalOpt(body, fieldName, split[0])
+		hcl.SetAdditionalAttr(body, fieldName, split[0])
 	}
 }
 
@@ -66,8 +66,8 @@ func (hcl *HCL) RemoveQuotation(hclStr string) string {
 	return strings.Join(lines, "\n")
 }
 
-func (hcl *HCL) SetAdditionalOpt(body *hclwrite.Body, fieldName string, opt string) {
-	additionalOpts := hcl.getAdditionalAttributes()
+func (hcl *HCL) SetAdditionalAttr(body *hclwrite.Body, fieldName string, opt string) {
+	additionalOpts := hcl.getAdditionalAttributes(fieldName)
 	for _, field := range additionalOpts {
 		if opt == field.Alias {
 			block := body.AppendNewBlock(field.Name, []string{})
@@ -89,13 +89,13 @@ func (hcl *HCL) getNoQuotationsAttributes() []string {
 	}
 }
 
-func (hcl *HCL) getAdditionalAttributes() []AdditionalOpts {
+func (hcl *HCL) getAdditionalAttributes(fielName string) []AdditionalOpts {
 	return []AdditionalOpts{
 		{
 			Alias: "PK",
 			Name:  "primary_key",
 			Attributes: map[string]string{
-				"columns": "[column.id]",
+				"columns": "[column." + fielName + "]",
 			},
 		},
 	}

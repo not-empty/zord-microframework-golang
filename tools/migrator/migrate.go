@@ -3,8 +3,11 @@ package migrator
 import (
 	"context"
 	"fmt"
+	"go-skeleton/tools/migrator/hcl"
 	"os"
 	"strings"
+
+	"github.com/fatih/structs"
 
 	"ariga.io/atlas-go-sdk/atlasexec"
 )
@@ -106,4 +109,26 @@ func (m *Migrator) Generate() {
 		fmt.Println(err)
 		return
 	}
+}
+
+func (m *Migrator) MigrateFromDomains() {
+	tables := GetTables()
+	_hcl := hcl.NewHCL()
+	for _, table := range tables {
+		fields := structs.Fields(table)
+		listFields := m.getFields("db", fields)
+		dbDefinitions := m.getFields("zord_db", fields)
+		hclConfig := _hcl.CreateAtlasHCLFromDomain(table.Schema(), "skeleton", listFields, dbDefinitions)
+		fmt.Println(hclConfig)
+		// Todo: adicionar ao arquivo de schemas
+	}
+}
+
+func (m *Migrator) getFields(tag string, fields []*structs.Field) []string {
+	var listFields []string
+	for _, field := range fields {
+		tag := field.Tag(tag)
+		listFields = append(listFields, tag)
+	}
+	return listFields
 }

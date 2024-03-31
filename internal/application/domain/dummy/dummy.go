@@ -6,8 +6,9 @@ import (
 )
 
 type Dummy struct {
-	ID        string `db:"id"`
-	DummyName string `db:"name"`
+	ID        string `db:"id" zord_db:"type=char(26),null=false,PK"`
+	DummyName string `db:"name" zord_db:"type=char(255),null=false"`
+	Email     string `db:"email" zord_db:"type=char(255),null=false,IDX"`
 }
 
 func (d Dummy) Schema() string {

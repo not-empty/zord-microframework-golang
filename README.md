@@ -3,27 +3,26 @@
 
 GOlang base repository with code gen to create a fast golang project based on hexagonal architeture
 
-### Installation
+---
 
-Remember to create your .env file based on .env.example
+# Development
+> Remember to create your .env file based on .env.example
 
-#### Using Docker
+### 1. Using Docker Compose
 Up mysql and zord project:
 
 ``` SHELL
 docker compose up
 ```
 
-#### Using raw go build
+<br />
+
+#### 2. Using raw go build
+
+You will need to build the http/main.go file:
 
 ``` SHELL
-go build cmd/http/server.go
-```
-
-to run local build you need a mysql server running, the easiest way is using docker
-
-``` SHELL
-docker compose up mysql -d
+go build -o server cmd/http/main.go
 ```
 
 Then run the server
@@ -32,16 +31,24 @@ Then run the server
 ./server
 ```
 
-#### Running from go file
+<br />
 
-to run local build you need a mysql server running, the easiest way is using docker
+#### 3. Running from go file
+
+``` SHELL
+go run cmd/http/main.go
+```
+
+<br />
+
+**Note:** To run the local build as described in the second or third option, a MySQL server must be running. This is necessary for the application to interact with its database. The easiest way to set up a MySQL server locally is by using Docker. Below is a command to start a MySQL server container using Docker:
+
 ``` SHELL
 docker compose up mysql -d
 ```
+This command will ensure that a MySQL server is running in the background, allowing you to execute the local build successfully.
 
-``` SHELL
-go run cmd/http/server.go
-```
+---
 
 ### Cli
 
@@ -49,7 +56,7 @@ go run cmd/http/server.go
 
 to build cli into binary file run
 ``` SHELL
-go build cmd/cli/cli.go
+go build -o cli cmd/cli/main.go
 ```
 
 then you can run all cli commands with the binary file
@@ -59,10 +66,12 @@ then you can run all cli commands with the binary file
 
 if you`re developing something in the cli the best way is run it directly to all changes 
 ``` SHELL
-go run cmd/cli/cli.go
+go run cmd/cli/main.go
 ```
 
-#### Cli usage
+---
+
+#### Cli Commands
 
 create new domain (crud):
 ``` SHELL
@@ -79,24 +88,7 @@ migrate all domains:
 ./cli migrate
 ```
 
-#### Cli usage inside docker image
-
-Enter in zord image:
-``` SHELL
-docker exec -it zord-http sh
-```
-
-Build cli binary:
-``` SHELL
-go build cmd/cli/cli.go
-```
-
-Use it:
-``` SHELL
-./cli -h
-```
-
-If you`re generating code inside docker container you need to change generated folder and file permissions to code out of docker container.
+**Obs:** If you`re generating code inside docker container you need to change generated folder and file permissions to code out of docker container.
 
 run the follow command to edit generated files:
 ``` SHELL
@@ -104,6 +96,8 @@ sudo chown $USER:$USER -R .
 ```
 
 if you have a group name different from username change the command accordingly
+
+---
 
 #### Run tests
 Run all tests:

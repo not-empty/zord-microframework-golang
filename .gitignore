@@ -7,3 +7,5 @@ tmp/*
 .vscode/
 temp/
 coverage.out
+cli
+server

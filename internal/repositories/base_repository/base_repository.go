@@ -134,11 +134,23 @@ func (repo *BaseRepo[Row]) Create(d Row, tx *sqlx.Tx, autoCommit bool) error {
 func (repo *BaseRepo[Row]) List(limit int, offset int, filters *Filters) (*[]Row, error) {
 	var data []Row
 	var value Row
+
+	where := ""
+	if filters != nil {
+		where = filters.Where
+	}
+
 	rows, err := repo.Mysql.Queryx(
 		fmt.Sprintf(
-			`SELECT %s FROM %s LIMIT %v OFFSET %v`,
+			`SELECT
+						%s
+					FROM
+						%s
+					%s
+					LIMIT %v OFFSET %v`,
 			strings.Join(repo.fields, ", "),
 			value.Schema(),
+			where,
 			limit,
 			offset,
 		),
@@ -229,10 +241,14 @@ func (repo *BaseRepo[Row]) Delete(field string, value string) error {
 	return err
 }
 
-func (repo *BaseRepo[Row]) Count(_ *Filters) (int64, error) {
+func (repo *BaseRepo[Row]) Count(filters *Filters) (int64, error) {
 	var count int64
 	var data Row
-	err := repo.Mysql.Get(&count, "SELECT count(1) FROM "+data.Schema())
+	where := ""
+	if filters != nil {
+		where = filters.Where
+	}
+	err := repo.Mysql.Get(&count, "SELECT count(1) FROM "+data.Schema()+" "+where)
 	return count, err
 }
 

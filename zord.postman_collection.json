@@ -41,7 +41,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						},
 						{
@@ -51,7 +52,8 @@
 									"var response = JSON.parse(responseBody);",
 									"postman.setEnvironmentVariable(\"ulid\", response.Data.ID);"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -60,7 +62,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"dummy_name\": \"test\"\n}",
+							"raw": "{\n    \"DummyName\": \"test\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -89,7 +91,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						},
 						{
@@ -99,7 +102,8 @@
 									"var response = JSON.parse(responseBody);",
 									"postman.setEnvironmentVariable(\"ulid\", response.Data.ID);"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -108,7 +112,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"dummy_name\": \"test 2\"\n}",
+							"raw": "{\n    \"DummyName\": \"test 2\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"

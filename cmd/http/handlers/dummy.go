@@ -107,6 +107,7 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 	bindErr := echo.QueryParamsBinder(context).
 		Int("page", &data.Page).
 		String("name", &data.Name).
+		String("email", &data.Email).
 		BindErrors()
 
 	if bindErr != nil {

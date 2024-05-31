@@ -40,6 +40,7 @@ func (s *Service) produceResponseRule(data *Data) {
 	dummy := dummy.Dummy{
 		ID:        data.DummyId,
 		DummyName: data.DummyName,
+		Email:     data.Email,
 	}
 
 	tx, txErr := s.repository.InitTX()

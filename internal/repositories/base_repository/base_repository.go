@@ -137,7 +137,7 @@ func (repo *BaseRepo[Row]) List(limit int, offset int, filters *QueryBuilder) (*
 
 	where := ""
 	if filters != nil {
-		where = filters.Where
+		where = filters.GetWhere()
 	}
 
 	rows, err := repo.Mysql.Queryx(
@@ -246,7 +246,7 @@ func (repo *BaseRepo[Row]) Count(filters *QueryBuilder) (int64, error) {
 	var data Row
 	where := ""
 	if filters != nil {
-		where = filters.Where
+		where = filters.GetWhere()
 	}
 	err := repo.Mysql.Get(&count, "SELECT count(1) FROM "+data.Schema()+" "+where)
 	return count, err

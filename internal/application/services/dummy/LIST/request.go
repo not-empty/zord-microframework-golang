@@ -11,8 +11,9 @@ type Request struct {
 }
 
 type Data struct {
-	Page int
-	Name string
+	Page  int
+	Name  string
+	Email string
 }
 
 func NewRequest(data *Data, filters filters.Filters) Request {
@@ -29,11 +30,16 @@ func (r *Request) Validate() error {
 
 	parseErr := r.Filters.Parse(
 		map[string]string{
-			"name": "eql,lik",
+			"name":  "eql,lik",
+			"email": "lik",
 		},
 		map[string]filters.FilterData{
 			"name": {
 				Value:    r.Data.Name,
+				IsString: true,
+			},
+			"email": {
+				Value:    r.Data.Email,
 				IsString: true,
 			},
 		})

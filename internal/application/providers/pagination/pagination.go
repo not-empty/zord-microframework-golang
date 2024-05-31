@@ -8,7 +8,7 @@ import (
 )
 
 type IPaginationProvider[Row any] interface {
-	PaginationHandler(page int, limit int, filters *base_repository.Filters) (*services.Error, *Pagination[Row])
+	PaginationHandler(page int, limit int, filters *base_repository.QueryBuilder) (*services.Error, *Pagination[Row])
 }
 
 type Pagination[Row any] struct {
@@ -18,8 +18,8 @@ type Pagination[Row any] struct {
 }
 
 type IPaginationRepository[Row any] interface {
-	List(limit int, offset int, filters *base_repository.Filters) (*[]Row, error)
-	Count(filters *base_repository.Filters) (int64, error)
+	List(limit int, offset int, filters *base_repository.QueryBuilder) (*[]Row, error)
+	Count(filters *base_repository.QueryBuilder) (int64, error)
 }
 
 type Provider[Row base_repository.Domain] struct {
@@ -32,7 +32,7 @@ func NewPaginationProvider[Row base_repository.Domain](repo IPaginationRepositor
 	}
 }
 
-func (pp *Provider[Row]) PaginationHandler(page int, limit int, filters *base_repository.Filters) (*services.Error, *Pagination[Row]) {
+func (pp *Provider[Row]) PaginationHandler(page int, limit int, filters *base_repository.QueryBuilder) (*services.Error, *Pagination[Row]) {
 	listData := &[]Row{}
 	offset := (page - 1) * limit
 

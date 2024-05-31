@@ -12,15 +12,15 @@ import (
 type BaseRepository[dom Domain] interface {
 	Get(field string, value string) (*dom, error)
 	Create(data dom, tx *sqlx.Tx, autoCommit bool) error
-	List(limit int, offset int, filters *Filters) (*[]dom, error)
+	List(limit int, offset int, filters *QueryBuilder) (*[]dom, error)
 	Search(field string, value string) (*[]dom, error)
 	Edit(data dom, field string, value string) (int, error)
 	Delete(field string, values string) error
-	Count(filters *Filters) (int64, error)
+	Count(filters *QueryBuilder) (int64, error)
 	InitTX() (*sqlx.Tx, error)
 	Commit(tx *sqlx.Tx) error
 	Rollback(tx *sqlx.Tx, err error) error
-	NewFilters() Filters
+	NewFilters() QueryBuilder
 }
 
 type Domain interface {
@@ -64,8 +64,8 @@ func (repo *BaseRepo[Domain]) Rollback(tx *sqlx.Tx, err error) error {
 	return err
 }
 
-func (repo *BaseRepo[Domain]) NewFilters() Filters {
-	return Filters{
+func (repo *BaseRepo[Domain]) NewFilters() QueryBuilder {
+	return QueryBuilder{
 		Fields: "",
 		Where:  "",
 		Order:  "",
@@ -131,7 +131,7 @@ func (repo *BaseRepo[Row]) Create(d Row, tx *sqlx.Tx, autoCommit bool) error {
 	return nil
 }
 
-func (repo *BaseRepo[Row]) List(limit int, offset int, filters *Filters) (*[]Row, error) {
+func (repo *BaseRepo[Row]) List(limit int, offset int, filters *QueryBuilder) (*[]Row, error) {
 	var data []Row
 	var value Row
 
@@ -241,7 +241,7 @@ func (repo *BaseRepo[Row]) Delete(field string, value string) error {
 	return err
 }
 
-func (repo *BaseRepo[Row]) Count(filters *Filters) (int64, error) {
+func (repo *BaseRepo[Row]) Count(filters *QueryBuilder) (int64, error) {
 	var count int64
 	var data Row
 	where := ""

@@ -2,7 +2,7 @@ package base_repository
 
 import "fmt"
 
-type Filters struct {
+type QueryBuilder struct {
 	Fields string
 	Where  string
 	Order  string
@@ -10,13 +10,16 @@ type Filters struct {
 	Offset *int
 }
 
-func (f *Filters) SetWhere(field string, op string, vl any, isString bool) *Filters {
+func (f *QueryBuilder) SetWhere(field string, op string, vl string, isString bool) *QueryBuilder {
 	where := ""
 	if f.Where == "" {
 		where = "WHERE \n"
 	}
 
 	if isString {
+		if op == "LIKE" {
+			vl = "%" + vl + "%"
+		}
 		vl = fmt.Sprintf("'%s'", vl)
 	}
 
@@ -24,17 +27,17 @@ func (f *Filters) SetWhere(field string, op string, vl any, isString bool) *Filt
 	return f
 }
 
-func (f *Filters) And() *Filters {
+func (f *QueryBuilder) And() *QueryBuilder {
 	f.Where += "AND"
 	return f
 }
 
-func (f *Filters) Or() *Filters {
+func (f *QueryBuilder) Or() *QueryBuilder {
 	f.Where += "OR"
 	return f
 }
 
-func (f *Filters) OrderBy(field string, order string) *Filters {
+func (f *QueryBuilder) OrderBy(field string, order string) *QueryBuilder {
 	orderBy := "ORDER BY"
 	if f.Order != "" {
 		orderBy += ", "

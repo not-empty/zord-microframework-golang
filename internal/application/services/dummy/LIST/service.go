@@ -2,6 +2,7 @@ package dummy
 
 import (
 	"go-skeleton/internal/application/domain/dummy"
+	"go-skeleton/internal/application/providers/filters"
 	"go-skeleton/internal/application/services"
 )
 
@@ -27,15 +28,21 @@ func (s *Service) Execute(request Request) {
 		s.BadRequest(err.Error())
 		return
 	}
-	s.produceResponseRule(request.Data.Page, 25)
+	s.produceResponseRule(request.Data.Page, 25, request.Filters)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(page int, limit int) {
-	err, pagination := s.pagProv.PaginationHandler(page, limit, nil)
+func (s *Service) produceResponseRule(page int, limit int, f filters.Filters) {
+	queryBuilder := s.repository.NewFilters()
+
+	for _, data := range f.ParsedData {
+		queryBuilder.SetWhere(data.Field, data.Operator, data.Value, data.IsString)
+	}
+
+	err, pagination := s.pagProv.PaginationHandler(page, limit, &queryBuilder)
 	if err != nil {
 		s.CustomError(err.Status, err)
 		return

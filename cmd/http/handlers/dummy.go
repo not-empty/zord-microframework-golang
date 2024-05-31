@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"go-skeleton/internal/application/domain/dummy"
+	"go-skeleton/internal/application/providers/filters"
 	"go-skeleton/internal/application/providers/pagination"
 	dummyCreate "go-skeleton/internal/application/services/dummy/CREATE"
 	dummyDelete "go-skeleton/internal/application/services/dummy/DELETE"
@@ -105,6 +106,7 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 	data := new(dummyList.Data)
 	bindErr := echo.QueryParamsBinder(context).
 		Int("page", &data.Page).
+		String("name", &data.Name).
 		BindErrors()
 
 	if bindErr != nil {
@@ -112,8 +114,13 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 		return context.JSON(http.StatusBadRequest, s.Error)
 	}
 
+	f := filters.NewFilters(map[string]string{
+		"name": "eql,lik",
+	},
+	)
+
 	s.Execute(
-		dummyList.NewRequest(data),
+		dummyList.NewRequest(data, *f),
 	)
 
 	response, err := s.GetResponse()

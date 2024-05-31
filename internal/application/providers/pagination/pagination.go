@@ -8,7 +8,7 @@ import (
 )
 
 type IPaginationProvider[Row any] interface {
-	PaginationHandler(page int, limit int) (*services.Error, *Pagination[Row])
+	PaginationHandler(page int, limit int, filters *base_repository.Filters) (*services.Error, *Pagination[Row])
 }
 
 type Pagination[Row any] struct {
@@ -17,21 +17,26 @@ type Pagination[Row any] struct {
 	Data        *[]Row
 }
 
-type PaginationProvider[Row base_repository.Domain] struct {
-	repo base_repository.BaseRepository[Row]
+type IPaginationRepository[Row any] interface {
+	List(limit int, offset int, filters *base_repository.Filters) (*[]Row, error)
+	Count(filters *base_repository.Filters) (int64, error)
 }
 
-func NewPaginationProvider[Row base_repository.Domain](repo base_repository.BaseRepository[Row]) *PaginationProvider[Row] {
-	return &PaginationProvider[Row]{
+type Provider[Row base_repository.Domain] struct {
+	repo IPaginationRepository[Row]
+}
+
+func NewPaginationProvider[Row base_repository.Domain](repo IPaginationRepository[Row]) *Provider[Row] {
+	return &Provider[Row]{
 		repo: repo,
 	}
 }
 
-func (pp *PaginationProvider[Row]) PaginationHandler(page int, limit int) (*services.Error, *Pagination[Row]) {
+func (pp *Provider[Row]) PaginationHandler(page int, limit int, filters *base_repository.Filters) (*services.Error, *Pagination[Row]) {
 	listData := &[]Row{}
 	offset := (page - 1) * limit
 
-	total, err := pp.repo.Count()
+	total, err := pp.repo.Count(filters)
 	if err != nil {
 		return &services.Error{
 			Status:  http.StatusInternalServerError,
@@ -49,7 +54,7 @@ func (pp *PaginationProvider[Row]) PaginationHandler(page int, limit int) (*serv
 
 	totalPages := math.Ceil(float64(total) / float64(limit))
 	if page <= int(totalPages) {
-		listData, err = pp.repo.List(limit, offset)
+		listData, err = pp.repo.List(limit, offset, filters)
 		if err != nil {
 			return &services.Error{
 				Status:  http.StatusInternalServerError,

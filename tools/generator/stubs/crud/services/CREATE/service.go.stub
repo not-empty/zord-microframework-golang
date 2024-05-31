@@ -39,9 +39,15 @@ func (s *Service) produceResponseRule(data *Data) {
 		ID:   s.idCreator.Create(),
 	}
 
-	err := s.repository.Create({{domainCamelCase}})
+		tx, txErr := s.repository.InitTX()
+    	if txErr != nil {
+    		s.InternalServerError("error on create", txErr)
+    		return
+    	}
+
+	err := s.repository.Create({{domainCamelCase}}, tx, true)
 	if err != nil {
-		s.InternalServerError("error on create")
+		s.InternalServerError("error on create", err)
 		return
 	}
 	s.response = &Response{

@@ -12,16 +12,18 @@ import (
 )
 
 type Server struct {
-	config   *config.Config
-	logger   *logger.Logger
-	registry *registry.Registry
+	config    *config.Config
+	logger    *logger.Logger
+	registry  *registry.Registry
+	apiPrefix string
 }
 
-func NewServer(reg *registry.Registry) *Server {
+func NewServer(reg *registry.Registry, apiPrefix string) *Server {
 	return &Server{
-		config:   reg.Inject("config").(*config.Config),
-		logger:   reg.Inject("logger").(*logger.Logger),
-		registry: reg,
+		config:    reg.Inject("config").(*config.Config),
+		logger:    reg.Inject("logger").(*logger.Logger),
+		registry:  reg,
+		apiPrefix: apiPrefix,
 	}
 }
 
@@ -33,12 +35,14 @@ func (hs *Server) Start() {
 
 	server.Use(middleware.Recover())
 
-	publicRoutes := routes.GetPublicRoutes(hs.registry)
-
 	public := server.Group("")
+	private := server.Group("")
 
-	for index, route := range publicRoutes {
-		route.DeclareRoutes(public)
+	allRoutes := routes.GetRoutes(hs.registry)
+
+	for index, route := range allRoutes {
+		route.DeclarePublicRoutes(public, hs.apiPrefix)
+		route.DeclarePrivateRoutes(private, hs.apiPrefix)
 		hs.logger.Info(fmt.Sprintf("[server.route] Declared %s", index))
 	}
 

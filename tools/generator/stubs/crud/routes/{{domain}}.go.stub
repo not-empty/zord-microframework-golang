@@ -18,10 +18,12 @@ func New{{domainPascalCase}}Routes(reg *registry.Registry) *{{domainPascalCase}}
 	}
 }
 
-func (hs *{{domainPascalCase}}Routes) DeclareRoutes(server *echo.Group) {
-	server.GET("/v1/{{domainCamelCase}}", hs.hand.HandleList{{domainPascalCase}})
-	server.GET("/v1/{{domainCamelCase}}/:id", hs.hand.HandleGet{{domainPascalCase}})
-	server.POST("/v1/{{domainCamelCase}}", hs.hand.HandleCreate{{domainPascalCase}})
-	server.PUT("/v1/{{domainCamelCase}}/:id", hs.hand.HandleEdit{{domainPascalCase}})
-	server.DELETE("/v1/{{domainCamelCase}}/:id", hs.hand.HandleDelete{{domainPascalCase}})
+func (hs *{{domainPascalCase}}Routes) DeclarePrivateRoutes(server *echo.Group, apiPrefix string) {
+	server.GET(apiPrefix+"/{{domainCamelCase}}", hs.hand.HandleList{{domainPascalCase}})
+	server.GET(apiPrefix+"/{{domainCamelCase}}/:id", hs.hand.HandleGet{{domainPascalCase}})
+	server.POST(apiPrefix+"/{{domainCamelCase}}", hs.hand.HandleCreate{{domainPascalCase}})
+	server.PUT(apiPrefix+"/{{domainCamelCase}}/:id", hs.hand.HandleEdit{{domainPascalCase}})
+	server.DELETE(apiPrefix+"/{{domainCamelCase}}/:id", hs.hand.HandleDelete{{domainPascalCase}})
 }
+
+func (hs *{{domainPascalCase}}Routes) DeclarePublicRoutes(server *echo.Group, apiPrefix string) {}

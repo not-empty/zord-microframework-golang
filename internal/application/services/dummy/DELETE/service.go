@@ -35,7 +35,7 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 func (s *Service) produceResponseRule(data *Data) {
 	err := s.repository.Delete("id", data.ID)
 	if err != nil {
-		s.InternalServerError("error on delete")
+		s.InternalServerError("error on delete", err)
 		return
 	}
 

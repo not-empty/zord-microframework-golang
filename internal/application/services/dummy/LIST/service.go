@@ -37,7 +37,7 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 func (s *Service) produceResponseRule(page int, limit int) {
 	err, pagination := s.pagProv.PaginationHandler(page, limit, nil)
 	if err != nil {
-		s.CustomError(err.Status, err.Message)
+		s.CustomError(err.Status, err)
 		return
 	}
 

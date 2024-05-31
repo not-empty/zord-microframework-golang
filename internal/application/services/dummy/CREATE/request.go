@@ -7,6 +7,7 @@ import (
 type Data struct {
 	DummyId   string
 	DummyName string `validate:"required,min=3,max=32"`
+	Email     string `validate:"required"`
 }
 
 type Request struct {

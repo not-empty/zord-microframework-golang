@@ -8,6 +8,10 @@ table "dummies" {
     null = false
     type = char(255)
   }
+  column "email" {
+    null = false
+    type = char(255)
+  }
   primary_key {
     columns = [column.id]
   }

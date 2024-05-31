@@ -1,18 +1,24 @@
 package {{domain}}
 
-import "errors"
+import (
+	"errors"
+	"go-skeleton/internal/application/providers/filters"
+)
 
 type Request struct {
 	Data *Data
+	Filters filters.Filters
 }
 
 type Data struct {
 	Page int
+	ID string
 }
 
-func NewRequest(data *Data) Request {
+func NewRequest(data *Data, filters filters.Filters) Request {
 	return Request{
 		Data: data,
+		Filters: filters,
 	}
 }
 
@@ -20,5 +26,21 @@ func (r *Request) Validate() error {
 	if r.Data.Page <= 0 {
 		return errors.New("invalid page")
 	}
+
+	parseErr := r.Filters.Parse(
+		map[string]string{
+			"id":  "eql",
+		},
+		map[string]filters.FilterData{
+			"id": {
+				Value:    r.Data.ID,
+				IsString: true,
+			},
+		})
+
+	if parseErr != nil {
+		return parseErr
+	}
+
 	return nil
 }

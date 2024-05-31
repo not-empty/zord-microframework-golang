@@ -8,6 +8,7 @@ import (
 type Dummy struct {
 	ID        string `db:"id"`
 	DummyName string `db:"name"`
+	Email     string `db:"email"`
 }
 
 func (d Dummy) Schema() string {

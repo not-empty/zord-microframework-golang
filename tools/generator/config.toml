@@ -27,11 +27,11 @@ crudPascalCase = "{{domainPascalCase}}"
 table "{{domain}}" {
   schema = schema.{{schemaName}}
   column "id" {
-	null = false
-	type = char(26)
+    null = false
+    type = char(26)
   }
   primary_key {
-	columns = [column.id]
+    columns = [column.id]
   }
 }
 //tableEnd

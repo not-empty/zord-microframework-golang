@@ -6,7 +6,7 @@ import (
 
 type Data struct {
 	ID        string `param:"id"`
-	DummyName string `json:"dummy_name"`
+	DummyName string
 }
 
 type Request struct {

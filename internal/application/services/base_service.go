@@ -31,9 +31,9 @@ type Validator interface {
 }
 
 type Error struct {
-	Status  int         `json:"-"`
-	Message interface{} `json:"message"`
-	Error   string      `json:"error"`
+	Status  int
+	Message interface{}
+	Error   string
 }
 
 type BaseService struct {

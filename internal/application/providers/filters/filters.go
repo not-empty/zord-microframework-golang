@@ -7,7 +7,6 @@ import (
 )
 
 type Filters struct {
-	config     map[string]string
 	ParsedData []Filter
 }
 
@@ -33,13 +32,11 @@ var FiltersMap = map[string]string{
 	"lte": "<=",
 }
 
-func NewFilters(config map[string]string) *Filters {
-	return &Filters{
-		config: config,
-	}
+func NewFilters() *Filters {
+	return &Filters{}
 }
 
-func (f *Filters) Parse(data map[string]FilterData) error {
+func (f *Filters) Parse(config map[string]string, data map[string]FilterData) error {
 	var filtersData []Filter
 	for field, value := range data {
 		if value.Value == "" {
@@ -51,7 +48,7 @@ func (f *Filters) Parse(data map[string]FilterData) error {
 			return errors.New("invalid filter definition for: " + field)
 		}
 
-		if !f.isValidOperation(field, vl[0]) {
+		if !f.isValidOperation(config, field, vl[0]) {
 			return errors.New("invalid filter operation for: " + field)
 		}
 
@@ -67,8 +64,8 @@ func (f *Filters) Parse(data map[string]FilterData) error {
 	return nil
 }
 
-func (f *Filters) isValidOperation(field string, op string) bool {
-	permissions, ok := f.config[field]
+func (f *Filters) isValidOperation(config map[string]string, field string, op string) bool {
+	permissions, ok := config[field]
 	if !ok {
 		return false
 	}

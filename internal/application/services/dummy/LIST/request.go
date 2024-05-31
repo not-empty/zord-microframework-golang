@@ -27,12 +27,16 @@ func (r *Request) Validate() error {
 		return errors.New("invalid page")
 	}
 
-	parseErr := r.Filters.Parse(map[string]filters.FilterData{
-		"name": {
-			Value:    r.Data.Name,
-			IsString: true,
+	parseErr := r.Filters.Parse(
+		map[string]string{
+			"name": "eql,lik",
 		},
-	})
+		map[string]filters.FilterData{
+			"name": {
+				Value:    r.Data.Name,
+				IsString: true,
+			},
+		})
 
 	if parseErr != nil {
 		return parseErr

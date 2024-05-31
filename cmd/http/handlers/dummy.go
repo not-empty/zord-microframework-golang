@@ -114,10 +114,7 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 		return context.JSON(http.StatusBadRequest, s.Error)
 	}
 
-	f := filters.NewFilters(map[string]string{
-		"name": "eql,lik",
-	},
-	)
+	f := filters.NewFilters()
 
 	s.Execute(
 		dummyList.NewRequest(data, *f),

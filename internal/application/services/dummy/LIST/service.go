@@ -40,6 +40,7 @@ func (s *Service) produceResponseRule(page int, limit int, f filters.Filters) {
 
 	for _, data := range f.ParsedData {
 		queryBuilder.SetWhere(data.Field, data.Operator, data.Value, data.IsString)
+		// queryBuilder.And()
 	}
 
 	err, pagination := s.pagProv.PaginationHandler(page, limit, &queryBuilder)

@@ -1,6 +1,9 @@
 package base_repository
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type QueryBuilder struct {
 	Fields string
@@ -25,6 +28,12 @@ func (f *QueryBuilder) SetWhere(field string, op string, vl string, isString boo
 
 	f.Where += fmt.Sprintf(" %s %s %s %v \n", where, field, op, vl)
 	return f
+}
+
+func (f *QueryBuilder) GetWhere() string {
+	f.Where = strings.TrimSuffix(f.Where, "AND")
+	f.Where = strings.TrimSuffix(f.Where, "OR")
+	return f.Where
 }
 
 func (f *QueryBuilder) And() *QueryBuilder {

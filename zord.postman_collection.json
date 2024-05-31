@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "3426810a-11a3-434c-a73d-63d51bc5889d",
+		"_postman_id": "9c2f9fd6-7dd9-4964-a23a-634e55a56d5e",
 		"name": "zord",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "19996998"
+		"_exporter_id": "31393856"
 	},
 	"item": [
 		{
@@ -15,11 +15,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{Host}}/health",
+							"raw": "{{Host}}/v1/health",
 							"host": [
 								"{{Host}}"
 							],
 							"path": [
+								"v1",
 								"health"
 							]
 						}
@@ -40,7 +41,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						},
 						{
@@ -50,7 +52,8 @@
 									"var response = JSON.parse(responseBody);",
 									"postman.setEnvironmentVariable(\"ulid\", response.Data.ID);"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -59,7 +62,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"dummy_name\": \"test\"\n}",
+							"raw": "{\n    \"DummyName\": \"test\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -80,7 +83,7 @@
 					"response": []
 				},
 				{
-					"name": "Add Copy",
+					"name": "Update",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -88,7 +91,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						},
 						{
@@ -98,7 +102,8 @@
 									"var response = JSON.parse(responseBody);",
 									"postman.setEnvironmentVariable(\"ulid\", response.Data.ID);"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -107,7 +112,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"dummy_name\": \"test 2\"\n}",
+							"raw": "{\n    \"DummyName\": \"test 2\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"

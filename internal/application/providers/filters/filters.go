@@ -69,7 +69,14 @@ func (f *Filters) isValidOperation(config map[string]string, field string, op st
 	if !ok {
 		return false
 	}
-	return strings.Contains(permissions, op)
+
+	for _, perm := range strings.Split(permissions, ",") {
+		if perm == op {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (f *Filters) FormatStr(data string) string {

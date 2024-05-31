@@ -11,11 +11,16 @@ import (
 
 type BaseRepository[dom Domain] interface {
 	Get(field string, value string) (*dom, error)
-	Create(data dom) error
-	List(limit int, offset int) (*[]dom, error)
+	Create(data dom, tx *sqlx.Tx, autoCommit bool) error
+	List(limit int, offset int, filters *Filters) (*[]dom, error)
+	Search(field string, value string) (*[]dom, error)
 	Edit(data dom, field string, value string) (int, error)
 	Delete(field string, values string) error
-	Count() (int64, error)
+	Count(filters *Filters) (int64, error)
+	InitTX() (*sqlx.Tx, error)
+	Commit(tx *sqlx.Tx) error
+	Rollback(tx *sqlx.Tx, err error) error
+	NewFilters() Filters
 }
 
 type Domain interface {
@@ -42,12 +47,13 @@ func NewBaseRepository[dom Domain](mysql *sqlx.DB) *BaseRepo[dom] {
 	}
 }
 
+func (repo *BaseRepo[Domain]) InitTX() (*sqlx.Tx, error) {
+	tx, err := repo.Mysql.Beginx()
+	return tx, err
+}
+
 func (repo *BaseRepo[Domain]) Commit(tx *sqlx.Tx) error {
-	err := tx.Commit()
-	if err != nil {
-		return err
-	}
-	return nil
+	return tx.Commit()
 }
 
 func (repo *BaseRepo[Domain]) Rollback(tx *sqlx.Tx, err error) error {
@@ -56,6 +62,16 @@ func (repo *BaseRepo[Domain]) Rollback(tx *sqlx.Tx, err error) error {
 		return rollbErr
 	}
 	return err
+}
+
+func (repo *BaseRepo[Domain]) NewFilters() Filters {
+	return Filters{
+		Fields: "",
+		Where:  "",
+		Order:  "",
+		Limit:  nil,
+		Offset: nil,
+	}
 }
 
 func (repo *BaseRepo[Domain]) Get(field string, value string) (*Domain, error) {
@@ -76,16 +92,12 @@ func (repo *BaseRepo[Domain]) Get(field string, value string) (*Domain, error) {
 	return &Data, nil
 }
 
-func (repo *BaseRepo[Row]) Create(d Row) error {
-	tx, err := repo.Mysql.Beginx()
-	if err != nil {
-		return err
-	}
-
+func (repo *BaseRepo[Row]) Create(d Row, tx *sqlx.Tx, autoCommit bool) error {
 	namedValues := []string{}
 	for _, field := range repo.fields {
 		namedValues = append(namedValues, ":"+field)
 	}
+
 	res, err := tx.NamedExec(
 		fmt.Sprintf(
 			`INSERT INTO %s (%s) VALUES (%s)`,
@@ -95,24 +107,31 @@ func (repo *BaseRepo[Row]) Create(d Row) error {
 		),
 		d,
 	)
+
 	if err != nil {
-		return err
+		return repo.Rollback(tx, err)
 	}
+
 	affected, err := res.RowsAffected()
 	if affected < 1 {
-		return errors.New("error on create, rows not affected")
+		return repo.Rollback(tx, errors.New("error on create, rows not affected"))
 	}
+
 	if err != nil {
-		return err
+		return repo.Rollback(tx, err)
 	}
-	err = tx.Commit()
-	if err != nil {
-		return err
+
+	if autoCommit {
+		err = tx.Commit()
+		if err != nil {
+			return repo.Rollback(tx, err)
+		}
 	}
+
 	return nil
 }
 
-func (repo *BaseRepo[Row]) List(limit int, offset int) (*[]Row, error) {
+func (repo *BaseRepo[Row]) List(limit int, offset int, filters *Filters) (*[]Row, error) {
 	var data []Row
 	var value Row
 	rows, err := repo.Mysql.Queryx(
@@ -210,9 +229,29 @@ func (repo *BaseRepo[Row]) Delete(field string, value string) error {
 	return err
 }
 
-func (repo *BaseRepo[Row]) Count() (int64, error) {
+func (repo *BaseRepo[Row]) Count(_ *Filters) (int64, error) {
 	var count int64
 	var data Row
 	err := repo.Mysql.Get(&count, "SELECT count(1) FROM "+data.Schema())
 	return count, err
+}
+
+func (repo *BaseRepo[Row]) Search(field string, value string) (*[]Row, error) {
+	var data []Row
+	var row Row
+	queryErr := repo.Mysql.Select(
+		&data,
+		fmt.Sprintf(
+			`SELECT %s FROM %s WHERE %s like ? LIMIT 25`,
+			strings.Join(repo.fields, ", "),
+			row.Schema(),
+			field,
+		),
+		"%"+value+"%",
+	)
+	if queryErr != nil {
+		return nil, queryErr
+	}
+
+	return &data, nil
 }

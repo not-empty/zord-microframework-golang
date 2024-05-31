@@ -7,10 +7,11 @@ import (
 )
 
 type Declarable interface {
-	DeclareRoutes(*echo.Group)
+	DeclarePrivateRoutes(server *echo.Group, apiPrefix string)
+	DeclarePublicRoutes(server *echo.Group, apiPrefix string)
 }
 
-func GetPublicRoutes(reg *registry.Registry) map[string]Declarable {
+func GetRoutes(reg *registry.Registry) map[string]Declarable {
 	health := NewHealthRoute()
 	dummyListRoutes := NewDummyRoutes(reg)
 	//{{codeGen1}}

@@ -18,10 +18,12 @@ func NewDummyRoutes(reg *registry.Registry) *DummyRoutes {
 	}
 }
 
-func (hs *DummyRoutes) DeclareRoutes(server *echo.Group) {
-	server.GET("/v1/dummy", hs.hand.HandleListDummy)
-	server.GET("/v1/dummy/:id", hs.hand.HandleGetDummy)
-	server.POST("/v1/dummy", hs.hand.HandleCreateDummy)
-	server.PUT("/v1/dummy/:id", hs.hand.HandleEditDummy)
-	server.DELETE("/v1/dummy/:id", hs.hand.HandleDeleteDummy)
+func (hs *DummyRoutes) DeclarePublicRoutes(server *echo.Group, apiPrefix string) {}
+
+func (hs *DummyRoutes) DeclarePrivateRoutes(server *echo.Group, apiPrefix string) {
+	server.GET(apiPrefix+"/dummy", hs.hand.HandleListDummy)
+	server.GET(apiPrefix+"/dummy/:id", hs.hand.HandleGetDummy)
+	server.POST(apiPrefix+"/dummy", hs.hand.HandleCreateDummy)
+	server.PUT(apiPrefix+"/dummy/:id", hs.hand.HandleEditDummy)
+	server.DELETE(apiPrefix+"/dummy/:id", hs.hand.HandleDeleteDummy)
 }

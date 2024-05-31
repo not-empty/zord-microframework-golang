@@ -41,7 +41,7 @@ func (s *Service) produceResponseRule(data *Data) {
 
 	affected, err := s.repository.Edit(dummyDomain, "id", data.ID)
 	if err != nil {
-		s.InternalServerError("error on edit")
+		s.InternalServerError("error on edit", err)
 		return
 	}
 

@@ -21,7 +21,7 @@ crudPascalCase = "{{domainPascalCase}}"
 "//{{codeGen3}}" = "\"go-skeleton/internal/application/domain/{{domain}}\"\n	$repeat$"
 "//{{codeGen4}}" = "m.db.Db.Migrator().CreateTable(&{{domain}}.{{domainPascalCase}}{})\n	$repeat$"
 "//{{codeGen5}}" = "{{domainCamelCase}}Repository \"go-skeleton/internal/repositories/{{domain}}\"\n	$repeat$"
-"//{{codeGen6}}" = "reg.Provide(\"{{domainCamelCase}}Repository\", {{domainCamelCase}}Repository.New{{domainPascalCase}}Repository(db.Db))\n	$repeat$"
+"//{{codeGen6}}" = "Reg.Provide(\"{{domainCamelCase}}Repository\", {{domainCamelCase}}Repository.New{{domainPascalCase}}Repository(db.Db))\n	$repeat$"
 "{{schemaName}}" = "skeleton"
 "//{{newTable}}" = """
 table "{{domain}}" {
@@ -74,7 +74,7 @@ deleteLinePatterns = [
 ]
 
 [stubs.crud.main]
-toPath = "cmd/http/main.go"
+toPath = "cmd/base_setup.go"
 isGenerated = false
 deleteLinePatterns = [
 	"New{{domainPascalCase}}Repo",

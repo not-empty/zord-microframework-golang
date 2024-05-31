@@ -40,7 +40,7 @@ func (s *Service) produceResponseRule(data *Data) {
 			s.NotFound("data not found")
 			return
 		}
-		s.InternalServerError("error on get data")
+		s.InternalServerError("error on get data", err)
 		return
 	}
 

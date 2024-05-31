@@ -39,7 +39,7 @@ func (s *Service) produceResponseRule(data *Data) {
 
 	err := s.repository.Delete("id", {{domainCamelCase}}.ID)
 	if err != nil {
-        s.InternalServerError("error on delete")
+        s.InternalServerError("error on delete", err)
         return
 	}
 

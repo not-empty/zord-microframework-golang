@@ -8,7 +8,7 @@ services:
     env_file:
       - .env
     ports:
-      - 9000:9000
+      - 9005:9000
     command: air http
     depends_on:
       mysql:
@@ -29,7 +29,7 @@ services:
         MYSQL_ROOT_PASSWORD: root
         MYSQL_DATABASE: skeleton
     ports:
-        - "3306:3306"
+        - "3307:3306"
     volumes:
         - ./storage/mysql:/var/lib/mysql
 

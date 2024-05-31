@@ -42,9 +42,15 @@ func (s *Service) produceResponseRule(data *Data) {
 		DummyName: data.DummyName,
 	}
 
-	err := s.repository.Create(dummy)
+	tx, txErr := s.repository.InitTX()
+	if txErr != nil {
+		s.InternalServerError("error on create", txErr)
+		return
+	}
+
+	err := s.repository.Create(dummy, tx, true)
 	if err != nil {
-		s.InternalServerError("error on create")
+		s.InternalServerError("error on create", err)
 		return
 	}
 

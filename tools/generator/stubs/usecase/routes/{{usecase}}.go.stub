@@ -17,6 +17,8 @@ func New{{usecasePascalCase}}Routes(reg *registry.Registry) *{{usecasePascalCase
 	}
 }
 
-func (hs *{{usecasePascalCase}}Routes) DeclareRoutes(server *echo.Group) {
-	server.GET("/v1/{{usecase}}", hs.hand.Handle{{usecasePascalCase}})
+func (hs *{{usecasePascalCase}}Routes) DeclarePublicRoutes(server *echo.Group, apiPrefix string) {}
+
+func (hs *{{usecasePascalCase}}Routes) DeclarePrivateRoutes(server *echo.Group, apiPrefix string) {
+    server.GET("/v1/{{usecase}}", hs.hand.Handle{{usecasePascalCase}})
 }

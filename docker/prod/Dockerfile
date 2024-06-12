@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine AS build
+FROM golang:1.22-alpine AS build
 
 ENV GO111MODULE="on"
 ENV GOOS="linux"
@@ -10,7 +10,7 @@ COPY . .
 
 RUN go mod download
 
-RUN go build -o /go-skeleton
+RUN go build -o /go-skeleton cmd/http/main.go
 
 ## Deploy
 FROM alpine

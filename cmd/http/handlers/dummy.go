@@ -113,12 +113,13 @@ func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 	s := dummyEdit.NewService(hs.logger, hs.DummyRepository)
 	data := new(dummyEdit.Data)
 
+	id := context.Param("id")
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(http.StatusBadRequest, errors)
 	}
 
 	s.Execute(
-		dummyEdit.NewRequest(data, hs.validator),
+		dummyEdit.NewRequest(id, data, hs.validator),
 	)
 
 	response, err := s.GetResponse()
@@ -133,7 +134,9 @@ func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 // @Tags         Dummy
 // @Accept       json
 // @Produce      json
-// @Param        page  query   int  false  "int valid"
+// @Param        page  query   int  true  "valid int"
+// @Param        name  query   string  false  "value example: eql|lik,value"
+// @Param        email  query   string  false  "value example: lik,value"
 // @Success      200  {object}  dummyList.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error
@@ -149,6 +152,8 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 	data := new(dummyList.Data)
 	bindErr := echo.QueryParamsBinder(context).
 		Int("page", &data.Page).
+		String("name", &data.Name).
+		String("email", &data.Email).
 		BindErrors()
 
 	if bindErr != nil {

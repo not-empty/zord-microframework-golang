@@ -26,21 +26,21 @@ func (s *Service) Execute(request Request) {
 		return
 	}
 
-	s.produceResponseRule(request.Data)
+	s.produceResponseRule(request.ID, request.Data)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(data *Data) {
+func (s *Service) produceResponseRule(id string, data *Data) {
 	dummyDomain := dummy.Dummy{
-		ID:        data.ID,
+		ID:        id,
 		DummyName: data.DummyName,
 		Email:     data.Email,
 	}
 
-	affected, err := s.repository.Edit(dummyDomain, "id", data.ID)
+	affected, err := s.repository.Edit(dummyDomain, "id", id)
 	if err != nil {
 		s.InternalServerError("error on edit", err)
 		return

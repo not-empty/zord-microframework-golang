@@ -36,12 +36,10 @@ func (s *Service) produceResponseRule(data *Data) {
 	dummyData, err := s.repository.Get("id", data.ID)
 
 	if err != nil {
-		if err.Error() == "sql: no rows in result set" {
-			s.NotFound("data not found")
+		if err.Error() != "sql: no rows in result set" {
+			s.InternalServerError("error on get data", err)
 			return
 		}
-		s.InternalServerError("error on get data", err)
-		return
 	}
 
 	s.response = &Response{

@@ -18,8 +18,6 @@ definitions:
     type: object
   go-skeleton_internal_application_services_dummy_CREATE.Data:
     properties:
-      DummyId:
-        type: string
       DummyName:
         maxLength: 32
         minLength: 3
@@ -44,8 +42,11 @@ definitions:
     properties:
       DummyName:
         type: string
-      ID:
+      Email:
         type: string
+    required:
+    - DummyName
+    - Email
     type: object
   go-skeleton_internal_application_services_dummy_EDIT.Response:
     properties:
@@ -82,7 +83,16 @@ paths:
       - description: int valid
         in: query
         name: page
+        required: true
         type: integer
+      - description: 'value example: eql|lik,value'
+        in: query
+        name: name
+        type: string
+      - description: 'value example: lik,value'
+        in: query
+        name: email
+        type: string
       produces:
       - application/json
       responses:

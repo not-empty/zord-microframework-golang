@@ -133,7 +133,7 @@ func (hs *{{domainPascalCase}}Handlers) HandleEdit{{domainPascalCase}}(context e
 // @Tags         {{domainPascalCase}}
 // @Accept       json
 // @Produce      json
-// @Param        page  query   int  false  "int valid"
+// @Param        page  query   int  true  "valid int"
 // @Success      200  {object}  {{domainCamelCase}}List.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error

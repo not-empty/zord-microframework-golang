@@ -32,6 +32,19 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "int valid",
                         "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "value example: eql|lik,value",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "value example: lik,value",
+                        "name": "email",
                         "in": "query"
                     }
                 ],
@@ -299,9 +312,6 @@ const docTemplate = `{
                 "Email"
             ],
             "properties": {
-                "DummyId": {
-                    "type": "string"
-                },
                 "DummyName": {
                     "type": "string",
                     "maxLength": 32,
@@ -330,11 +340,15 @@ const docTemplate = `{
         },
         "go-skeleton_internal_application_services_dummy_EDIT.Data": {
             "type": "object",
+            "required": [
+                "DummyName",
+                "Email"
+            ],
             "properties": {
                 "DummyName": {
                     "type": "string"
                 },
-                "ID": {
+                "Email": {
                     "type": "string"
                 }
             }

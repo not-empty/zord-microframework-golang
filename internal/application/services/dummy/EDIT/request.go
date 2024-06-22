@@ -6,6 +6,7 @@ import (
 
 type Data struct {
 	ID        string `param:"id"`
+	Email     string
 	DummyName string
 }
 

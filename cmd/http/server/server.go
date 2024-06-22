@@ -2,7 +2,9 @@ package server
 
 import (
 	"fmt"
+	echoSwagger "github.com/swaggo/echo-swagger"
 	"go-skeleton/cmd/http/routes"
+	"go-skeleton/docs"
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/logger"
 	"go-skeleton/pkg/registry"
@@ -32,6 +34,12 @@ func (hs *Server) Start() {
 
 	server.HideBanner = true
 	server.HidePort = true
+
+	if hs.config.ReadConfig("ENVIRONMENT") == "development" {
+		docs.SwaggerInfo.Host = "localhost:" + hs.config.ReadConfig("HTTP_PORT")
+		docs.SwaggerInfo.BasePath = "/" + hs.config.ReadConfig("API_PREFIX")
+		server.GET("/swagger/*", echoSwagger.WrapHandler)
+	}
 
 	server.Use(middleware.Recover())
 

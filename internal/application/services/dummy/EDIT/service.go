@@ -37,6 +37,7 @@ func (s *Service) produceResponseRule(data *Data) {
 	dummyDomain := dummy.Dummy{
 		ID:        data.ID,
 		DummyName: data.DummyName,
+		Email:     data.Email,
 	}
 
 	affected, err := s.repository.Edit(dummyDomain, "id", data.ID)

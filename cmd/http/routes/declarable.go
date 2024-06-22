@@ -17,7 +17,7 @@ func GetRoutes(reg *registry.Registry) map[string]Declarable {
 	//{{codeGen1}}
 	routes := map[string]Declarable{
 		"health": health,
-		"dummy":  dummyListRoutes,
+		"dummy": dummyListRoutes,
 		//{{codeGen2}}
 	}
 	return routes

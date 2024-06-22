@@ -1,0 +1,240 @@
+definitions:
+  go-skeleton_internal_application_domain_dummy.Dummy:
+    properties:
+      DummyName:
+        type: string
+      Email:
+        type: string
+      ID:
+        type: string
+    type: object
+  go-skeleton_internal_application_services.Error:
+    properties:
+      Error:
+        type: string
+      Message: {}
+      Status:
+        type: integer
+    type: object
+  go-skeleton_internal_application_services_dummy_CREATE.Data:
+    properties:
+      DummyId:
+        type: string
+      DummyName:
+        maxLength: 32
+        minLength: 3
+        type: string
+      Email:
+        type: string
+    required:
+    - DummyName
+    - Email
+    type: object
+  go-skeleton_internal_application_services_dummy_CREATE.Response:
+    properties:
+      Data:
+        $ref: '#/definitions/go-skeleton_internal_application_domain_dummy.Dummy'
+    type: object
+  go-skeleton_internal_application_services_dummy_DELETE.Response:
+    properties:
+      Message:
+        type: string
+    type: object
+  go-skeleton_internal_application_services_dummy_EDIT.Data:
+    properties:
+      DummyName:
+        type: string
+      ID:
+        type: string
+    type: object
+  go-skeleton_internal_application_services_dummy_EDIT.Response:
+    properties:
+      Data:
+        $ref: '#/definitions/go-skeleton_internal_application_services_dummy_EDIT.Data'
+    type: object
+  go-skeleton_internal_application_services_dummy_GET.Response:
+    properties:
+      Data:
+        $ref: '#/definitions/go-skeleton_internal_application_domain_dummy.Dummy'
+    type: object
+  go-skeleton_internal_application_services_dummy_LIST.Response:
+    properties:
+      CurrentPage:
+        type: integer
+      Data:
+        items:
+          $ref: '#/definitions/go-skeleton_internal_application_domain_dummy.Dummy'
+        type: array
+      TotalPages:
+        type: integer
+    type: object
+info:
+  contact: {}
+  description: This is the Zord backend server.
+  title: Swagger Zord API
+  version: "1.0"
+paths:
+  /dummy:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: int valid
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services_dummy_LIST.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services.Error'
+      summary: List Dummy
+      tags:
+      - Dummy
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: body model
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/go-skeleton_internal_application_services_dummy_CREATE.Data'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services_dummy_CREATE.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services.Error'
+      summary: Create Dummy
+      tags:
+      - Dummy
+  /dummy/{dummy_id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dummy ID
+        in: path
+        name: dummy_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services_dummy_DELETE.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services.Error'
+      summary: Delete Dummy
+      tags:
+      - Dummy
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dummy ID
+        in: path
+        name: dummy_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services_dummy_GET.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services.Error'
+      summary: Get a Dummy
+      tags:
+      - Dummy
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dummy ID
+        in: path
+        name: dummy_id
+        required: true
+        type: string
+      - description: body model
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/go-skeleton_internal_application_services_dummy_EDIT.Data'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services_dummy_EDIT.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/go-skeleton_internal_application_services.Error'
+      summary: Edit Dummy
+      tags:
+      - Dummy
+swagger: "2.0"

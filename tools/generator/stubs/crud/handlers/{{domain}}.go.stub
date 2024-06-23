@@ -113,12 +113,13 @@ func (hs *{{domainPascalCase}}Handlers) HandleEdit{{domainPascalCase}}(context e
 	s := {{domainCamelCase}}Edit.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
 	data := new({{domainCamelCase}}Edit.Data)
 
+	id := context.Param("id")
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(http.StatusBadRequest, errors)
 	}
 
 	s.Execute(
-		{{domainCamelCase}}Edit.NewRequest(data, hs.validator),
+		{{domainCamelCase}}Edit.NewRequest(id, data, hs.validator),
 	)
 
 	response, err := s.GetResponse()

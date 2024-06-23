@@ -80,7 +80,7 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: int valid
+      - description: valid int
         in: query
         name: page
         required: true

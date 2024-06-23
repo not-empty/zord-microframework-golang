@@ -26,19 +26,19 @@ func (s *Service) Execute(request Request) {
 		return
 	}
 
-	s.produceResponseRule(request.Data)
+	s.produceResponseRule(request.ID, request.Data)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(data *Data) {
+func (s *Service) produceResponseRule(id string, data *Data) {
     {{domainCamelCase}} := {{domain}}.{{domainPascalCase}}{
-        ID:        data.ID,
+        ID:        id,
     }
 
-    affected, err := s.repository.Edit({{domainCamelCase}}, "id", data.ID)
+    affected, err := s.repository.Edit({{domainCamelCase}}, "id", id)
     if err != nil {
         s.InternalServerError("error on edit", err)
         return

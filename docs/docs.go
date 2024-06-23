@@ -30,7 +30,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "int valid",
+                        "description": "valid int",
                         "name": "page",
                         "in": "query",
                         "required": true

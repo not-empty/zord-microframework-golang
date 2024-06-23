@@ -4,6 +4,7 @@ import (
 	"go-skeleton/internal/application/domain/{{domain}}"
 	"go-skeleton/internal/application/providers/filters"
 	"go-skeleton/internal/application/providers/pagination"
+	_ "go-skeleton/internal/application/services"
 	{{domainCamelCase}}Create "go-skeleton/internal/application/services/{{domain}}/CREATE"
 	{{domainCamelCase}}Delete "go-skeleton/internal/application/services/{{domain}}/DELETE"
 	{{domainCamelCase}}Edit "go-skeleton/internal/application/services/{{domain}}/EDIT"
@@ -36,6 +37,17 @@ func New{{domainPascalCase}}Handlers(reg *registry.Registry) *{{domainPascalCase
 	}
 }
 
+// HandleGet{{domainPascalCase}} Get {{domainPascalCase}}
+// @Summary      Get a {{domainPascalCase}}
+// @Tags         {{domainPascalCase}}
+// @Accept       json
+// @Produce      json
+// @Param        {{domainCamelCase}}_id path string true "{{domainPascalCase}} ID"
+// @Success      200  {object}  {{domainCamelCase}}Get.Response
+// @Failure      400  {object}  services.Error
+// @Failure      404  {object}  services.Error
+// @Failure      500  {object}  services.Error
+// @Router       /{{domainCamelCase}}/{{{domainCamelCase}}_id} [get]
 func (hs *{{domainPascalCase}}Handlers) HandleGet{{domainPascalCase}}(context echo.Context) error {
 	s := {{domainCamelCase}}Get.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
 	data := new({{domainCamelCase}}Get.Data)
@@ -55,6 +67,17 @@ func (hs *{{domainPascalCase}}Handlers) HandleGet{{domainPascalCase}}(context ec
 	return context.JSON(http.StatusOK, response)
 }
 
+// HandleCreate{{domainPascalCase}} Create {{domainPascalCase}}
+// @Summary      Create {{domainPascalCase}}
+// @Tags         {{domainPascalCase}}
+// @Accept       json
+// @Produce      json
+// @Param        request body {{domainCamelCase}}Create.Data true "body model"
+// @Success      200  {object}  {{domainCamelCase}}Create.Response
+// @Failure      400  {object}  services.Error
+// @Failure      404  {object}  services.Error
+// @Failure      500  {object}  services.Error
+// @Router       /{{domainCamelCase}} [post]
 func (hs *{{domainPascalCase}}Handlers) HandleCreate{{domainPascalCase}}(context echo.Context) error {
 	s := {{domainCamelCase}}Create.NewService(hs.logger, hs.{{domainPascalCase}}Repository, hs.idCreator)
 	data := new({{domainCamelCase}}Create.Data)
@@ -74,16 +97,29 @@ func (hs *{{domainPascalCase}}Handlers) HandleCreate{{domainPascalCase}}(context
 	return context.JSON(http.StatusCreated, response)
 }
 
+// HandleEdit{{domainPascalCase}} Edit {{domainPascalCase}}
+// @Summary      Edit {{domainPascalCase}}
+// @Tags         {{domainPascalCase}}
+// @Accept       json
+// @Produce      json
+// @Param        {{domainCamelCase}}_id path string true "{{domainPascalCase}} ID"
+// @Param        request body {{domainCamelCase}}Edit.Data true "body model"
+// @Success      200  {object}  {{domainCamelCase}}Edit.Response
+// @Failure      400  {object}  services.Error
+// @Failure      404  {object}  services.Error
+// @Failure      500  {object}  services.Error
+// @Router       /{{domainCamelCase}}/{{{domainCamelCase}}_id} [put]
 func (hs *{{domainPascalCase}}Handlers) HandleEdit{{domainPascalCase}}(context echo.Context) error {
 	s := {{domainCamelCase}}Edit.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
 	data := new({{domainCamelCase}}Edit.Data)
 
+	id := context.Param("id")
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(http.StatusBadRequest, errors)
 	}
 
 	s.Execute(
-		{{domainCamelCase}}Edit.NewRequest(data, hs.validator),
+		{{domainCamelCase}}Edit.NewRequest(id, data, hs.validator),
 	)
 
 	response, err := s.GetResponse()
@@ -93,6 +129,17 @@ func (hs *{{domainPascalCase}}Handlers) HandleEdit{{domainPascalCase}}(context e
 	return context.JSON(http.StatusOK, response)
 }
 
+// HandleList{{domainPascalCase}} List {{domainPascalCase}}
+// @Summary      List {{domainPascalCase}}
+// @Tags         {{domainPascalCase}}
+// @Accept       json
+// @Produce      json
+// @Param        page  query   int  true  "valid int"
+// @Success      200  {object}  {{domainCamelCase}}List.Response
+// @Failure      400  {object}  services.Error
+// @Failure      404  {object}  services.Error
+// @Failure      500  {object}  services.Error
+// @Router       /{{domainCamelCase}} [get]
 func (hs *{{domainPascalCase}}Handlers) HandleList{{domainPascalCase}}(context echo.Context) error {
 	s := {{domainCamelCase}}List.NewService(
 		hs.logger,
@@ -123,6 +170,17 @@ func (hs *{{domainPascalCase}}Handlers) HandleList{{domainPascalCase}}(context e
 	return context.JSON(http.StatusOK, response)
 }
 
+// HandleDelete{{domainPascalCase}} Delete {{domainPascalCase}}
+// @Summary      Delete {{domainPascalCase}}
+// @Tags         {{domainPascalCase}}
+// @Accept       json
+// @Produce      json
+// @Param        {{domainCamelCase}}_id path string true "{{domainPascalCase}} ID"
+// @Success      200  {object}  {{domainCamelCase}}Delete.Response
+// @Failure      400  {object}  services.Error
+// @Failure      404  {object}  services.Error
+// @Failure      500  {object}  services.Error
+// @Router       /{{domainCamelCase}}/{{{domainCamelCase}}_id} [delete]
 func (hs *{{domainPascalCase}}Handlers) HandleDelete{{domainPascalCase}}(context echo.Context) error {
 	s := {{domainCamelCase}}Delete.NewService(hs.logger, hs.{{domainPascalCase}}Repository)
 	data := new({{domainCamelCase}}Delete.Data)

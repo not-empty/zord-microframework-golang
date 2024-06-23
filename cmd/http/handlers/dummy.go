@@ -4,6 +4,7 @@ import (
 	"go-skeleton/internal/application/domain/dummy"
 	"go-skeleton/internal/application/providers/filters"
 	"go-skeleton/internal/application/providers/pagination"
+	_ "go-skeleton/internal/application/services"
 	dummyCreate "go-skeleton/internal/application/services/dummy/CREATE"
 	dummyDelete "go-skeleton/internal/application/services/dummy/DELETE"
 	dummyEdit "go-skeleton/internal/application/services/dummy/EDIT"
@@ -36,13 +37,23 @@ func NewDummyHandlers(reg *registry.Registry) *DummyHandlers {
 	}
 }
 
+// HandleGetDummy Get Dummy
+// @Summary      Get a Dummy
+// @Tags         Dummy
+// @Accept       json
+// @Produce      json
+// @Param        dummy_id path string true "Dummy ID"
+// @Success      200  {object}  dummyGet.Response
+// @Failure      400  {object}  services.Error
+// @Failure      404  {object}  services.Error
+// @Failure      500  {object}  services.Error
+// @Router       /dummy/{dummy_id} [get]
 func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
 	s := dummyGet.NewService(hs.logger, hs.DummyRepository)
 	data := new(dummyGet.Data)
 
 	if errors := context.Bind(data); errors != nil {
-		s.CustomError(http.StatusBadRequest, errors)
-		return context.JSON(s.Error.Status, s.Error)
+		return context.JSON(422, errors)
 	}
 
 	s.Execute(
@@ -56,13 +67,23 @@ func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
 	return context.JSON(http.StatusOK, response)
 }
 
+// HandleCreateDummy Create Dummy
+// @Summary      Create Dummy
+// @Tags         Dummy
+// @Accept       json
+// @Produce      json
+// @Param        request body dummyCreate.Data true "body model"
+// @Success      200  {object}  dummyCreate.Response
+// @Failure      400  {object}  services.Error
+// @Failure      404  {object}  services.Error
+// @Failure      500  {object}  services.Error
+// @Router       /dummy [post]
 func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 	s := dummyCreate.NewService(hs.logger, hs.DummyRepository, hs.idCreator)
 	data := new(dummyCreate.Data)
 
 	if errors := context.Bind(data); errors != nil {
-		s.CustomError(http.StatusBadRequest, errors)
-		return context.JSON(s.Error.Status, s.Error)
+		return context.JSON(http.StatusBadRequest, errors)
 	}
 
 	s.Execute(
@@ -76,17 +97,29 @@ func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 	return context.JSON(http.StatusCreated, response)
 }
 
+// HandleEditDummy Edit Dummy
+// @Summary      Edit Dummy
+// @Tags         Dummy
+// @Accept       json
+// @Produce      json
+// @Param        dummy_id path string true "Dummy ID"
+// @Param        request body dummyEdit.Data true "body model"
+// @Success      200  {object}  dummyEdit.Response
+// @Failure      400  {object}  services.Error
+// @Failure      404  {object}  services.Error
+// @Failure      500  {object}  services.Error
+// @Router       /dummy/{dummy_id} [put]
 func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 	s := dummyEdit.NewService(hs.logger, hs.DummyRepository)
 	data := new(dummyEdit.Data)
 
+	id := context.Param("id")
 	if errors := context.Bind(data); errors != nil {
-		s.CustomError(http.StatusBadRequest, errors)
-		return context.JSON(s.Error.Status, s.Error)
+		return context.JSON(http.StatusBadRequest, errors)
 	}
 
 	s.Execute(
-		dummyEdit.NewRequest(data, hs.validator),
+		dummyEdit.NewRequest(id, data, hs.validator),
 	)
 
 	response, err := s.GetResponse()
@@ -96,6 +129,19 @@ func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 	return context.JSON(http.StatusOK, response)
 }
 
+// HandleListDummy List Dummy
+// @Summary      List Dummy
+// @Tags         Dummy
+// @Accept       json
+// @Produce      json
+// @Param        page  query   int  true  "valid int"
+// @Param        name  query   string  false  "value example: eql|lik,value"
+// @Param        email  query   string  false  "value example: lik,value"
+// @Success      200  {object}  dummyList.Response
+// @Failure      400  {object}  services.Error
+// @Failure      404  {object}  services.Error
+// @Failure      500  {object}  services.Error
+// @Router       /dummy [get]
 func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 	s := dummyList.NewService(
 		hs.logger,
@@ -111,8 +157,7 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 		BindErrors()
 
 	if bindErr != nil {
-		s.CustomError(http.StatusBadRequest, bindErr)
-		return context.JSON(http.StatusBadRequest, s.Error)
+		return context.JSON(http.StatusBadRequest, bindErr)
 	}
 
 	f := filters.NewFilters()
@@ -128,13 +173,23 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 	return context.JSON(http.StatusOK, response)
 }
 
+// HandleDeleteDummy Delete Dummy
+// @Summary      Delete Dummy
+// @Tags         Dummy
+// @Accept       json
+// @Produce      json
+// @Param        dummy_id path string true "Dummy ID"
+// @Success      200  {object}  dummyDelete.Response
+// @Failure      400  {object}  services.Error
+// @Failure      404  {object}  services.Error
+// @Failure      500  {object}  services.Error
+// @Router       /dummy/{dummy_id} [delete]
 func (hs *DummyHandlers) HandleDeleteDummy(context echo.Context) error {
 	s := dummyDelete.NewService(hs.logger, hs.DummyRepository)
 	data := new(dummyDelete.Data)
 
 	if errors := context.Bind(data); errors != nil {
-		s.CustomError(http.StatusBadRequest, errors)
-		return context.JSON(s.Error.Status, s.Error)
+		return context.JSON(http.StatusBadRequest, errors)
 	}
 
 	s.Execute(

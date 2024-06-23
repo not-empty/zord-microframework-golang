@@ -3,6 +3,7 @@ package handlers
 import (
 	"github.com/labstack/echo/v4"
 	"go-skeleton/internal/application/services/{{usecase}}"
+	_ "go-skeleton/internal/application/services"
 	"go-skeleton/pkg/logger"
 	"go-skeleton/pkg/registry"
 )
@@ -17,7 +18,16 @@ func New{{usecasePascalCase}}Handlers(reg *registry.Registry) *{{usecasePascalCa
 	}
 }
 
-
+// Handle{{usecasePascalCase}} {{usecasePascalCase}}
+// @Summary      {{usecasePascalCase}}
+// @Tags         {{usecasePascalCase}}
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  {{usecase}}.Response
+// @Failure      400  {object}  services.Error
+// @Failure      404  {object}  services.Error
+// @Failure      500  {object}  services.Error
+// @Router       /{{usecase}} [get]
 func (hs *{{usecasePascalCase}}Handlers) Handle{{usecasePascalCase}}(context echo.Context) error {
 	s := {{usecase}}.NewService(hs.logger)
 

@@ -12,6 +12,9 @@ var (
 	reg *registry.Registry
 )
 
+// @title Swagger Zord API
+// @version 1.0
+// @description This is the Zord backend server.
 func main() {
 	cmd.Setup()
 	serverInstance := server.NewServer(cmd.Reg, cmd.ApiPrefix)

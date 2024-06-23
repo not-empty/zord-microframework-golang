@@ -1,4 +1,3 @@
-version: '3.7'
 services:
   zord-http:
     build:
@@ -8,7 +7,7 @@ services:
     env_file:
       - .env
     ports:
-      - "9005:9000"
+      - "9000:9000"
     command: air http
     depends_on:
       mysql:

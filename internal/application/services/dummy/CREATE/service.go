@@ -28,7 +28,6 @@ func (s *Service) Execute(request Request) {
 		return
 	}
 
-	request.Data.DummyId = s.idCreator.Create()
 	s.produceResponseRule(request.Data)
 }
 
@@ -38,7 +37,7 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 
 func (s *Service) produceResponseRule(data *Data) {
 	dummy := dummy.Dummy{
-		ID:        data.DummyId,
+		ID:        s.idCreator.Create(),
 		DummyName: data.DummyName,
 		Email:     data.Email,
 	}

@@ -4,9 +4,7 @@ import (
 	{{validatorImport}}
 )
 
-type Data struct {
-	ID string
-}
+type Data struct {}
 
 type Request struct {
 	Data *Data

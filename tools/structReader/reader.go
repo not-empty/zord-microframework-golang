@@ -35,6 +35,15 @@ var goTypeToDbType = map[string]string{
 
 func GenerateHclFileFromDomain(domain string) {
 	file := hclwrite.NewEmptyFile()
+
+	if domain != "" {
+		content, err := os.ReadFile("tools/migrator/schema/schema.my.hcl")
+		if err != nil {
+			fmt.Println("Error reading file:", err)
+			return
+		}
+		file, _ = hclwrite.ParseConfig(content, "tools/migrator/schema/schema.my.hcl", hcl.Pos{Line: 1, Column: 1})
+	}
 	body := file.Body()
 	filepath.Walk("./internal/application/domain/"+domain, func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
@@ -49,12 +58,15 @@ func GenerateHclFileFromDomain(domain string) {
 		}
 		return nil
 	})
-	schemaBlock := hclwrite.NewBlock("schema", []string{"skeleton"})
-	schemaBody := schemaBlock.Body()
-	schemaBody.SetAttributeValue("charset", cty.StringVal("utf8mb4"))
-	schemaBody.SetAttributeValue("collate", cty.StringVal("utf8mb4_0900_ai_ci"))
-	body.AppendBlock(schemaBlock)
-	err := os.WriteFile("tools/migrator/generated/generated_from_domain.my.hcl", file.Bytes(), 0644)
+	if domain == "" {
+		schemaBlock := hclwrite.NewBlock("schema", []string{"skeleton"})
+		schemaBody := schemaBlock.Body()
+		schemaBody.SetAttributeValue("charset", cty.StringVal("utf8mb4"))
+		schemaBody.SetAttributeValue("collate", cty.StringVal("utf8mb4_0900_ai_ci"))
+		body.AppendBlock(schemaBlock)
+	}
+
+	err := os.WriteFile("tools/migrator/schema/schema.my.hcl", file.Bytes(), 0644)
 	if err != nil {
 		fmt.Println(err)
 	}

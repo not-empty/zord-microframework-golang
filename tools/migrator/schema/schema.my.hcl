@@ -10,7 +10,7 @@ table "dummies" {
   }
   column "email" {
     null = false
-    type = datetime
+    type = char(255)
   }
   primary_key {
     columns = [column.id]

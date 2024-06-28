@@ -5,9 +5,7 @@ import (
 	"go-skeleton/internal/repositories/base_repository"
 )
 
-type {{domainPascalCase}} struct {
-	ID   string `db:"id"`
-}
+{{domainType}}
 
 func (d {{domainPascalCase}}) Schema() string {
 	return "{{domain}}"

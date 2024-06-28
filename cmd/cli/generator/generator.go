@@ -45,9 +45,17 @@ func (g *Generator) DeclareCommands(cmd *cobra.Command) {
 
 	destroyDomain.Flags().StringVar(&g.Flags.domainType, "type", "crud", "Define domain type: ['crud'|'<custom>']")
 
+	generateFromDb := &cobra.Command{
+		Use:    "generate-from-db",
+		Short:  "Generate from database",
+		PreRun: g.BootGenerator,
+		Run:    g.GenerateFromDb,
+	}
+
 	cmd.AddCommand(
 		createDomain,
 		destroyDomain,
+		generateFromDb,
 	)
 }
 
@@ -74,6 +82,14 @@ func (g *Generator) DestroyDomain(_ *cobra.Command, args []string) {
 	).Handler(
 		args,
 	)
+}
+
+func (g *Generator) GenerateFromDb(_ *cobra.Command, _ []string) {
+	generator.NewCodeGenerator(
+		g.Logger,
+		g.Flags.validator,
+		g.Flags.domainType,
+	).ReadFromDb()
 }
 
 func (g *Generator) BootGenerator(_ *cobra.Command, _ []string) {

@@ -37,6 +37,9 @@ table "{{domain}}" {
 //tableEnd
 
 $repeat$"""
+"{{domainType}}" = """type {{domainPascalCase}} struct {
+  ID   string `db:"id"`
+}"""
 
 [stubs.crud.domain]
 toPath = "internal/application/domain/{{domain}}/"

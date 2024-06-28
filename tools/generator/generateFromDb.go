@@ -67,16 +67,17 @@ func dbTypesToGoTypes(typo string) string {
 		"date":       "time.Time",
 		"tinyint":    "int8",
 		"tinytext":   "string",
-		"varbinary":  "",
+		"varbinary":  "string",
 		"varchar":    "string",
-	}
-	if strings.Contains(typo, "char") {
-		return "string"
 	}
 
 	typ, ok := dbtypesMap[typo]
 	if ok {
 		return typ
+	}
+
+	if strings.Contains(typo, "char") {
+		return "string"
 	}
 	return typo
 }

@@ -21,8 +21,9 @@ func (cg *CodeGenerator) ReadFromDb() {
 			continue
 		}
 		tableName := block.Labels()[0]
-		domain := handleTable(block.Body().Blocks(), tableName)
+		domain := cg.handleTable(block.Body().Blocks(), tableName)
 		cg.config.Replacers["crud"]["{{domainType}}"] = domain
+		cg.config.Replacers["crud"]["{{optionalImports}}"] = `"time"`
 		err := cg.validateFiles(domain)
 		if err != nil {
 			fmt.Println("Error validating files:", err)
@@ -33,7 +34,7 @@ func (cg *CodeGenerator) ReadFromDb() {
 	}
 }
 
-func handleTable(blocks []*hclwrite.Block, tableName string) string {
+func (cg *CodeGenerator) handleTable(blocks []*hclwrite.Block, tableName string) string {
 	structString := "type " + PascalCase(tableName) + " struct {\n"
 	for _, block := range blocks {
 		if block.Type() == "column" {
@@ -41,20 +42,21 @@ func handleTable(blocks []*hclwrite.Block, tableName string) string {
 			if !ok {
 				continue
 			}
-			structString = fmt.Sprintf("%s	%s %s `db:\"%s\"`\n", structString, PascalCase(block.Labels()[0]), dbTypesToGoTypes(string(token.Expr().BuildTokens(nil).Bytes())), block.Labels()[0])
+			structString = fmt.Sprintf("%s	%s %s `db:\"%s\"`\n", structString, PascalCase(block.Labels()[0]), cg.dbTypesToGoTypes(string(token.Expr().BuildTokens(nil).Bytes())), block.Labels()[0])
 		}
 	}
 	structString += "}"
 	return structString
 }
 
-func dbTypesToGoTypes(typo string) string {
+func (cg *CodeGenerator) dbTypesToGoTypes(typo string) string {
 	dbtypesMap := map[string]string{
 		"bigint":     "int64",
 		"bit":        "bool",
 		"char":       "string",
 		"decimal":    "float64",
 		"float":      "float32",
+		"double":     "float64",
 		"int":        "int",
 		"longtext":   "string",
 		"mediumint":  "int",
@@ -72,12 +74,17 @@ func dbTypesToGoTypes(typo string) string {
 	}
 
 	typ, ok := dbtypesMap[typo]
+	fmt.Println(typ)
 	if ok {
 		return typ
 	}
 
 	if strings.Contains(typo, "char") {
 		return "string"
+	}
+
+	if strings.Contains(typo, "time") {
+		return "time.Time"
 	}
 	return typo
 }

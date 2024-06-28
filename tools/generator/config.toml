@@ -40,6 +40,7 @@ $repeat$"""
 "{{domainType}}" = """type {{domainPascalCase}} struct {
   ID   string `db:"id"`
 }"""
+"{{optionalImports}}" = ""
 
 [stubs.crud.domain]
 toPath = "internal/application/domain/{{domain}}/"

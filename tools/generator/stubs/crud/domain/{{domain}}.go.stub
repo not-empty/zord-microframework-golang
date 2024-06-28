@@ -3,6 +3,7 @@ package {{domain}}
 import (
 	"go-skeleton/internal/application/providers/pagination"
 	"go-skeleton/internal/repositories/base_repository"
+	{{optionalImports}}
 )
 
 {{domainType}}

@@ -13,10 +13,11 @@ var (
 )
 
 type CodeGenerator struct {
-	Logger     *logger.Logger
-	config     *Config
-	validator  bool
-	domainType string
+	Logger         *logger.Logger
+	config         *Config
+	validator      bool
+	domainType     string
+	needImportTime bool
 }
 
 func NewCodeGenerator(logger *logger.Logger, validator bool, domainType string) *CodeGenerator {

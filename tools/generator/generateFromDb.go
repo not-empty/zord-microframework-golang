@@ -24,7 +24,7 @@ func (cg *CodeGenerator) ReadFromSchema(schema string) {
 }
 
 func (cg *CodeGenerator) getHclFile(schema string) (*hclwrite.File, error) {
-	filepath := fmt.Sprintf("tools/migrator/%s.my.hcl", schema)
+	filepath := fmt.Sprintf("tools/migrator/schema/%s.my.hcl", schema)
 	content, err := os.ReadFile(filepath)
 	if err != nil {
 		fmt.Println("Error reading file:", err)
@@ -50,36 +50,139 @@ func (cg *CodeGenerator) handleHclBlock(block *hclwrite.Block) error {
 }
 
 func (cg *CodeGenerator) generateDomainFromHclBlock(block *hclwrite.Block, tableName string) map[string]string {
-	cg.needImportTime = false
-	domain := cg.generateDomainStruct(block.Body().Blocks(), tableName)
+	cg.needImportTime = new(bool)
+	cg.primaryKey = new(string)
+	cg.pkType = new(string)
+	*cg.needImportTime = false
+	domain := cg.generateDomainStruct(block.Body().Blocks(), tableName, cg.primaryKey, cg.pkType)
+	dataType := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateDeclarationLine)
+	createAttrData := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateCreateAttributionLine)
+	editAttrData := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateEditAttributionLine)
 	replacers := GetReplacersConfig(cg.config, cg.domainType, []string{tableName})
 	replacers["{{domainType}}"] = domain
-	replacers["{{optionalImports}}"] = ""
-	if cg.needImportTime {
-		replacers["{{optionalImports}}"] = `"time"`
+	replacers["{{dataType}}"] = dataType
+	replacers["{{pkDbName}}"] = *cg.primaryKey
+	replacers["{{pkName}}"] = PascalCase(*cg.primaryKey)
+	replacers["{{pkType}}"] = *cg.pkType
+	replacers["{{createServiceData}}"] = createAttrData
+	replacers["{{editServiceData}}"] = editAttrData
+	if *cg.needImportTime {
+		replacers["{{optionalImports}}"] = "\"time\""
 	}
 	return replacers
 }
 
-func (cg *CodeGenerator) generateDomainStruct(blocks []*hclwrite.Block, tableName string) string {
+func (cg *CodeGenerator) generateDomainStruct(blocks []*hclwrite.Block, tableName string, pk, pkType *string) string {
+	*pk = cg.findPkOnBlocks(blocks)
 	structString := "type " + PascalCase(tableName) + " struct {\n"
+	structString += cg.generateStruct(blocks, pk, pkType, cg.generateDeclarationLine)
+	structString += "}"
+	return structString
+}
+
+func (cg *CodeGenerator) generateStruct(blocks []*hclwrite.Block, pk, pkType *string, strFormationFunc func(string, string, string, string) string) string {
+	declarationString := "\n"
 	for _, block := range blocks {
 		if block.Type() == "column" {
 			token, ok := block.Body().Attributes()["type"]
 			if !ok {
 				continue
 			}
-			structString = fmt.Sprintf(
-				"%s	%s %s `db:\"%s\"`\n",
-				structString,
+			tokenStr := string(token.Expr().BuildTokens(nil).Bytes())
+			goType := cg.dbTypesToGoTypes(tokenStr)
+
+			if pk != nil && block.Labels()[0] == *pk {
+				*pkType = fmt.Sprintf("%s string `param:\"id\"`", PascalCase(*pk))
+			}
+
+			declarationString = strFormationFunc(
+				declarationString,
 				PascalCase(block.Labels()[0]),
-				cg.dbTypesToGoTypes(string(token.Expr().BuildTokens(nil).Bytes())),
+				goType,
 				block.Labels()[0],
 			)
 		}
 	}
-	structString += "}"
-	return structString
+	return declarationString
+}
+
+func (cg *CodeGenerator) generateDeclarationLine(str, name, goType, dbTag string) string {
+	if name == PascalCase(*cg.primaryKey) && goType == "int" {
+		return fmt.Sprintf(
+			"%s	%s %s `db:\"%s\"`\n",
+			str,
+			name,
+			"string",
+			dbTag,
+		)
+	}
+	return fmt.Sprintf(
+		"%s	%s %s `db:\"%s\"`\n",
+		str,
+		name,
+		goType,
+		dbTag,
+	)
+}
+
+func (cg *CodeGenerator) generateCreateAttributionLine(str, name, goType, _ string) string {
+	if name == PascalCase(*cg.primaryKey) {
+		if goType == "int" {
+			return str
+		}
+		return fmt.Sprintf(
+			"%s	%s: s.idCreator.Create(),\n",
+			str,
+			name,
+		)
+	}
+	return fmt.Sprintf(
+		"%s	%s: data.%s,\n",
+		str,
+		name,
+		name,
+	)
+}
+
+func (cg *CodeGenerator) generateEditAttributionLine(str, name, goType, _ string) string {
+	if name == PascalCase(*cg.primaryKey) {
+		if goType == "int" {
+			return str
+		}
+		return fmt.Sprintf(
+			"%s	%s: id,\n",
+			str,
+			name,
+		)
+	}
+	return fmt.Sprintf(
+		"%s	%s: data.%s,\n",
+		str,
+		name,
+		name,
+	)
+}
+
+func (cg *CodeGenerator) findPkOnBlocks(blocks []*hclwrite.Block) string {
+	str := ""
+	for _, block := range blocks {
+		if block.Type() == "primary_key" {
+			token, ok := block.Body().Attributes()["columns"]
+			if !ok {
+				return ""
+			}
+			pkAttr := string(token.Expr().BuildTokens(nil).Bytes())
+			str = cg.getColumnFromAttrString(pkAttr)
+		}
+	}
+	return str
+}
+
+func (cg *CodeGenerator) getColumnFromAttrString(attrStr string) string {
+	str := strings.Replace(attrStr, "[", "", -1)
+	str = strings.Replace(str, "]", "", -1)
+	str = strings.Split(str, ".")[1]
+	return str
 }
 
 func (cg *CodeGenerator) dbTypesToGoTypes(typo string) string {
@@ -108,16 +211,18 @@ func (cg *CodeGenerator) dbTypesToGoTypes(typo string) string {
 
 	GolangType, ok := dbTypesMap[typo]
 	if ok {
+		if GolangType == "time.Time" {
+			*cg.needImportTime = true
+		}
 		return GolangType
 	}
 
 	if strings.Contains(typo, "char") {
 		return "string"
 	}
-
-	if strings.Contains(typo, "time") {
-		cg.needImportTime = true
-		return "time.Time"
+	if strings.Contains(typo, "double") {
+		return "float64"
 	}
+
 	return typo
 }

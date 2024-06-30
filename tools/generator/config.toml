@@ -40,6 +40,12 @@ $repeat$"""
 "{{domainType}}" = """type {{domainPascalCase}} struct {
   ID   string `db:"id"`
 }"""
+"{{pkType}}" = "ID string `param:\"id\"`"
+"{{pkName}}" = "ID"
+"{{pkDbName}}" = "id"
+"{{dataType}}" = ""
+"{{createServiceData}}" = "ID:   s.idCreator.Create(),"
+"{{editServiceData}}" = "ID:        id,"
 "{{optionalImports}}" = ""
 
 [stubs.crud.domain]

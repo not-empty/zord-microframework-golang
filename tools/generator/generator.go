@@ -17,7 +17,9 @@ type CodeGenerator struct {
 	config         *Config
 	validator      bool
 	domainType     string
-	needImportTime bool
+	needImportTime *bool
+	primaryKey     *string
+	pkType         *string
 }
 
 func NewCodeGenerator(logger *logger.Logger, validator bool, domainType string) *CodeGenerator {

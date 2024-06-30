@@ -4,6 +4,7 @@ import (
 	"go-skeleton/cmd/cli/generator"
 	"go-skeleton/cmd/cli/migrator"
 	"go-skeleton/cmd/cli/struct_reader"
+	"go-skeleton/pkg/config"
 
 	"github.com/spf13/cobra"
 )
@@ -23,6 +24,7 @@ func (c *Cli) Start() {
 	generatorInstance.DeclareCommands(c.Cmd)
 	migratorInstance := migrator.NewMigrator()
 	migratorInstance.DeclareCommands(c.Cmd)
-	reader := struct_reader.NewStructReader()
+	config := config.NewConfig()
+	reader := struct_reader.NewStructReader(config)
 	reader.DeclareCommands(c.Cmd)
 }

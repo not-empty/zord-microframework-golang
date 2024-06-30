@@ -42,18 +42,17 @@ func GenerateHclFileFromDomain(schema string, domain string) {
 	// TODO: add more drivers support
 	schemaFile := toolsConf.MountSchemaHCLFilePath(schema, "mysql")
 
-	fmt.Println(schemaFile)
-
 	if domain != "" {
-		content, err := os.ReadFile("tools/migrator/schema/schema.my.hcl")
+		content, err := os.ReadFile(schemaFile)
 		if err != nil {
 			fmt.Println("Error reading file:", err)
 			return
 		}
-		file, _ = hclwrite.ParseConfig(content, "tools/migrator/schema/schema.my.hcl", hcl.Pos{Line: 1, Column: 1})
+		file, _ = hclwrite.ParseConfig(content, schemaFile, hcl.Pos{Line: 1, Column: 1})
 	}
+
 	body := file.Body()
-	filepath.Walk("./internal/application/domain/"+domain, func(path string, info os.FileInfo, err error) error {
+	filepath.Walk(toolsConf.DomainsPath+domain, func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
@@ -66,6 +65,7 @@ func GenerateHclFileFromDomain(schema string, domain string) {
 		}
 		return nil
 	})
+
 	if domain == "" {
 		schemaBlock := hclwrite.NewBlock("schema", []string{"skeleton"})
 		schemaBody := schemaBlock.Body()
@@ -74,7 +74,7 @@ func GenerateHclFileFromDomain(schema string, domain string) {
 		body.AppendBlock(schemaBlock)
 	}
 
-	err := os.WriteFile("tools/migrator/schema/schema.my.hcl", file.Bytes(), 0644)
+	err := os.WriteFile(schemaFile, file.Bytes(), 0644)
 	if err != nil {
 		fmt.Println(err)
 	}

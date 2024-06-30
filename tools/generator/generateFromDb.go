@@ -121,7 +121,7 @@ func (cg *CodeGenerator) generateDeclarationLine(str, name, goType, dbTag string
 			"%s	%s %s `db:\"%s\"`\n",
 			str,
 			name,
-			"string",
+			"*string",
 			dbTag,
 		)
 	}
@@ -222,7 +222,7 @@ func (cg *CodeGenerator) dbTypesToGoTypes(typo string) string {
 
 	GolangType, ok := dbTypesMap[typo]
 	if ok {
-		if GolangType == "time.Time" {
+		if GolangType == "*time.Time" {
 			*cg.needImportTime = true
 		}
 		return GolangType

@@ -37,7 +37,7 @@ func (s *Service) produceResponseRule(data *Data) {
 		{{pkName}}: &data.{{pkName}},
 	}
 
-	err := s.repository.Delete("{{pkDbName}}", &{{domainCamelCase}}.{{pkName}})
+	err := s.repository.Delete("{{pkDbName}}", *{{domainCamelCase}}.{{pkName}})
 	if err != nil {
         s.InternalServerError("error on delete", err)
         return

@@ -2,9 +2,7 @@ package structReader
 
 import (
 	"fmt"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclwrite"
-	"github.com/zclconf/go-cty/cty"
+	"go-skeleton/tools/conf"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -12,6 +10,10 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+
+	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/hclwrite"
+	"github.com/zclconf/go-cty/cty"
 )
 
 var goTypeToDbType = map[string]string{
@@ -33,8 +35,14 @@ var goTypeToDbType = map[string]string{
 	"time.Time": "datetime",
 }
 
-func GenerateHclFileFromDomain(domain string) {
+func GenerateHclFileFromDomain(schema string, domain string) {
 	file := hclwrite.NewEmptyFile()
+
+	toolsConf := conf.NewToolsConfig()
+	// TODO: add more drivers support
+	schemaFile := toolsConf.MountSchemaHCLFilePath(schema, "mysql")
+
+	fmt.Println(schemaFile)
 
 	if domain != "" {
 		content, err := os.ReadFile("tools/migrator/schema/schema.my.hcl")

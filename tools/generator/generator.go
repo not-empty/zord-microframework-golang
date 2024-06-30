@@ -20,6 +20,7 @@ type CodeGenerator struct {
 	needImportTime *bool
 	primaryKey     *string
 	pkType         *string
+	isIntId        *bool
 }
 
 func NewCodeGenerator(logger *logger.Logger, validator bool, domainType string) *CodeGenerator {

@@ -57,7 +57,9 @@ func (cg *CodeGenerator) generateDomainFromHclBlock(block *hclwrite.Block, table
 	cg.needImportTime = new(bool)
 	cg.primaryKey = new(string)
 	cg.pkType = new(string)
+	cg.isIntId = new(bool)
 	*cg.needImportTime = false
+	*cg.isIntId = false
 	domain := cg.generateDomainStruct(block.Body().Blocks(), tableName, cg.primaryKey, cg.pkType)
 	dataType := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateDeclarationLine)
 	createAttrData := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateCreateAttributionLine)
@@ -72,6 +74,9 @@ func (cg *CodeGenerator) generateDomainFromHclBlock(block *hclwrite.Block, table
 	replacers["{{editServiceData}}"] = editAttrData
 	if *cg.needImportTime {
 		replacers["{{optionalImports}}"] = "\"time\""
+	}
+	if !*cg.isIntId {
+		replacers["{{idVar}}"] = "id := s.idCreator.Create()"
 	}
 	return replacers
 }
@@ -132,10 +137,11 @@ func (cg *CodeGenerator) generateDeclarationLine(str, name, goType, dbTag string
 func (cg *CodeGenerator) generateCreateAttributionLine(str, name, goType, _ string) string {
 	if name == PascalCase(*cg.primaryKey) {
 		if strings.Contains(goType, "int") {
+			*cg.isIntId = true
 			return str
 		}
 		return fmt.Sprintf(
-			"%s	%s: s.idCreator.Create(),\n",
+			"%s	%s: &id,\n",
 			str,
 			name,
 		)
@@ -154,7 +160,7 @@ func (cg *CodeGenerator) generateEditAttributionLine(str, name, goType, _ string
 			return str
 		}
 		return fmt.Sprintf(
-			"%s	%s: id,\n",
+			"%s	%s: &id,\n",
 			str,
 			name,
 		)
@@ -216,7 +222,7 @@ func (cg *CodeGenerator) dbTypesToGoTypes(typo string) string {
 
 	GolangType, ok := dbTypesMap[typo]
 	if ok {
-		if GolangType == "*time.Time" {
+		if GolangType == "time.Time" {
 			*cg.needImportTime = true
 		}
 		return GolangType

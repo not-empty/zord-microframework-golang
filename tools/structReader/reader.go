@@ -35,24 +35,27 @@ var goTypeToDbType = map[string]string{
 	"time.Time": "datetime",
 }
 
-func GenerateHclFileFromDomain(schema string, domain string) {
-	file := hclwrite.NewEmptyFile()
-
+func GenerateHclFileFromDomain(schema string) {
 	toolsConf := conf.NewToolsConfig()
 	// TODO: add more drivers support
 	schemaFile := toolsConf.MountSchemaHCLFilePath(schema, "mysql")
 
-	if domain != "" {
-		content, err := os.ReadFile(schemaFile)
-		if err != nil {
-			fmt.Println("Error reading file:", err)
-			return
-		}
-		file, _ = hclwrite.ParseConfig(content, schemaFile, hcl.Pos{Line: 1, Column: 1})
+	os.Remove(schemaFile)
+	err := os.WriteFile(schemaFile, make([]byte, 0), 0644)
+	if err != nil {
+		panic(err)
 	}
 
+	content, err := os.ReadFile(schemaFile)
+	if err != nil {
+		fmt.Println("Error reading file:", err)
+		return
+	}
+
+	file, _ := hclwrite.ParseConfig(content, schemaFile, hcl.Pos{Line: 1, Column: 1})
 	body := file.Body()
-	filepath.Walk(toolsConf.DomainsPath+domain, func(path string, info os.FileInfo, err error) error {
+
+	filepath.Walk(toolsConf.DomainsPath, func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
@@ -66,15 +69,13 @@ func GenerateHclFileFromDomain(schema string, domain string) {
 		return nil
 	})
 
-	if domain == "" {
-		schemaBlock := hclwrite.NewBlock("schema", []string{"skeleton"})
-		schemaBody := schemaBlock.Body()
-		schemaBody.SetAttributeValue("charset", cty.StringVal("utf8mb4"))
-		schemaBody.SetAttributeValue("collate", cty.StringVal("utf8mb4_0900_ai_ci"))
-		body.AppendBlock(schemaBlock)
-	}
+	schemaBlock := hclwrite.NewBlock("schema", []string{"skeleton"})
+	schemaBody := schemaBlock.Body()
+	schemaBody.SetAttributeValue("charset", cty.StringVal("utf8mb4"))
+	schemaBody.SetAttributeValue("collate", cty.StringVal("utf8mb4_0900_ai_ci"))
+	body.AppendBlock(schemaBlock)
 
-	err := os.WriteFile(schemaFile, file.Bytes(), 0644)
+	err = os.WriteFile(schemaFile, file.Bytes(), 0644)
 	if err != nil {
 		fmt.Println(err)
 	}

@@ -8,9 +8,6 @@ import (
 )
 
 type StructReader struct {
-	GenerateFlags struct {
-		Domain string
-	}
 	Config *config.Config
 }
 
@@ -27,12 +24,10 @@ func (sr *StructReader) DeclareCommands(cmd *cobra.Command) {
 		Run:   sr.Generate,
 	}
 
-	generateSchemaFromDomain.Flags().StringVar(&sr.GenerateFlags.Domain, "domain", "", "Generate to specific domain")
-
 	cmd.AddCommand(generateSchemaFromDomain)
 }
 
 func (sr *StructReader) Generate(cmd *cobra.Command, args []string) {
 	schema := sr.Config.ReadConfig("DB_DATABASE")
-	structReader.GenerateHclFileFromDomain(schema, sr.GenerateFlags.Domain)
+	structReader.GenerateHclFileFromDomain(schema)
 }

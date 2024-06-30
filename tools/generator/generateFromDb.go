@@ -8,37 +8,60 @@ import (
 	"strings"
 )
 
-func (cg *CodeGenerator) ReadFromDb() {
-	stubs := GetStubsConfig(cg.Logger, cg.config, cg.domainType)
-	content, err := os.ReadFile("tools/migrator/schema/schema.my.hcl")
-	if err != nil {
-		fmt.Println("Error reading file:", err)
+func (cg *CodeGenerator) ReadFromSchema(schema string) {
+	file, hclErr := cg.getHclFile(schema)
+	if hclErr != nil {
+		fmt.Println("Error validating files:", hclErr)
 		return
 	}
-	file, _ := hclwrite.ParseConfig(content, "tools/migrator/schema/schema.my.hcl", hcl.Pos{Line: 1, Column: 1})
 	for _, block := range file.Body().Blocks() {
-		if block.Type() == "schema" {
-			continue
-		}
-		tableName := block.Labels()[0]
-		cg.needImportTime = false
-		domain := cg.handleTable(block.Body().Blocks(), tableName)
-		cg.config.Replacers["crud"]["{{domainType}}"] = domain
-		cg.config.Replacers["crud"]["{{optionalImports}}"] = ""
-		if cg.needImportTime {
-			cg.config.Replacers["crud"]["{{optionalImports}}"] = `"time"`
-		}
-		err := cg.validateFiles(domain)
+		err := cg.handleHclBlock(block)
 		if err != nil {
 			fmt.Println("Error validating files:", err)
 			return
 		}
-		replacers := GetReplacersConfig(cg.config, cg.domainType, []string{tableName})
-		cg.GenerateFilesFromStubs(stubs, replacers)
 	}
 }
 
-func (cg *CodeGenerator) handleTable(blocks []*hclwrite.Block, tableName string) string {
+func (cg *CodeGenerator) getHclFile(schema string) (*hclwrite.File, error) {
+	filepath := fmt.Sprintf("tools/migrator/%s.my.hcl", schema)
+	content, err := os.ReadFile(filepath)
+	if err != nil {
+		fmt.Println("Error reading file:", err)
+		return nil, err
+	}
+	file, _ := hclwrite.ParseConfig(content, filepath, hcl.Pos{Line: 1, Column: 1})
+	return file, err
+}
+
+func (cg *CodeGenerator) handleHclBlock(block *hclwrite.Block) error {
+	if block.Type() == "schema" {
+		return nil
+	}
+	tableName := block.Labels()[0]
+	replacers := cg.generateDomainFromHclBlock(block, tableName)
+	validateErr := cg.validateFiles(tableName)
+	if validateErr != nil {
+		return validateErr
+	}
+	stubs := GetStubsConfig(cg.Logger, cg.config, cg.domainType)
+	cg.GenerateFilesFromStubs(stubs, replacers)
+	return nil
+}
+
+func (cg *CodeGenerator) generateDomainFromHclBlock(block *hclwrite.Block, tableName string) map[string]string {
+	cg.needImportTime = false
+	domain := cg.generateDomainStruct(block.Body().Blocks(), tableName)
+	replacers := GetReplacersConfig(cg.config, cg.domainType, []string{tableName})
+	replacers["{{domainType}}"] = domain
+	replacers["{{optionalImports}}"] = ""
+	if cg.needImportTime {
+		replacers["{{optionalImports}}"] = `"time"`
+	}
+	return replacers
+}
+
+func (cg *CodeGenerator) generateDomainStruct(blocks []*hclwrite.Block, tableName string) string {
 	structString := "type " + PascalCase(tableName) + " struct {\n"
 	for _, block := range blocks {
 		if block.Type() == "column" {

@@ -84,12 +84,15 @@ func (g *Generator) DestroyDomain(_ *cobra.Command, args []string) {
 	)
 }
 
-func (g *Generator) GenerateFromDb(_ *cobra.Command, _ []string) {
+func (g *Generator) GenerateFromDb(_ *cobra.Command, args []string) {
+	if len(args) == 0 {
+		g.Logger.Error(errors.New("empty args"))
+	}
 	generator.NewCodeGenerator(
 		g.Logger,
 		g.Flags.validator,
 		g.Flags.domainType,
-	).ReadFromDb()
+	).ReadFromSchema(args[0])
 }
 
 func (g *Generator) BootGenerator(_ *cobra.Command, _ []string) {

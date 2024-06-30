@@ -94,7 +94,6 @@ func (cg *CodeGenerator) GenerateFilesFromStubs(stubs map[string]Stubs, replacer
 			if err != nil {
 				cg.Logger.Error(err)
 			}
-
 			continue
 		}
 

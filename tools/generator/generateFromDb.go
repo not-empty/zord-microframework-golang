@@ -21,9 +21,13 @@ func (cg *CodeGenerator) ReadFromDb() {
 			continue
 		}
 		tableName := block.Labels()[0]
+		cg.needImportTime = false
 		domain := cg.handleTable(block.Body().Blocks(), tableName)
 		cg.config.Replacers["crud"]["{{domainType}}"] = domain
-		cg.config.Replacers["crud"]["{{optionalImports}}"] = `"time"`
+		cg.config.Replacers["crud"]["{{optionalImports}}"] = ""
+		if cg.needImportTime {
+			cg.config.Replacers["crud"]["{{optionalImports}}"] = `"time"`
+		}
 		err := cg.validateFiles(domain)
 		if err != nil {
 			fmt.Println("Error validating files:", err)
@@ -89,6 +93,7 @@ func (cg *CodeGenerator) dbTypesToGoTypes(typo string) string {
 	}
 
 	if strings.Contains(typo, "time") {
+		cg.needImportTime = true
 		return "time.Time"
 	}
 	return typo

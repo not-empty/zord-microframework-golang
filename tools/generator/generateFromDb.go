@@ -191,51 +191,51 @@ func (cg *CodeGenerator) getColumnFromAttrString(attrStr string) string {
 
 func (cg *CodeGenerator) dbTypesToGoTypes(typo string) string {
 	dbTypesMap := map[string]string{
-		" bigint":     "int64",
-		" bit":        "bool",
-		" char":       "string",
-		" decimal":    "float64",
-		" float":      "float32",
-		" double":     "float64",
-		" int":        "int",
-		" longtext":   "string",
-		" mediumint":  "int",
-		" mediumtext": "string",
-		" smallint":   "int16",
-		" text":       "string",
-		" time":       "time.Time",
-		" timestamp":  "time.Time",
-		" datetime":   "time.Time",
-		" date":       "time.Time",
-		" tinyint":    "int8",
-		" tinytext":   "string",
-		" varbinary":  "string",
-		" varchar":    "string",
-		" json":       "string",
+		" bigint":     "*int64",
+		" bit":        "*bool",
+		" char":       "*string",
+		" decimal":    "*float64",
+		" float":      "*float32",
+		" double":     "*float64",
+		" int":        "*int",
+		" longtext":   "*string",
+		" mediumint":  "*int",
+		" mediumtext": "*string",
+		" smallint":   "*int16",
+		" text":       "*string",
+		" time":       "*string",
+		" timestamp":  "*string",
+		" datetime":   "*time.Time",
+		" date":       "*string",
+		" tinyint":    "*int8",
+		" tinytext":   "*string",
+		" varbinary":  "*string",
+		" varchar":    "*string",
+		" json":       "*string",
 	}
 
 	GolangType, ok := dbTypesMap[typo]
 	if ok {
-		if GolangType == "time.Time" {
+		if GolangType == "*time.Time" {
 			*cg.needImportTime = true
 		}
 		return GolangType
 	}
 
 	if strings.Contains(typo, "char") {
-		return "string"
+		return "*string"
 	}
 
 	if strings.Contains(typo, "double") {
-		return "float64"
+		return "*float64"
 	}
 
 	if strings.Contains(typo, "year") {
-		return "string"
+		return "*string"
 	}
 
 	if strings.Contains(typo, "decimal") {
-		return "float64"
+		return "*float64"
 	}
 
 	return typo

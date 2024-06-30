@@ -207,6 +207,7 @@ func (cg *CodeGenerator) dbTypesToGoTypes(typo string) string {
 		" tinytext":   "string",
 		" varbinary":  "string",
 		" varchar":    "string",
+		" json":       "string",
 	}
 
 	GolangType, ok := dbTypesMap[typo]
@@ -220,7 +221,16 @@ func (cg *CodeGenerator) dbTypesToGoTypes(typo string) string {
 	if strings.Contains(typo, "char") {
 		return "string"
 	}
+
 	if strings.Contains(typo, "double") {
+		return "float64"
+	}
+
+	if strings.Contains(typo, "year") {
+		return "string"
+	}
+
+	if strings.Contains(typo, "decimal") {
 		return "float64"
 	}
 

@@ -38,6 +38,10 @@ func (cg *CodeGenerator) handleHclBlock(block *hclwrite.Block) error {
 	if block.Type() == "schema" {
 		return nil
 	}
+	if len(block.Labels()) == 0 {
+		return nil
+	}
+
 	tableName := block.Labels()[0]
 	replacers := cg.generateDomainFromHclBlock(block, tableName)
 	validateErr := cg.validateFiles(tableName)
@@ -107,7 +111,7 @@ func (cg *CodeGenerator) generateStruct(blocks []*hclwrite.Block, pk, pkType *st
 }
 
 func (cg *CodeGenerator) generateDeclarationLine(str, name, goType, dbTag string) string {
-	if name == PascalCase(*cg.primaryKey) && goType == "int" {
+	if name == PascalCase(*cg.primaryKey) && strings.Contains(goType, "int") {
 		return fmt.Sprintf(
 			"%s	%s %s `db:\"%s\"`\n",
 			str,
@@ -127,7 +131,7 @@ func (cg *CodeGenerator) generateDeclarationLine(str, name, goType, dbTag string
 
 func (cg *CodeGenerator) generateCreateAttributionLine(str, name, goType, _ string) string {
 	if name == PascalCase(*cg.primaryKey) {
-		if goType == "int" {
+		if strings.Contains(goType, "int") {
 			return str
 		}
 		return fmt.Sprintf(
@@ -146,7 +150,7 @@ func (cg *CodeGenerator) generateCreateAttributionLine(str, name, goType, _ stri
 
 func (cg *CodeGenerator) generateEditAttributionLine(str, name, goType, _ string) string {
 	if name == PascalCase(*cg.primaryKey) {
-		if goType == "int" {
+		if strings.Contains(goType, "int") {
 			return str
 		}
 		return fmt.Sprintf(

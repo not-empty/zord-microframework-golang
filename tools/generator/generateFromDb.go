@@ -42,7 +42,13 @@ func (cg *CodeGenerator) handleTable(blocks []*hclwrite.Block, tableName string)
 			if !ok {
 				continue
 			}
-			structString = fmt.Sprintf("%s	%s %s `db:\"%s\"`\n", structString, PascalCase(block.Labels()[0]), cg.dbTypesToGoTypes(string(token.Expr().BuildTokens(nil).Bytes())), block.Labels()[0])
+			structString = fmt.Sprintf(
+				"%s	%s %s `db:\"%s\"`\n",
+				structString,
+				PascalCase(block.Labels()[0]),
+				cg.dbTypesToGoTypes(string(token.Expr().BuildTokens(nil).Bytes())),
+				block.Labels()[0],
+			)
 		}
 	}
 	structString += "}"
@@ -50,33 +56,32 @@ func (cg *CodeGenerator) handleTable(blocks []*hclwrite.Block, tableName string)
 }
 
 func (cg *CodeGenerator) dbTypesToGoTypes(typo string) string {
-	dbtypesMap := map[string]string{
-		"bigint":     "int64",
-		"bit":        "bool",
-		"char":       "string",
-		"decimal":    "float64",
-		"float":      "float32",
-		"double":     "float64",
-		"int":        "int",
-		"longtext":   "string",
-		"mediumint":  "int",
-		"mediumtext": "string",
-		"smallint":   "int16",
-		"text":       "string",
-		"time":       "time.Time",
-		"timestamp":  "time.Time",
-		"datetime":   "time.Time",
-		"date":       "time.Time",
-		"tinyint":    "int8",
-		"tinytext":   "string",
-		"varbinary":  "string",
-		"varchar":    "string",
+	dbTypesMap := map[string]string{
+		" bigint":     "int64",
+		" bit":        "bool",
+		" char":       "string",
+		" decimal":    "float64",
+		" float":      "float32",
+		" double":     "float64",
+		" int":        "int",
+		" longtext":   "string",
+		" mediumint":  "int",
+		" mediumtext": "string",
+		" smallint":   "int16",
+		" text":       "string",
+		" time":       "time.Time",
+		" timestamp":  "time.Time",
+		" datetime":   "time.Time",
+		" date":       "time.Time",
+		" tinyint":    "int8",
+		" tinytext":   "string",
+		" varbinary":  "string",
+		" varchar":    "string",
 	}
 
-	typ, ok := dbtypesMap[typo]
-	fmt.Println(typ)
+	GolangType, ok := dbTypesMap[typo]
 	if ok {
-		return typ
+		return GolangType
 	}
 
 	if strings.Contains(typo, "char") {

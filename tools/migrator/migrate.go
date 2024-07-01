@@ -77,7 +77,7 @@ func (m *Migrator) Inspect() {
 	fmt.Println(res)
 }
 
-func (m *Migrator) Generate() {
+func (m *Migrator) Generate(schemaName string) {
 	workdir, err := atlasexec.NewWorkingDir(
 		atlasexec.WithAtlasHCLPath("tools/migrator/schema/schema.my.hcl"),
 	)
@@ -101,7 +101,7 @@ func (m *Migrator) Generate() {
 		fmt.Printf("failed to inspect schema: %v", err)
 		return
 	}
-	err = os.WriteFile("tools/migrator/generated/database.hcl", []byte(res), 0755)
+	err = os.WriteFile("tools/migrator/schema/"+schemaName+".my.hcl", []byte(res), 0755)
 	if err != nil {
 		fmt.Println(err)
 		return

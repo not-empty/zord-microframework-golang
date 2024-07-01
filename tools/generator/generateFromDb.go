@@ -15,7 +15,6 @@ func (cg *CodeGenerator) ReadFromSchema(schema string, table string) {
 		return
 	}
 	for _, block := range file.Body().Blocks() {
-		fmt.Println(block.Labels()[0], table)
 		if table != "" && block.Labels()[0] != table {
 			continue
 		}

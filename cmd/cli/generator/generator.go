@@ -88,11 +88,15 @@ func (g *Generator) GenerateFromDb(_ *cobra.Command, args []string) {
 	if len(args) == 0 {
 		g.Logger.Error(errors.New("empty args"))
 	}
+	table := ""
+	if len(args) > 1 {
+		table = args[1]
+	}
 	generator.NewCodeGenerator(
 		g.Logger,
 		g.Flags.validator,
 		g.Flags.domainType,
-	).ReadFromSchema(args[0])
+	).ReadFromSchema(args[0], table)
 }
 
 func (g *Generator) BootGenerator(_ *cobra.Command, _ []string) {

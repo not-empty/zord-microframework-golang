@@ -8,13 +8,17 @@ import (
 	"strings"
 )
 
-func (cg *CodeGenerator) ReadFromSchema(schema string) {
+func (cg *CodeGenerator) ReadFromSchema(schema string, table string) {
 	file, hclErr := cg.getHclFile(schema)
 	if hclErr != nil {
 		fmt.Println("Error validating files:", hclErr)
 		return
 	}
 	for _, block := range file.Body().Blocks() {
+		fmt.Println(block.Labels()[0], table)
+		if table != "" && block.Labels()[0] != table {
+			continue
+		}
 		err := cg.handleHclBlock(block)
 		if err != nil {
 			fmt.Println("Error validating files:", err)
@@ -198,7 +202,7 @@ func (cg *CodeGenerator) getColumnFromAttrString(attrStr string) string {
 func (cg *CodeGenerator) dbTypesToGoTypes(typo string) string {
 	dbTypesMap := map[string]string{
 		" bigint":     "*int64",
-		" bit":        "*bool",
+		" bit":        "* ",
 		" char":       "*string",
 		" decimal":    "*float64",
 		" float":      "*float32",

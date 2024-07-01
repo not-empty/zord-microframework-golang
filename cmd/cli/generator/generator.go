@@ -94,6 +94,6 @@ func (g *Generator) BootGenerator(_ *cobra.Command, _ []string) {
 }
 
 func (g *Generator) initFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().StringVar(&g.Flags.domain, "domain", "", "Describe name to New Domain")
+	cmd.Flags().StringVar(&g.Flags.domain, "domain", "", "Describe name to New Domain")
 	cmd.MarkFlagsMutuallyExclusive("domain")
 }

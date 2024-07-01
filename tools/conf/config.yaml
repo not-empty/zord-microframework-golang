@@ -1,0 +1,4 @@
+domainsPath: "internal/application/domain/"
+schemasPath: "tools/migrator/schema/"
+supportedDrivers:
+  mysql: my

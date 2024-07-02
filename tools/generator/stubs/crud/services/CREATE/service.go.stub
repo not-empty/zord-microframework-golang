@@ -35,9 +35,8 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 }
 
 func (s *Service) produceResponseRule(data *Data) {
-	{{domainCamelCase}} := {{domain}}.{{domainPascalCase}}{
-		ID:   s.idCreator.Create(),
-	}
+    {{idVar}}
+	{{domainCamelCase}} := {{domain}}.{{domainPascalCase}}{{{createServiceData}}}
 
 		tx, txErr := s.repository.InitTX()
     	if txErr != nil {

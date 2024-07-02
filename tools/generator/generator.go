@@ -13,10 +13,14 @@ var (
 )
 
 type CodeGenerator struct {
-	Logger     *logger.Logger
-	config     *Config
-	validator  bool
-	domainType string
+	Logger         *logger.Logger
+	config         *Config
+	validator      bool
+	domainType     string
+	needImportTime *bool
+	primaryKey     *string
+	pkType         *string
+	isIntId        *bool
 }
 
 func NewCodeGenerator(logger *logger.Logger, validator bool, domainType string) *CodeGenerator {
@@ -61,16 +65,26 @@ func (cg *CodeGenerator) Handler(args []string) {
 	stubs := GetStubsConfig(cg.Logger, cg.config, cg.domainType)
 	replacers := GetReplacersConfig(cg.config, cg.domainType, args)
 	domain := args[0]
-	if FileExists("application/domain/"+domain+"/"+domain+".go") && cg.domainType == "crud" {
-		cg.Logger.Error(errors.New("domain already exists"))
+	err := cg.validateFiles(domain)
+	if err != nil {
+		cg.Logger.Error(err)
 		return
+	}
+	cg.GenerateFilesFromStubs(stubs, replacers)
+}
+
+func (cg *CodeGenerator) validateFiles(domain string) error {
+	if FileExists("application/domain/"+domain+"/"+domain+".go") && cg.domainType == "crud" {
+		return errors.New("domain already exists")
 	}
 
 	if FileExists("application/services/"+domain+"service.go") && cg.domainType == "usecase" {
-		cg.Logger.Error(errors.New("service already exists"))
-		return
+		return errors.New("service already exists")
 	}
+	return nil
+}
 
+func (cg *CodeGenerator) GenerateFilesFromStubs(stubs map[string]Stubs, replacers map[string]string) {
 	for name, stub := range stubs {
 		if !stub.IsGenerated {
 			data, err := GetFileData(stub.ToPath)
@@ -83,7 +97,6 @@ func (cg *CodeGenerator) Handler(args []string) {
 			if err != nil {
 				cg.Logger.Error(err)
 			}
-
 			continue
 		}
 

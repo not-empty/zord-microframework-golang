@@ -33,7 +33,7 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 }
 
 func (s *Service) produceResponseRule(data *Data) {
-	{{domainCamelCase}}, err := s.repository.Get("id", data.ID)
+	{{domainCamelCase}}, err := s.repository.Get("{{pkDbName}}", data.{{pkName}})
 
 	if err != nil {
 	    if err.Error() == "sql: no rows in result set" {

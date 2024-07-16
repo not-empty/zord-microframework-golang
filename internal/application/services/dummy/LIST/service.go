@@ -28,22 +28,23 @@ func (s *Service) Execute(request Request) {
 		s.BadRequest(err.Error())
 		return
 	}
-	s.produceResponseRule(request.Data.Page, 25, request.Filters)
+	s.produceResponseRule(request.Data.Page, 25, request.Filters, request.Client)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(page int, limit int, f filters.Filters) {
+func (s *Service) produceResponseRule(page int, limit int, f filters.Filters, client string) {
 	queryBuilder := s.repository.NewFilters()
 
 	for _, data := range f.ParsedData {
 		queryBuilder.SetWhere(data.Field, data.Operator, data.Value, data.IsString)
 		queryBuilder.And()
 	}
-
-	err, pagination := s.pagProv.PaginationHandler(page, limit, &queryBuilder)
+	domain := dummy.Dummy{}
+	domain = domain.SetClient(client)
+	err, pagination := s.pagProv.PaginationHandler(domain, page, limit, &queryBuilder)
 	if err != nil {
 		s.CustomError(err.Status, err)
 		return

@@ -26,11 +26,14 @@ services:
       retries: 2
     environment:
         MYSQL_ROOT_PASSWORD: root
-        MYSQL_DATABASE: skeleton
+        MYSQL_DATABASE: test
     ports:
         - "3307:3306"
     volumes:
-        - ./storage/mysql:/var/lib/mysql
+        - storage:/var/lib/mysql
+
+volumes:
+  storage:
 
 networks:
     default:

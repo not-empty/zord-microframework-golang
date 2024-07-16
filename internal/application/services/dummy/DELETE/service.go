@@ -25,15 +25,17 @@ func (s *Service) Execute(request Request) {
 		s.BadRequest(err.Error())
 		return
 	}
-	s.produceResponseRule(request.Data)
+	s.produceResponseRule(request.Data, request.Client)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(data *Data) {
-	err := s.repository.Delete("id", data.ID)
+func (s *Service) produceResponseRule(data *Data, client string) {
+	dummy := dummy.Dummy{}
+	dummy = dummy.SetClient(client)
+	err := s.repository.Delete(dummy, "id", data.ID)
 	if err != nil {
 		s.InternalServerError("error on delete", err)
 		return

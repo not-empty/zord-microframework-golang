@@ -8,6 +8,7 @@ import (
 type Request struct {
 	Data    *Data
 	Filters filters.Filters
+	Client  string
 }
 
 type Data struct {
@@ -16,10 +17,11 @@ type Data struct {
 	Email string
 }
 
-func NewRequest(data *Data, filters filters.Filters) Request {
+func NewRequest(data *Data, filters filters.Filters, client string) Request {
 	return Request{
 		Data:    data,
 		Filters: filters,
+		Client:  client,
 	}
 }
 

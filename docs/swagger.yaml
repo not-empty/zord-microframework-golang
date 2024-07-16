@@ -93,6 +93,11 @@ paths:
         in: query
         name: email
         type: string
+      - description: tenant name
+        in: header
+        name: Tenant
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -125,6 +130,11 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/go-skeleton_internal_application_services_dummy_CREATE.Data'
+      - description: tenant name
+        in: header
+        name: Tenant
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -157,6 +167,11 @@ paths:
         name: dummy_id
         required: true
         type: string
+      - description: tenant name
+        in: header
+        name: Tenant
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -186,6 +201,11 @@ paths:
       - description: Dummy ID
         in: path
         name: dummy_id
+        required: true
+        type: string
+      - description: tenant name
+        in: header
+        name: Tenant
         required: true
         type: string
       produces:
@@ -225,6 +245,11 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/go-skeleton_internal_application_services_dummy_EDIT.Data'
+      - description: tenant name
+        in: header
+        name: Tenant
+        required: true
+        type: string
       produces:
       - application/json
       responses:

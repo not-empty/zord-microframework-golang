@@ -43,6 +43,7 @@ func NewDummyHandlers(reg *registry.Registry) *DummyHandlers {
 // @Accept       json
 // @Produce      json
 // @Param        dummy_id path string true "Dummy ID"
+// @Param        Tenant header string true "tenant name"
 // @Success      200  {object}  dummyGet.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error
@@ -55,9 +56,9 @@ func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(422, errors)
 	}
-
+	tenant := context.Request().Header.Get("Tenant")
 	s.Execute(
-		dummyGet.NewRequest(data),
+		dummyGet.NewRequest(data, tenant),
 	)
 
 	response, err := s.GetResponse()
@@ -73,6 +74,7 @@ func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
 // @Accept       json
 // @Produce      json
 // @Param        request body dummyCreate.Data true "body model"
+// @Param        Tenant header string true "tenant name"
 // @Success      200  {object}  dummyCreate.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error
@@ -86,8 +88,9 @@ func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 		return context.JSON(http.StatusBadRequest, errors)
 	}
 
+	tenant := context.Request().Header.Get("Tenant")
 	s.Execute(
-		dummyCreate.NewRequest(data, hs.validator),
+		dummyCreate.NewRequest(data, hs.validator, tenant),
 	)
 
 	response, err := s.GetResponse()
@@ -104,6 +107,7 @@ func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 // @Produce      json
 // @Param        dummy_id path string true "Dummy ID"
 // @Param        request body dummyEdit.Data true "body model"
+// @Param        Tenant header string true "tenant name"
 // @Success      200  {object}  dummyEdit.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error
@@ -118,8 +122,9 @@ func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 		return context.JSON(http.StatusBadRequest, errors)
 	}
 
+	tenant := context.Request().Header.Get("Tenant")
 	s.Execute(
-		dummyEdit.NewRequest(id, data, hs.validator),
+		dummyEdit.NewRequest(id, data, hs.validator, tenant),
 	)
 
 	response, err := s.GetResponse()
@@ -137,6 +142,7 @@ func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 // @Param        page  query   int  true  "valid int"
 // @Param        name  query   string  false  "value example: eql|lik,value"
 // @Param        email  query   string  false  "value example: lik,value"
+// @Param        Tenant header string true "tenant name"
 // @Success      200  {object}  dummyList.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error
@@ -162,8 +168,9 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 
 	f := filters.NewFilters()
 
+	tenant := context.Request().Header.Get("Tenant")
 	s.Execute(
-		dummyList.NewRequest(data, *f),
+		dummyList.NewRequest(data, *f, tenant),
 	)
 
 	response, err := s.GetResponse()
@@ -179,6 +186,7 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 // @Accept       json
 // @Produce      json
 // @Param        dummy_id path string true "Dummy ID"
+// @Param        Tenant header string true "tenant name"
 // @Success      200  {object}  dummyDelete.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error
@@ -192,8 +200,9 @@ func (hs *DummyHandlers) HandleDeleteDummy(context echo.Context) error {
 		return context.JSON(http.StatusBadRequest, errors)
 	}
 
+	tenant := context.Request().Header.Get("Tenant")
 	s.Execute(
-		dummyDelete.NewRequest(data),
+		dummyDelete.NewRequest(data, tenant),
 	)
 
 	response, err := s.GetResponse()

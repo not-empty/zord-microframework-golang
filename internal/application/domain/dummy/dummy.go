@@ -9,10 +9,19 @@ type Dummy struct {
 	ID        string `db:"id"`
 	DummyName string `db:"name"`
 	Email     string `db:"email"`
+	client    string
+}
+
+func (d Dummy) SetClient(client string) Dummy {
+	d.client = client
+	return d
 }
 
 func (d Dummy) Schema() string {
-	return "dummies"
+	if d.client == "" {
+		return "dummy"
+	}
+	return d.client + "." + "dummy"
 }
 
 type Repository interface {

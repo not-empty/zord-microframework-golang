@@ -5,12 +5,14 @@ type Data struct {
 }
 
 type Request struct {
-	Data *Data
+	Data   *Data
+	Client string
 }
 
-func NewRequest(data *Data) Request {
+func NewRequest(data *Data, client string) Request {
 	return Request{
-		Data: data,
+		Data:   data,
+		Client: client,
 	}
 }
 

@@ -12,15 +12,17 @@ type Data struct {
 
 type Request struct {
 	ID        string
+	Client    string
 	Data      *Data
 	validator services.Validator
 }
 
-func NewRequest(id string, data *Data, validator services.Validator) Request {
+func NewRequest(id string, data *Data, validator services.Validator, client string) Request {
 	return Request{
 		Data:      data,
 		ID:        id,
 		validator: validator,
+		Client:    client,
 	}
 }
 

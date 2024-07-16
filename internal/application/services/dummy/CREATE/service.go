@@ -28,19 +28,20 @@ func (s *Service) Execute(request Request) {
 		return
 	}
 
-	s.produceResponseRule(request.Data)
+	s.produceResponseRule(request.Data, request.Client)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(data *Data) {
-	dummy := dummy.Dummy{
+func (s *Service) produceResponseRule(data *Data, client string) {
+	dummyData := dummy.Dummy{
 		ID:        s.idCreator.Create(),
 		DummyName: data.DummyName,
 		Email:     data.Email,
 	}
+	dummyData = dummyData.SetClient(client)
 
 	tx, txErr := s.repository.InitTX()
 	if txErr != nil {
@@ -48,13 +49,13 @@ func (s *Service) produceResponseRule(data *Data) {
 		return
 	}
 
-	err := s.repository.Create(dummy, tx, true)
+	err := s.repository.Create(dummyData, tx, true)
 	if err != nil {
 		s.InternalServerError("error on create", err)
 		return
 	}
 
 	s.response = &Response{
-		Data: dummy,
+		Data: dummyData,
 	}
 }

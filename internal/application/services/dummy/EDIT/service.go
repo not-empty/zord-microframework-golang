@@ -26,19 +26,20 @@ func (s *Service) Execute(request Request) {
 		return
 	}
 
-	s.produceResponseRule(request.ID, request.Data)
+	s.produceResponseRule(request.ID, request.Client, request.Data)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(id string, data *Data) {
+func (s *Service) produceResponseRule(id string, client string, data *Data) {
 	dummyDomain := dummy.Dummy{
 		ID:        id,
 		DummyName: data.DummyName,
 		Email:     data.Email,
 	}
+	dummyDomain = dummyDomain.SetClient(client)
 
 	affected, err := s.repository.Edit(dummyDomain, "id", id)
 	if err != nil {

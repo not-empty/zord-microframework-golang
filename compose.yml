@@ -10,14 +10,14 @@ services:
       - "9000:9000"
     command: air http
     depends_on:
-      mysql:
+      zord-mysql:
         condition: service_healthy
     volumes:
       - ./:/app
 
-  mysql:
+  zord-mysql:
     image: mysql:latest
-    container_name: mysql
+    container_name: zord-mysql
     healthcheck:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
       start_period: 5s

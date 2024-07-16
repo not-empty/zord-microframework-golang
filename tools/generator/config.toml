@@ -37,6 +37,17 @@ table "{{domain}}" {
 //tableEnd
 
 $repeat$"""
+"{{domainType}}" = """type {{domainPascalCase}} struct {
+  ID   string `db:"id"`
+}"""
+"{{pkType}}" = "ID string `param:\"id\"`"
+"{{pkName}}" = "ID"
+"{{pkDbName}}" = "id"
+"{{dataType}}" = ""
+"{{createServiceData}}" = "ID:   s.idCreator.Create(),"
+"{{editServiceData}}" = "ID:        id,"
+"{{optionalImports}}" = ""
+"{{idVar}}" = ""
 
 [stubs.crud.domain]
 toPath = "internal/application/domain/{{domain}}/"

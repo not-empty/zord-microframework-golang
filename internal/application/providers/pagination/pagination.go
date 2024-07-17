@@ -1,6 +1,7 @@
 package pagination
 
 import (
+	"fmt"
 	"go-skeleton/internal/application/services"
 	"go-skeleton/internal/repositories/base_repository"
 	"math"
@@ -8,7 +9,7 @@ import (
 )
 
 type IPaginationProvider[Row any] interface {
-	PaginationHandler(row Row, page int, limit int, filters *base_repository.QueryBuilder) (*services.Error, *Pagination[Row])
+	PaginationHandler(row Row, page int, limit int) (*services.Error, *Pagination[Row])
 }
 
 type Pagination[Row any] struct {
@@ -18,8 +19,8 @@ type Pagination[Row any] struct {
 }
 
 type IPaginationRepository[Row any] interface {
-	List(domain Row, limit int, offset int, filters *base_repository.QueryBuilder) (*[]Row, error)
-	Count(domain Row, filters *base_repository.QueryBuilder) (int64, error)
+	List(domain Row, limit int, offset int) (*[]Row, error)
+	Count(domain Row) (int64, error)
 }
 
 type Provider[Row base_repository.Domain] struct {
@@ -32,11 +33,11 @@ func NewPaginationProvider[Row base_repository.Domain](repo IPaginationRepositor
 	}
 }
 
-func (pp *Provider[Row]) PaginationHandler(row Row, page int, limit int, filters *base_repository.QueryBuilder) (*services.Error, *Pagination[Row]) {
+func (pp *Provider[Row]) PaginationHandler(row Row, page int, limit int) (*services.Error, *Pagination[Row]) {
 	listData := &[]Row{}
 	offset := (page - 1) * limit
-
-	total, err := pp.repo.Count(row, filters)
+	fmt.Println(row)
+	total, err := pp.repo.Count(row)
 	if err != nil {
 		return &services.Error{
 			Status:  http.StatusInternalServerError,
@@ -54,7 +55,7 @@ func (pp *Provider[Row]) PaginationHandler(row Row, page int, limit int, filters
 
 	totalPages := math.Ceil(float64(total) / float64(limit))
 	if page <= int(totalPages) {
-		listData, err = pp.repo.List(row, limit, offset, filters)
+		listData, err = pp.repo.List(row, limit, offset)
 		if err != nil {
 			return &services.Error{
 				Status:  http.StatusInternalServerError,

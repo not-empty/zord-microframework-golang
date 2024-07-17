@@ -3,6 +3,7 @@ package base_repository
 import (
 	"errors"
 	"fmt"
+	"go-skeleton/internal/application/providers/filters"
 	"strings"
 
 	"github.com/fatih/structs"
@@ -12,19 +13,20 @@ import (
 type BaseRepository[dom Domain] interface {
 	Get(domain dom, field string, value string) (*dom, error)
 	Create(data dom, tx *sqlx.Tx, autoCommit bool) error
-	List(domain dom, limit int, offset int, filters *QueryBuilder) (*[]dom, error)
+	List(domain dom, limit int, offset int) (*[]dom, error)
 	Search(domain dom, field string, value string) (*[]dom, error)
 	Edit(data dom, field string, value string) (int, error)
 	Delete(domain dom, field string, values string) error
-	Count(Data dom, filters *QueryBuilder) (int64, error)
+	Count(Data dom) (int64, error)
 	InitTX() (*sqlx.Tx, error)
 	Commit(tx *sqlx.Tx) error
 	Rollback(tx *sqlx.Tx, err error) error
-	NewFilters() QueryBuilder
+	NewFilters() *QueryBuilder
 }
 
 type Domain interface {
 	Schema() string
+	GetFilters() filters.Filters
 }
 
 type BaseRepo[dom Domain] struct {
@@ -67,8 +69,8 @@ func (repo *BaseRepo[Domain]) Rollback(tx *sqlx.Tx, err error) error {
 	return err
 }
 
-func (repo *BaseRepo[Domain]) NewFilters() QueryBuilder {
-	return QueryBuilder{
+func (repo *BaseRepo[Domain]) NewFilters() *QueryBuilder {
+	return &QueryBuilder{
 		Fields: "",
 		Where:  "",
 		Order:  "",
@@ -132,12 +134,16 @@ func (repo *BaseRepo[Domain]) Create(Data Domain, tx *sqlx.Tx, autoCommit bool) 
 	return nil
 }
 
-func (repo *BaseRepo[Domain]) List(Data Domain, limit int, offset int, filters *QueryBuilder) (*[]Domain, error) {
+func (repo *BaseRepo[Domain]) List(Data Domain, limit int, offset int) (*[]Domain, error) {
 	var results []Domain
-	where := ""
-	if filters != nil {
-		where = filters.GetWhere()
+	queryBuilder := repo.NewFilters()
+	f := Data.GetFilters()
+	for _, data := range f.ParsedData {
+		queryBuilder.SetWhere(data.Field, data.Operator, data.Value, data.IsString)
+		queryBuilder.And()
 	}
+
+	where := queryBuilder.GetWhere()
 
 	rows, err := repo.Mysql.Queryx(
 		fmt.Sprintf(
@@ -239,12 +245,16 @@ func (repo *BaseRepo[Domain]) Delete(Data Domain, field string, value string) er
 	return err
 }
 
-func (repo *BaseRepo[Domain]) Count(Data Domain, filters *QueryBuilder) (int64, error) {
+func (repo *BaseRepo[Domain]) Count(Data Domain) (int64, error) {
 	var count int64
-	where := ""
-	if filters != nil {
-		where = filters.GetWhere()
+	queryBuilder := repo.NewFilters()
+	f := Data.GetFilters()
+	for _, data := range f.ParsedData {
+		queryBuilder.SetWhere(data.Field, data.Operator, data.Value, data.IsString)
+		queryBuilder.And()
 	}
+
+	where := queryBuilder.GetWhere()
 	err := repo.Mysql.Get(&count, "SELECT count(1) FROM "+Data.Schema()+" "+where)
 	return count, err
 }

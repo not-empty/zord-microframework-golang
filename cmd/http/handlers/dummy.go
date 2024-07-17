@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	requestContext "go-skeleton/internal/application/context"
 	"go-skeleton/internal/application/domain/dummy"
 	"go-skeleton/internal/application/providers/filters"
 	"go-skeleton/internal/application/providers/pagination"
@@ -57,8 +58,11 @@ func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
 		return context.JSON(422, errors)
 	}
 	tenant := context.Request().Header.Get("Tenant")
+	request := dummyGet.NewRequest(data)
+	ctx := requestContext.NewPrepareContext(tenant)
+	ctx.SetContext(request.Domain)
 	s.Execute(
-		dummyGet.NewRequest(data, tenant),
+		request,
 	)
 
 	response, err := s.GetResponse()
@@ -89,8 +93,11 @@ func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 	}
 
 	tenant := context.Request().Header.Get("Tenant")
+	request := dummyCreate.NewRequest(data, hs.validator)
+	ctx := requestContext.NewPrepareContext(tenant)
+	ctx.SetContext(request.Domain)
 	s.Execute(
-		dummyCreate.NewRequest(data, hs.validator, tenant),
+		request,
 	)
 
 	response, err := s.GetResponse()
@@ -123,8 +130,11 @@ func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 	}
 
 	tenant := context.Request().Header.Get("Tenant")
+	request := dummyEdit.NewRequest(id, data, hs.validator)
+	ctx := requestContext.NewPrepareContext(tenant)
+	ctx.SetContext(request.Domain)
 	s.Execute(
-		dummyEdit.NewRequest(id, data, hs.validator, tenant),
+		request,
 	)
 
 	response, err := s.GetResponse()
@@ -169,8 +179,11 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 	f := filters.NewFilters()
 
 	tenant := context.Request().Header.Get("Tenant")
+	request := dummyList.NewRequest(data, f)
+	ctx := requestContext.NewPrepareContext(tenant)
+	ctx.SetContext(request.Domain)
 	s.Execute(
-		dummyList.NewRequest(data, *f, tenant),
+		request,
 	)
 
 	response, err := s.GetResponse()
@@ -201,8 +214,11 @@ func (hs *DummyHandlers) HandleDeleteDummy(context echo.Context) error {
 	}
 
 	tenant := context.Request().Header.Get("Tenant")
+	request := dummyDelete.NewRequest(data)
+	ctx := requestContext.NewPrepareContext(tenant)
+	ctx.SetContext(request.Domain)
 	s.Execute(
-		dummyDelete.NewRequest(data, tenant),
+		request,
 	)
 
 	response, err := s.GetResponse()

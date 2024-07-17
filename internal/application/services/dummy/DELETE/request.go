@@ -1,18 +1,21 @@
 package dummy
 
+import "go-skeleton/internal/application/domain/dummy"
+
 type Data struct {
 	ID string `param:"id"`
 }
 
 type Request struct {
 	Data   *Data
-	Client string
+	Domain *dummy.Dummy
 }
 
-func NewRequest(data *Data, client string) Request {
+func NewRequest(data *Data) Request {
+	domain := &dummy.Dummy{}
 	return Request{
 		Data:   data,
-		Client: client,
+		Domain: domain,
 	}
 }
 

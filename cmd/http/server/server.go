@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	echoSwagger "github.com/swaggo/echo-swagger"
+	"go-skeleton/cmd/http/middlewares"
 	"go-skeleton/cmd/http/routes"
 	"go-skeleton/docs"
 	"go-skeleton/pkg/config"
@@ -42,6 +43,7 @@ func (hs *Server) Start() {
 	}
 
 	server.Use(middleware.Recover())
+	server.Use(middlewares.SetTenant)
 
 	public := server.Group("")
 	private := server.Group("")

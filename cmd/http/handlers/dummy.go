@@ -57,7 +57,7 @@ func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(422, errors)
 	}
-	tenant := context.Request().Header.Get("Tenant")
+	tenant := context.Get("tenant").(string)
 	request := dummyGet.NewRequest(data)
 	ctx := requestContext.NewPrepareContext(tenant)
 	ctx.SetContext(request.Domain)
@@ -92,7 +92,7 @@ func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 		return context.JSON(http.StatusBadRequest, errors)
 	}
 
-	tenant := context.Request().Header.Get("Tenant")
+	tenant := context.Get("tenant").(string)
 	request := dummyCreate.NewRequest(data, hs.validator)
 	ctx := requestContext.NewPrepareContext(tenant)
 	ctx.SetContext(request.Domain)
@@ -129,7 +129,7 @@ func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 		return context.JSON(http.StatusBadRequest, errors)
 	}
 
-	tenant := context.Request().Header.Get("Tenant")
+	tenant := context.Get("tenant").(string)
 	request := dummyEdit.NewRequest(id, data, hs.validator)
 	ctx := requestContext.NewPrepareContext(tenant)
 	ctx.SetContext(request.Domain)
@@ -178,7 +178,7 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 
 	f := filters.NewFilters()
 
-	tenant := context.Request().Header.Get("Tenant")
+	tenant := context.Get("tenant").(string)
 	request := dummyList.NewRequest(data, f)
 	ctx := requestContext.NewPrepareContext(tenant)
 	ctx.SetContext(request.Domain)
@@ -212,8 +212,7 @@ func (hs *DummyHandlers) HandleDeleteDummy(context echo.Context) error {
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(http.StatusBadRequest, errors)
 	}
-
-	tenant := context.Request().Header.Get("Tenant")
+	tenant := context.Get("tenant").(string)
 	request := dummyDelete.NewRequest(data)
 	ctx := requestContext.NewPrepareContext(tenant)
 	ctx.SetContext(request.Domain)

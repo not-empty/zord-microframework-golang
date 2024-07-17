@@ -1,7 +1,6 @@
 package pagination
 
 import (
-	"fmt"
 	"go-skeleton/internal/application/services"
 	"go-skeleton/internal/repositories/base_repository"
 	"math"
@@ -36,7 +35,6 @@ func NewPaginationProvider[Row base_repository.Domain](repo IPaginationRepositor
 func (pp *Provider[Row]) PaginationHandler(row Row, page int, limit int) (*services.Error, *Pagination[Row]) {
 	listData := &[]Row{}
 	offset := (page - 1) * limit
-	fmt.Println(row)
 	total, err := pp.repo.Count(row)
 	if err != nil {
 		return &services.Error{

@@ -25,7 +25,6 @@ func NewGenerator() *Generator {
 }
 
 func (g *Generator) DeclareCommands(cmd *cobra.Command) {
-	g.initFlags(cmd)
 	createDomain := &cobra.Command{
 		Use:    "create-domain",
 		Short:  "Create a new domain service",
@@ -48,6 +47,19 @@ func (g *Generator) DeclareCommands(cmd *cobra.Command) {
 	cmd.AddCommand(
 		createDomain,
 		destroyDomain,
+	)
+}
+
+func (g *Generator) DeclareDomainCreatorFromSchema(cmd *cobra.Command) {
+	generateFromDb := &cobra.Command{
+		Use:    "create-domain-from-schema",
+		Short:  "create-domain-from-schema <schema name> <table name>",
+		Long:   "this command will read the chosen schema and create a crud for each table (if you pass a specific table it will generate only this)",
+		PreRun: g.BootGenerator,
+		Run:    g.GenerateFromDb,
+	}
+	cmd.AddCommand(
+		generateFromDb,
 	)
 }
 
@@ -76,6 +88,21 @@ func (g *Generator) DestroyDomain(_ *cobra.Command, args []string) {
 	)
 }
 
+func (g *Generator) GenerateFromDb(_ *cobra.Command, args []string) {
+	if len(args) == 0 {
+		g.Logger.Error(errors.New("empty args"))
+	}
+	table := ""
+	if len(args) > 1 {
+		table = args[1]
+	}
+	generator.NewCodeGenerator(
+		g.Logger,
+		g.Flags.validator,
+		g.Flags.domainType,
+	).ReadFromSchema(args[0], table)
+}
+
 func (g *Generator) BootGenerator(_ *cobra.Command, _ []string) {
 	conf := config.NewConfig()
 	err := conf.LoadEnvs()
@@ -91,9 +118,4 @@ func (g *Generator) BootGenerator(_ *cobra.Command, _ []string) {
 
 	l.Boot()
 	g.Logger = l
-}
-
-func (g *Generator) initFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().StringVar(&g.Flags.domain, "domain", "", "Describe name to New Domain")
-	cmd.MarkFlagsMutuallyExclusive("domain")
 }

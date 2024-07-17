@@ -3,11 +3,10 @@ package {{domain}}
 import (
 	"go-skeleton/internal/application/providers/pagination"
 	"go-skeleton/internal/repositories/base_repository"
+	{{optionalImports}}
 )
 
-type {{domainPascalCase}} struct {
-	ID   string `db:"id"`
-}
+{{domainType}}
 
 func (d {{domainPascalCase}}) Schema() string {
 	return "{{domain}}"

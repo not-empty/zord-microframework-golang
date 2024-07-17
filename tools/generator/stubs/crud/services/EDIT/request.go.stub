@@ -3,27 +3,27 @@ package {{domain}}
 import (
 	"errors"
 	{{validatorImport}}
+	{{optionalImports}}
 )
 
-type Data struct {
-}
+type Data struct {{{dataType}}}
 
 type Request struct {
 	Data *Data
-	ID string
+	{{pkType}}
 	{{validator}}
 }
 
 func NewRequest(id string, data *Data{{,validator}}) Request {
 	return Request{
 		Data: data,
-		ID: id,
+		{{pkName}}: id,
 		{{validatorInject}}
 	}
 }
 
 func (r *Request) Validate() error {
-	if r.ID == "" {
+	if r.{{pkName}} == "" {
 		return errors.New("invalid id")
 	}
 

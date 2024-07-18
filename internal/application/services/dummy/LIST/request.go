@@ -2,12 +2,14 @@ package dummy
 
 import (
 	"errors"
+	"go-skeleton/internal/application/domain/dummy"
 	"go-skeleton/internal/application/providers/filters"
 )
 
 type Request struct {
 	Data    *Data
-	Filters filters.Filters
+	Filters *filters.Filters
+	Domain  *dummy.Dummy
 }
 
 type Data struct {
@@ -16,36 +18,18 @@ type Data struct {
 	Email string
 }
 
-func NewRequest(data *Data, filters filters.Filters) Request {
+func NewRequest(data *Data, filters *filters.Filters) Request {
+	domain := &dummy.Dummy{}
 	return Request{
 		Data:    data,
 		Filters: filters,
+		Domain:  domain,
 	}
 }
 
 func (r *Request) Validate() error {
 	if r.Data.Page <= 0 {
 		return errors.New("invalid page")
-	}
-
-	parseErr := r.Filters.Parse(
-		map[string]string{
-			"name":  "eql,lik",
-			"email": "lik",
-		},
-		map[string]filters.FilterData{
-			"name": {
-				Value:    r.Data.Name,
-				IsString: true,
-			},
-			"email": {
-				Value:    r.Data.Email,
-				IsString: true,
-			},
-		})
-
-	if parseErr != nil {
-		return parseErr
 	}
 
 	return nil

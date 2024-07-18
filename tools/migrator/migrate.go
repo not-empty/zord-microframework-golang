@@ -10,20 +10,22 @@ import (
 )
 
 type Migrator struct {
-	dsn     string
-	dsnTest string
+	dsn          string
+	dsnTest      string
+	databaseName string
 }
 
-func NewMigrator(dsn string, dsnTest string) *Migrator {
+func NewMigrator(dsn string, dsnTest string, databaseName string) *Migrator {
 	return &Migrator{
-		dsn:     dsn,
-		dsnTest: dsnTest,
+		dsn:          dsn,
+		dsnTest:      dsnTest,
+		databaseName: databaseName,
 	}
 }
 
-func (m *Migrator) MigrateAllDomains() {
+func (m *Migrator) MigrateAllDomains(Tenant string) {
 	workdir, err := atlasexec.NewWorkingDir(
-		atlasexec.WithAtlasHCLPath("tools/migrator/schema/schema.my.hcl"),
+		atlasexec.WithAtlasHCLPath("schemas/schema.my.hcl"),
 	)
 	if err != nil {
 		fmt.Printf("failed to load working directory: %v", err)
@@ -37,11 +39,28 @@ func (m *Migrator) MigrateAllDomains() {
 		return
 	}
 
-	res, err := client.SchemaApply(context.Background(), &atlasexec.SchemaApplyParams{
+	params := &atlasexec.SchemaApplyParams{
 		DevURL: "mysql://" + m.dsnTest,
 		To:     "file://" + workdir.Path(),
 		URL:    "mysql://" + m.dsn,
-	})
+		Vars: atlasexec.Vars{
+			"database": m.databaseName,
+		},
+		Schema: []string{
+			m.databaseName,
+		},
+	}
+
+	if Tenant != "" {
+		params.Vars = atlasexec.Vars{
+			"database": Tenant,
+		}
+		params.Schema = []string{
+			Tenant,
+		}
+	}
+
+	res, err := client.SchemaApply(context.Background(), params)
 	if err != nil {
 		fmt.Printf("failed to apply migrations: %v", err)
 		return
@@ -52,7 +71,7 @@ func (m *Migrator) MigrateAllDomains() {
 
 func (m *Migrator) Inspect() {
 	workdir, err := atlasexec.NewWorkingDir(
-		atlasexec.WithAtlasHCLPath("tools/migrator/schema/schema.my.hcl"),
+		atlasexec.WithAtlasHCLPath("schemas/schema.my.hcl"),
 	)
 	if err != nil {
 		fmt.Printf("failed to load working directory: %v", err)
@@ -79,7 +98,7 @@ func (m *Migrator) Inspect() {
 
 func (m *Migrator) Generate(schemaName string) {
 	workdir, err := atlasexec.NewWorkingDir(
-		atlasexec.WithAtlasHCLPath("tools/migrator/schema/schema.my.hcl"),
+		atlasexec.WithAtlasHCLPath("schemas/schema.my.hcl"),
 	)
 	if err != nil {
 		fmt.Printf("failed to load working directory: %v", err)

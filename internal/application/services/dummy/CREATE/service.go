@@ -22,25 +22,22 @@ func NewService(log services.Logger, repository dummy.Repository, idCreator serv
 	}
 }
 
-func (s *Service) Execute(request Request) {
+func (s *Service) Execute(request *Request) {
 	if err := request.Validate(); err != nil {
 		s.BadRequest(err.Error())
 		return
 	}
-
-	s.produceResponseRule(request.Data)
+	s.produceResponseRule(request.Data, request.Domain)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(data *Data) {
-	dummy := dummy.Dummy{
-		ID:        s.idCreator.Create(),
-		DummyName: data.DummyName,
-		Email:     data.Email,
-	}
+func (s *Service) produceResponseRule(data *Data, dummyData *dummy.Dummy) {
+	dummyData.ID = s.idCreator.Create()
+	dummyData.DummyName = data.DummyName
+	dummyData.Email = data.Email
 
 	tx, txErr := s.repository.InitTX()
 	if txErr != nil {
@@ -48,13 +45,13 @@ func (s *Service) produceResponseRule(data *Data) {
 		return
 	}
 
-	err := s.repository.Create(dummy, tx, true)
+	err := s.repository.Create(*dummyData, tx, true)
 	if err != nil {
 		s.InternalServerError("error on create", err)
 		return
 	}
 
 	s.response = &Response{
-		Data: dummy,
+		Data: *dummyData,
 	}
 }

@@ -46,6 +46,13 @@ const docTemplate = `{
                         "description": "value example: lik,value",
                         "name": "email",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "tenant name",
+                        "name": "Tenant",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -95,6 +102,13 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/go-skeleton_internal_application_services_dummy_CREATE.Data"
                         }
+                    },
+                    {
+                        "type": "string",
+                        "description": "tenant name",
+                        "name": "Tenant",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -143,6 +157,13 @@ const docTemplate = `{
                         "description": "Dummy ID",
                         "name": "dummy_id",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "tenant name",
+                        "name": "Tenant",
+                        "in": "header",
                         "required": true
                     }
                 ],
@@ -200,6 +221,13 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/go-skeleton_internal_application_services_dummy_EDIT.Data"
                         }
+                    },
+                    {
+                        "type": "string",
+                        "description": "tenant name",
+                        "name": "Tenant",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -246,6 +274,13 @@ const docTemplate = `{
                         "description": "Dummy ID",
                         "name": "dummy_id",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "tenant name",
+                        "name": "Tenant",
+                        "in": "header",
                         "required": true
                     }
                 ],

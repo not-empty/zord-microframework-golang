@@ -2,6 +2,7 @@ package dummy
 
 import (
 	"errors"
+	"go-skeleton/internal/application/domain/dummy"
 	"go-skeleton/internal/application/services"
 )
 
@@ -13,14 +14,17 @@ type Data struct {
 type Request struct {
 	ID        string
 	Data      *Data
+	Domain    *dummy.Dummy
 	validator services.Validator
 }
 
 func NewRequest(id string, data *Data, validator services.Validator) Request {
+	domain := &dummy.Dummy{}
 	return Request{
 		Data:      data,
 		ID:        id,
 		validator: validator,
+		Domain:    domain,
 	}
 }
 

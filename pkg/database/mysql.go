@@ -42,7 +42,6 @@ func (m *MySql) Connect() {
 		Passwd:    m.DbPass,
 		Addr:      m.DbUrl + ":" + m.DbPort,
 		Net:       "tcp",
-		DBName:    m.Database,
 		ParseTime: true,
 	}
 

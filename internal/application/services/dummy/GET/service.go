@@ -25,15 +25,15 @@ func (s *Service) Execute(request Request) {
 		s.BadRequest(err.Error())
 		return
 	}
-	s.produceResponseRule(request.Data)
+	s.produceResponseRule(request.Data, request.Client, request.Domain)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(data *Data) {
-	dummyData, err := s.repository.Get("id", data.ID)
+func (s *Service) produceResponseRule(data *Data, client string, domain *dummy.Dummy) {
+	dummyData, err := s.repository.Get(*domain, "id", data.ID)
 
 	if err != nil {
 		if err.Error() != "sql: no rows in result set" {

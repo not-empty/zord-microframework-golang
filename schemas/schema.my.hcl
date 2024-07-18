@@ -1,4 +1,4 @@
-table "dummies" {
+table "dummy" {
   schema = schema.skeleton
   column "id" {
     null = false
@@ -19,7 +19,12 @@ table "dummies" {
 
 //{{newTable}}
 
+variable "database" {
+  type = string
+}
+
 schema "skeleton" {
+  name = var.database
   charset = "utf8mb4"
   collate = "utf8mb4_0900_ai_ci"
 }

@@ -3,6 +3,7 @@ package base_repository
 import (
 	"errors"
 	"fmt"
+	"go-skeleton/internal/application/providers/filters"
 	"strings"
 
 	"github.com/fatih/structs"
@@ -10,21 +11,22 @@ import (
 )
 
 type BaseRepository[dom Domain] interface {
-	Get(field string, value string) (*dom, error)
+	Get(domain dom, field string, value string) (*dom, error)
 	Create(data dom, tx *sqlx.Tx, autoCommit bool) error
-	List(limit int, offset int, filters *QueryBuilder) (*[]dom, error)
-	Search(field string, value string) (*[]dom, error)
+	List(domain dom, limit int, offset int) (*[]dom, error)
+	Search(domain dom, field string, value string) (*[]dom, error)
 	Edit(data dom, field string, value string) (int, error)
-	Delete(field string, values string) error
-	Count(filters *QueryBuilder) (int64, error)
+	Delete(domain dom, field string, values string) error
+	Count(Data dom) (int64, error)
 	InitTX() (*sqlx.Tx, error)
 	Commit(tx *sqlx.Tx) error
 	Rollback(tx *sqlx.Tx, err error) error
-	NewFilters() QueryBuilder
+	NewFilters() *QueryBuilder
 }
 
 type Domain interface {
 	Schema() string
+	GetFilters() filters.Filters
 }
 
 type BaseRepo[dom Domain] struct {
@@ -37,6 +39,9 @@ func NewBaseRepository[dom Domain](mysql *sqlx.DB) *BaseRepo[dom] {
 	listFields := []string{}
 	fields := structs.Fields(&do)
 	for _, field := range fields {
+		if !field.IsExported() {
+			continue
+		}
 		tag := field.Tag("db")
 		listFields = append(listFields, tag)
 	}
@@ -64,8 +69,8 @@ func (repo *BaseRepo[Domain]) Rollback(tx *sqlx.Tx, err error) error {
 	return err
 }
 
-func (repo *BaseRepo[Domain]) NewFilters() QueryBuilder {
-	return QueryBuilder{
+func (repo *BaseRepo[Domain]) NewFilters() *QueryBuilder {
+	return &QueryBuilder{
 		Fields: "",
 		Where:  "",
 		Order:  "",
@@ -74,8 +79,7 @@ func (repo *BaseRepo[Domain]) NewFilters() QueryBuilder {
 	}
 }
 
-func (repo *BaseRepo[Domain]) Get(field string, value string) (*Domain, error) {
-	var Data Domain
+func (repo *BaseRepo[Domain]) Get(Data Domain, field string, value string) (*Domain, error) {
 	row := repo.Mysql.QueryRowx(
 		fmt.Sprintf(
 			"SELECT %s FROM %s WHERE %s = ?",
@@ -92,20 +96,19 @@ func (repo *BaseRepo[Domain]) Get(field string, value string) (*Domain, error) {
 	return &Data, nil
 }
 
-func (repo *BaseRepo[Row]) Create(d Row, tx *sqlx.Tx, autoCommit bool) error {
+func (repo *BaseRepo[Domain]) Create(Data Domain, tx *sqlx.Tx, autoCommit bool) error {
 	namedValues := []string{}
 	for _, field := range repo.fields {
 		namedValues = append(namedValues, ":"+field)
 	}
-
 	res, err := tx.NamedExec(
 		fmt.Sprintf(
 			`INSERT INTO %s (%s) VALUES (%s)`,
-			d.Schema(),
+			Data.Schema(),
 			strings.Join(repo.fields, ", "),
 			strings.Join(namedValues, ", "),
 		),
-		d,
+		Data,
 	)
 
 	if err != nil {
@@ -131,14 +134,16 @@ func (repo *BaseRepo[Row]) Create(d Row, tx *sqlx.Tx, autoCommit bool) error {
 	return nil
 }
 
-func (repo *BaseRepo[Row]) List(limit int, offset int, filters *QueryBuilder) (*[]Row, error) {
-	var data []Row
-	var value Row
-
-	where := ""
-	if filters != nil {
-		where = filters.GetWhere()
+func (repo *BaseRepo[Domain]) List(Data Domain, limit int, offset int) (*[]Domain, error) {
+	var results []Domain
+	queryBuilder := repo.NewFilters()
+	f := Data.GetFilters()
+	for _, data := range f.ParsedData {
+		queryBuilder.SetWhere(data.Field, data.Operator, data.Value, data.IsString)
+		queryBuilder.And()
 	}
+
+	where := queryBuilder.GetWhere()
 
 	rows, err := repo.Mysql.Queryx(
 		fmt.Sprintf(
@@ -149,7 +154,7 @@ func (repo *BaseRepo[Row]) List(limit int, offset int, filters *QueryBuilder) (*
 					%s
 					LIMIT %v OFFSET %v`,
 			strings.Join(repo.fields, ", "),
-			value.Schema(),
+			Data.Schema(),
 			where,
 			limit,
 			offset,
@@ -160,19 +165,19 @@ func (repo *BaseRepo[Row]) List(limit int, offset int, filters *QueryBuilder) (*
 	}
 
 	for rows.Next() {
-		err := rows.StructScan(&value)
+		err := rows.StructScan(&Data)
 		if err != nil {
 			return nil, err
 		}
-		data = append(data, value)
+		results = append(results, Data)
 	}
 	if err != nil {
 		return nil, err
 	}
-	return &data, nil
+	return &results, nil
 }
 
-func (repo *BaseRepo[Row]) Edit(d Row, field string, value string) (int, error) {
+func (repo *BaseRepo[Domain]) Edit(Data Domain, field string, value string) (int, error) {
 	tx, err := repo.Mysql.Beginx()
 	if err != nil {
 		return 0, err
@@ -186,12 +191,12 @@ func (repo *BaseRepo[Row]) Edit(d Row, field string, value string) (int, error) 
 	query, args, bindErr := tx.BindNamed(
 		fmt.Sprintf(
 			`UPDATE %s SET %s WHERE %s = '%s'`,
-			d.Schema(),
+			Data.Schema(),
 			strings.Join(namedValues, ", "),
 			field,
 			value,
 		),
-		&d,
+		&Data,
 	)
 
 	if bindErr != nil {
@@ -221,12 +226,11 @@ func (repo *BaseRepo[Row]) Edit(d Row, field string, value string) (int, error) 
 	return int(affected), nil
 }
 
-func (repo *BaseRepo[Row]) Delete(field string, value string) error {
-	var data Row
+func (repo *BaseRepo[Domain]) Delete(Data Domain, field string, value string) error {
 	exec, err := repo.Mysql.Exec(
 		fmt.Sprintf(
 			`DELETE FROM %s WHERE %s = '%s'`,
-			data.Schema(),
+			Data.Schema(),
 			field,
 			value,
 		),
@@ -241,26 +245,28 @@ func (repo *BaseRepo[Row]) Delete(field string, value string) error {
 	return err
 }
 
-func (repo *BaseRepo[Row]) Count(filters *QueryBuilder) (int64, error) {
+func (repo *BaseRepo[Domain]) Count(Data Domain) (int64, error) {
 	var count int64
-	var data Row
-	where := ""
-	if filters != nil {
-		where = filters.GetWhere()
+	queryBuilder := repo.NewFilters()
+	f := Data.GetFilters()
+	for _, data := range f.ParsedData {
+		queryBuilder.SetWhere(data.Field, data.Operator, data.Value, data.IsString)
+		queryBuilder.And()
 	}
-	err := repo.Mysql.Get(&count, "SELECT count(1) FROM "+data.Schema()+" "+where)
+
+	where := queryBuilder.GetWhere()
+	err := repo.Mysql.Get(&count, "SELECT count(1) FROM "+Data.Schema()+" "+where)
 	return count, err
 }
 
-func (repo *BaseRepo[Row]) Search(field string, value string) (*[]Row, error) {
-	var data []Row
-	var row Row
+func (repo *BaseRepo[Domain]) Search(Data Domain, field string, value string) (*[]Domain, error) {
+	var data []Domain
 	queryErr := repo.Mysql.Select(
 		&data,
 		fmt.Sprintf(
 			`SELECT %s FROM %s WHERE %s like ? LIMIT 25`,
 			strings.Join(repo.fields, ", "),
-			row.Schema(),
+			Data.Schema(),
 			field,
 		),
 		"%"+value+"%",

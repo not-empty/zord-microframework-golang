@@ -96,7 +96,7 @@ func (m *Migrator) Inspect() {
 	fmt.Println(res)
 }
 
-func (m *Migrator) Generate(schemaName string) {
+func (m *Migrator) Generate(schemaName string, database string) {
 	workdir, err := atlasexec.NewWorkingDir(
 		atlasexec.WithAtlasHCLPath("schemas/schema.my.hcl"),
 	)
@@ -111,16 +111,18 @@ func (m *Migrator) Generate(schemaName string) {
 		fmt.Printf("failed to initialize client: %v", err)
 		return
 	}
-
+	if database != "" {
+		database = "/" + database
+	}
 	res, err := client.SchemaInspect(context.Background(), &atlasexec.SchemaInspectParams{
 		DevURL: "mysql://" + m.dsnTest,
-		URL:    "mysql://" + m.dsn,
+		URL:    "mysql://" + m.dsn + database,
 	})
 	if err != nil {
 		fmt.Printf("failed to inspect schema: %v", err)
 		return
 	}
-	err = os.WriteFile("tools/migrator/schema/"+schemaName+".my.hcl", []byte(res), 0755)
+	err = os.WriteFile("schemas/"+schemaName+".my.hcl", []byte(res), 0755)
 	if err != nil {
 		fmt.Println(err)
 		return

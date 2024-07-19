@@ -33,11 +33,11 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(id string, data *Data, {{domainCamelCase}}Data *{{domainCamelCase}}.{{domainPascalCase}}) {
-	{{domainCamelCase}}Data.{{pkName}} = id
+func (s *Service) produceResponseRule(id string, data *Data, domain *{{domainCamelCase}}.{{domainPascalCase}}) {
+	domain.{{pkName}} = id
 	{{editServiceData}}
 
-	affected, err := s.repository.Edit(*{{domainCamelCase}}Data, "{{pkDbName}}", id)
+	affected, err := s.repository.Edit(*domain, "{{pkDbName}}", id)
 	if err != nil {
 		s.InternalServerError("error on edit", err)
 		return

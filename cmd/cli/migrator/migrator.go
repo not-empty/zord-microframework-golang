@@ -36,8 +36,8 @@ func (m *Migrator) DeclareCommands(cmd *cobra.Command) {
 		},
 		&cobra.Command{
 			Use:    "generate-schema-from-db",
-			Short:  "generate-schema-from-db <schema name>",
-			Long:   "generate HCL schema from database connected on env",
+			Short:  "generate-schema-from-db <schema name> <database name>",
+			Long:   "generate HCL schema from connection on env \ngenerate all databases if <database name> is not provided (all databases generations does`nt work with domain generation from schema)",
 			PreRun: m.BootMigrator,
 			Run:    m.Generate,
 		},
@@ -60,11 +60,15 @@ func (m *Migrator) Inspect(_ *cobra.Command, _ []string) {
 
 func (m *Migrator) Generate(_ *cobra.Command, args []string) {
 	schema := ""
+	if len(args) > 0 {
+		schema = args[0]
+	}
+	databaseName := ""
 	if len(args) > 1 {
-		schema = args[1]
+		databaseName = args[1]
 	}
 	migratorInstance := migrator.NewMigrator(m.dsn, m.dsnTest, m.database)
-	migratorInstance.Generate(schema)
+	migratorInstance.Generate(schema, databaseName)
 }
 
 func (m *Migrator) BootMigrator(_ *cobra.Command, _ []string) {

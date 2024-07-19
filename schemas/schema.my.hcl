@@ -1,5 +1,5 @@
 table "dummy" {
-  schema = schema.skeleton
+  schema = schema.zord
   column "id" {
     null = false
     type = char(26)
@@ -16,15 +16,7 @@ table "dummy" {
     columns = [column.id]
   }
 }
-
-//{{newTable}}
-
-variable "database" {
-  type = string
-}
-
-schema "skeleton" {
-  name = var.database
+schema "zord" {
   charset = "utf8mb4"
   collate = "utf8mb4_0900_ai_ci"
 }

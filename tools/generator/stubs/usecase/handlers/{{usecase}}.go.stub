@@ -24,6 +24,7 @@ func New{{usecasePascalCase}}Handlers(reg *registry.Registry) *{{usecasePascalCa
 // @Accept       json
 // @Produce      json
 // @Success      200  {object}  {{usecase}}.Response
+// @Param        Tenant header string false "tenant name"
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error
 // @Failure      500  {object}  services.Error
@@ -31,14 +32,19 @@ func New{{usecasePascalCase}}Handlers(reg *registry.Registry) *{{usecasePascalCa
 func (hs *{{usecasePascalCase}}Handlers) Handle{{usecasePascalCase}}(context echo.Context) error {
 	s := {{usecase}}.NewService(hs.logger)
 
-    data := new({{usecase}}.Data)
-    if errors := context.Bind(data); errors != nil {
-        return context.JSON(422, errors)
-    }
+	data := new({{usecase}}.Data)
+	if errors := context.Bind(data); errors != nil {
+		return context.JSON(422, errors)
+	}
 
+	tenant := context.Get("tenant").(string)
+	request := {{usecase}}.NewRequest(data)
+	ctx := requestContext.NewPrepareContext(tenant)
+	ctx.SetContext(request.Domain)
 	s.Execute(
-		{{usecase}}.NewRequest(data),
+		request,
 	)
+
 	response, err := s.GetResponse()
 	if err != nil {
 		return context.JSON(422, err)

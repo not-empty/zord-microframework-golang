@@ -27,7 +27,7 @@ func (cg *CodeGenerator) ReadFromSchema(schema string, table string) {
 }
 
 func (cg *CodeGenerator) getHclFile(schema string) (*hclwrite.File, error) {
-	filepath := fmt.Sprintf("tools/migrator/schema/%s.my.hcl", schema)
+	filepath := fmt.Sprintf("schemas/%s.my.hcl", schema)
 	content, err := os.ReadFile(filepath)
 	if err != nil {
 		fmt.Println("Error reading file:", err)
@@ -45,7 +45,7 @@ func (cg *CodeGenerator) handleHclBlock(block *hclwrite.Block) error {
 		return nil
 	}
 
-	tableName := block.Labels()[0]
+	tableName := CamelCase(block.Labels()[0])
 	replacers := cg.generateDomainFromHclBlock(block, tableName)
 	validateErr := cg.validateFiles(tableName)
 	if validateErr != nil {
@@ -65,13 +65,13 @@ func (cg *CodeGenerator) generateDomainFromHclBlock(block *hclwrite.Block, table
 	*cg.isIntId = false
 	domain := cg.generateDomainStruct(block.Body().Blocks(), tableName, cg.primaryKey, cg.pkType)
 	dataType := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateDeclarationLine)
-	createAttrData := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateCreateAttributionLine)
-	editAttrData := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateEditAttributionLine)
+	createAttrData := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateAttributionLine)
+	editAttrData := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateAttributionLine)
 	replacers := GetReplacersConfig(cg.config, cg.domainType, []string{tableName})
 	replacers["{{domainType}}"] = domain
 	replacers["{{dataType}}"] = dataType
 	replacers["{{pkDbName}}"] = *cg.primaryKey
-	replacers["{{pkName}}"] = PascalCase(*cg.primaryKey)
+	replacers["{{pkName}}"] = *cg.primaryKey
 	replacers["{{pkType}}"] = *cg.pkType
 	replacers["{{createServiceData}}"] = createAttrData
 	replacers["{{editServiceData}}"] = editAttrData
@@ -79,7 +79,7 @@ func (cg *CodeGenerator) generateDomainFromHclBlock(block *hclwrite.Block, table
 		replacers["{{optionalImports}}"] = "\"time\""
 	}
 	if !*cg.isIntId {
-		replacers["{{idVar}}"] = "id := s.idCreator.Create()"
+		replacers["{{idVar}}"] = "domain." + PascalCase(*cg.primaryKey) + " = s.idCreator.Create()"
 	}
 	return replacers
 }
@@ -88,12 +88,13 @@ func (cg *CodeGenerator) generateDomainStruct(blocks []*hclwrite.Block, tableNam
 	*pk = cg.findPkOnBlocks(blocks)
 	structString := "type " + PascalCase(tableName) + " struct {\n"
 	structString += cg.generateStruct(blocks, pk, pkType, cg.generateDeclarationLine)
+	structString += "\tclient string\n\tfilters *filters.Filters\n"
 	structString += "}"
 	return structString
 }
 
 func (cg *CodeGenerator) generateStruct(blocks []*hclwrite.Block, pk, pkType *string, strFormationFunc func(string, string, string, string) string) string {
-	declarationString := "\n"
+	declarationString := ""
 	for _, block := range blocks {
 		if block.Type() == "column" {
 			token, ok := block.Body().Attributes()["type"]
@@ -102,9 +103,14 @@ func (cg *CodeGenerator) generateStruct(blocks []*hclwrite.Block, pk, pkType *st
 			}
 			tokenStr := string(token.Expr().BuildTokens(nil).Bytes())
 			goType := cg.dbTypesToGoTypes(tokenStr)
+			nullable, nullOk := block.Body().Attributes()["null"]
+			isNullable := cg.verifyIsNullable(nullable, nullOk)
+			if isNullable {
+				goType = "*" + goType
+			}
 
 			if pk != nil && block.Labels()[0] == *pk {
-				*pkType = fmt.Sprintf("%s string `param:\"id\"`", PascalCase(*pk))
+				*pkType = fmt.Sprintf("%s string `param:\"id\"`\n", PascalCase(*pk))
 			}
 
 			declarationString = strFormationFunc(
@@ -137,39 +143,12 @@ func (cg *CodeGenerator) generateDeclarationLine(str, name, goType, dbTag string
 	)
 }
 
-func (cg *CodeGenerator) generateCreateAttributionLine(str, name, goType, _ string) string {
+func (cg *CodeGenerator) generateAttributionLine(str, name, _, _ string) string {
 	if name == PascalCase(*cg.primaryKey) {
-		if strings.Contains(goType, "int") {
-			*cg.isIntId = true
-			return str
-		}
-		return fmt.Sprintf(
-			"%s	%s: &id,\n",
-			str,
-			name,
-		)
+		return str
 	}
 	return fmt.Sprintf(
-		"%s	%s: data.%s,\n",
-		str,
-		name,
-		name,
-	)
-}
-
-func (cg *CodeGenerator) generateEditAttributionLine(str, name, goType, _ string) string {
-	if name == PascalCase(*cg.primaryKey) {
-		if strings.Contains(goType, "int") {
-			return str
-		}
-		return fmt.Sprintf(
-			"%s	%s: &id,\n",
-			str,
-			name,
-		)
-	}
-	return fmt.Sprintf(
-		"%s	%s: data.%s,\n",
+		"%s	domain.%s = data.%s\n",
 		str,
 		name,
 		name,
@@ -188,7 +167,7 @@ func (cg *CodeGenerator) findPkOnBlocks(blocks []*hclwrite.Block) string {
 			str = cg.getColumnFromAttrString(pkAttr)
 		}
 	}
-	return str
+	return PascalCase(str)
 }
 
 func (cg *CodeGenerator) getColumnFromAttrString(attrStr string) string {
@@ -200,52 +179,63 @@ func (cg *CodeGenerator) getColumnFromAttrString(attrStr string) string {
 
 func (cg *CodeGenerator) dbTypesToGoTypes(typo string) string {
 	dbTypesMap := map[string]string{
-		" bigint":     "*int64",
-		" bit":        "* ",
-		" char":       "*string",
-		" decimal":    "*float64",
-		" float":      "*float32",
-		" double":     "*float64",
-		" int":        "*int",
-		" longtext":   "*string",
-		" mediumint":  "*int",
-		" mediumtext": "*string",
-		" smallint":   "*int16",
-		" text":       "*string",
-		" time":       "*string",
-		" timestamp":  "*string",
-		" datetime":   "*time.Time",
-		" date":       "*string",
-		" tinyint":    "*int8",
-		" tinytext":   "*string",
-		" varbinary":  "*string",
-		" varchar":    "*string",
-		" json":       "*string",
+		" bigint":     "int64",
+		" bit":        " ",
+		" char":       "string",
+		" decimal":    "float64",
+		" float":      "float32",
+		" double":     "float64",
+		" int":        "int",
+		" longtext":   "string",
+		" mediumint":  "int",
+		" mediumtext": "string",
+		" smallint":   "int16",
+		" text":       "string",
+		" time":       "string",
+		" timestamp":  "string",
+		" datetime":   "time.Time",
+		" date":       "string",
+		" tinyint":    "int8",
+		" tinytext":   "string",
+		" varbinary":  "string",
+		" varchar":    "string",
+		" json":       "string",
 	}
 
 	GolangType, ok := dbTypesMap[typo]
 	if ok {
-		if GolangType == "*time.Time" {
+		if GolangType == "time.Time" {
 			*cg.needImportTime = true
 		}
 		return GolangType
 	}
 
 	if strings.Contains(typo, "char") {
-		return "*string"
+		return "string"
 	}
 
 	if strings.Contains(typo, "double") {
-		return "*float64"
+		return "float64"
 	}
 
 	if strings.Contains(typo, "year") {
-		return "*string"
+		return "string"
 	}
 
 	if strings.Contains(typo, "decimal") {
-		return "*float64"
+		return "float64"
 	}
 
 	return typo
+}
+
+func (cg *CodeGenerator) verifyIsNullable(token *hclwrite.Attribute, ok bool) bool {
+	if !ok {
+		return false
+	}
+	value := token.Expr().BuildTokens(nil).Bytes()
+	if string(value) == "true" {
+		return true
+	}
+	return false
 }

@@ -26,28 +26,29 @@ func (s *Service) Execute(request Request) {
 		return
 	}
 
-	s.produceResponseRule(request.{{pkName}}, request.Data)
+	s.produceResponseRule(request.{{pkName}}, request.Data, request.Domain)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(id string, data *Data) {
-    {{domainCamelCase}} := {{domain}}.{{domainPascalCase}}{{{editServiceData}}}
+func (s *Service) produceResponseRule(id string, data *Data, domain *{{domainCamelCase}}.{{domainPascalCase}}) {
+	domain.{{pkName}} = id
+	{{editServiceData}}
 
-    affected, err := s.repository.Edit({{domainCamelCase}}, "{{pkDbName}}", id)
-    if err != nil {
-        s.InternalServerError("error on edit", err)
-        return
-    }
+	affected, err := s.repository.Edit(*domain, "{{pkDbName}}", id)
+	if err != nil {
+		s.InternalServerError("error on edit", err)
+		return
+	}
 
-    if affected < 1 {
-        s.UnprocessableEntity("same data or invalid id")
-        return
-    }
+	if affected < 1 {
+		s.UnprocessableEntity("same data or invalid id")
+		return
+	}
 
-    s.response = &Response{
-        Data: data,
-    }
+	s.response = &Response{
+		Data: data,
+	}
 }

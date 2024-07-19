@@ -89,7 +89,7 @@ func (cg *CodeGenerator) GenerateFilesFromStubs(stubs map[string]Stubs, replacer
 		if !stub.IsGenerated {
 			data, err := GetFileData(stub.ToPath)
 			if err != nil {
-				cg.Logger.Error(err)
+				cg.Logger.Info("File: " + stub.ToPath + " does not exist, generation in this file will be ignored")
 			}
 
 			replData := Replacer(data, replacers)

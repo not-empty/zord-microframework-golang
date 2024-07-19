@@ -6,12 +6,15 @@ type Data struct {
 
 type Request struct {
 	Data *Data
+	Domain *{{domainCamelCase}}.{{domainPascalCase}}
 	Err error
 }
 
 func NewRequest(data *Data) Request {
+	domain := &{{domainCamelCase}}.{{domainPascalCase}}{}
 	return Request{
 		Data: data,
+		Domain: domain,
 	}
 }
 

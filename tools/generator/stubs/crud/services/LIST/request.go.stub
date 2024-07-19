@@ -3,11 +3,13 @@ package {{domain}}
 import (
 	"errors"
 	"go-skeleton/internal/application/providers/filters"
+	"go-skeleton/internal/application/domain/{{domainCamelCase}}"
 )
 
 type Request struct {
 	Data *Data
-	Filters filters.Filters
+	Domain *{{domainCamelCase}}.{{domainPascalCase}}
+	Filters *filters.Filters
 }
 
 type Data struct {
@@ -15,31 +17,18 @@ type Data struct {
 	ID string
 }
 
-func NewRequest(data *Data, filters filters.Filters) Request {
+func NewRequest(data *Data, filters *filters.Filters) Request {
+	domain := &{{domainCamelCase}}.{{domainPascalCase}}{}
 	return Request{
 		Data: data,
 		Filters: filters,
+		Domain: domain,
 	}
 }
 
 func (r *Request) Validate() error {
 	if r.Data.Page <= 0 {
 		return errors.New("invalid page")
-	}
-
-	parseErr := r.Filters.Parse(
-		map[string]string{
-			"id":  "eql",
-		},
-		map[string]filters.FilterData{
-			"id": {
-				Value:    r.Data.ID,
-				IsString: true,
-			},
-		})
-
-	if parseErr != nil {
-		return parseErr
 	}
 
 	return nil

@@ -66,7 +66,7 @@ func (cg *CodeGenerator) generateDomainFromHclBlock(block *hclwrite.Block, table
 	domain := cg.generateDomainStruct(block.Body().Blocks(), tableName, cg.primaryKey, cg.pkType)
 	dataType := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateDeclarationLine)
 	createAttrData := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateCreateAttributionLine)
-	editAttrData := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateEditAttributionLine)
+	editAttrData := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateCreateAttributionLine)
 	replacers := GetReplacersConfig(cg.config, cg.domainType, []string{tableName})
 	replacers["{{domainType}}"] = domain
 	replacers["{{dataType}}"] = dataType
@@ -88,6 +88,7 @@ func (cg *CodeGenerator) generateDomainStruct(blocks []*hclwrite.Block, tableNam
 	*pk = cg.findPkOnBlocks(blocks)
 	structString := "type " + PascalCase(tableName) + " struct {\n"
 	structString += cg.generateStruct(blocks, pk, pkType, cg.generateDeclarationLine)
+	structString += "\tclient    string\n\tfilters   *filters.Filters"
 	structString += "}"
 	return structString
 }
@@ -137,36 +138,20 @@ func (cg *CodeGenerator) generateDeclarationLine(str, name, goType, dbTag string
 	)
 }
 
-func (cg *CodeGenerator) generateCreateAttributionLine(str, name, goType, _ string) string {
+func (cg *CodeGenerator) generateCreateAttributionLine(str, name, _, _ string) string {
 	if name == PascalCase(*cg.primaryKey) {
-		if strings.Contains(goType, "int") {
-			*cg.isIntId = true
-			return str
-		}
-		return fmt.Sprintf(
-			"%s	%s: &id,\n",
-			str,
-			name,
-		)
+		return ""
 	}
 	return fmt.Sprintf(
-		"%s	%s: data.%s,\n",
+		"{{domainCamelCase}}Data.%s = data.%s",
 		str,
-		name,
 		name,
 	)
 }
 
-func (cg *CodeGenerator) generateEditAttributionLine(str, name, goType, _ string) string {
+func (cg *CodeGenerator) generateEditAttributionLine(str, name, _, _ string) string {
 	if name == PascalCase(*cg.primaryKey) {
-		if strings.Contains(goType, "int") {
-			return str
-		}
-		return fmt.Sprintf(
-			"%s	%s: &id,\n",
-			str,
-			name,
-		)
+		return ""
 	}
 	return fmt.Sprintf(
 		"%s	%s: data.%s,\n",

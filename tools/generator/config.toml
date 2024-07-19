@@ -39,13 +39,15 @@ table "{{domain}}" {
 $repeat$"""
 "{{domainType}}" = """type {{domainPascalCase}} struct {
   ID   string `db:"id"`
+  client    string
+  filters   *filters.Filters
 }"""
 "{{pkType}}" = "ID string `param:\"id\"`"
 "{{pkName}}" = "ID"
 "{{pkDbName}}" = "id"
 "{{dataType}}" = ""
-"{{createServiceData}}" = "ID:   s.idCreator.Create(),"
-"{{editServiceData}}" = "ID:        id,"
+"{{createServiceData}}" = ""
+"{{editServiceData}}" = ""
 "{{optionalImports}}" = ""
 "{{idVar}}" = ""
 
@@ -101,7 +103,7 @@ deleteLinePatterns = [
 ]
 
 [stubs.crud.migrator_schema]
-toPath = "tools/migrator/schema/schema.my.hcl"
+toPath = "schemas/schema.my.hcl"
 isGenerated = false
 deleteRegex = "(?s)table \"{{domain}}\" {\\s*.*?\\s*}\n*//tableEnd\n\n"
 

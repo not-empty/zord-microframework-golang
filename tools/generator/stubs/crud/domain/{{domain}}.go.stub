@@ -3,10 +3,26 @@ package {{domain}}
 import (
 	"go-skeleton/internal/application/providers/pagination"
 	"go-skeleton/internal/repositories/base_repository"
+	"go-skeleton/internal/application/providers/filters"
 	{{optionalImports}}
 )
 
 {{domainType}}
+
+func (d *{{domainPascalCase}}) SetClient(client string) {
+	d.client = client
+}
+
+func (d *{{domainPascalCase}}) SetFilters(filters *filters.Filters) {
+	d.filters = filters
+}
+
+func (d {{domainPascalCase}}) GetFilters() filters.Filters {
+	if d.filters != nil {
+		return *d.filters
+	}
+	return filters.Filters{}
+}
 
 func (d {{domainPascalCase}}) Schema() string {
 	return "{{domain}}"

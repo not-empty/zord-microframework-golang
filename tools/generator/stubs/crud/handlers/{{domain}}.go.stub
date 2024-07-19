@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	requestContext "go-skeleton/internal/application/context"
 	"go-skeleton/internal/application/domain/{{domain}}"
 	"go-skeleton/internal/application/providers/filters"
 	"go-skeleton/internal/application/providers/pagination"
@@ -43,6 +44,7 @@ func New{{domainPascalCase}}Handlers(reg *registry.Registry) *{{domainPascalCase
 // @Accept       json
 // @Produce      json
 // @Param        {{domainCamelCase}}_id path string true "{{domainPascalCase}} ID"
+// @Param        Tenant header string false "tenant name"
 // @Success      200  {object}  {{domainCamelCase}}Get.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error
@@ -55,9 +57,12 @@ func (hs *{{domainPascalCase}}Handlers) HandleGet{{domainPascalCase}}(context ec
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(422, errors)
 	}
-
+	tenant := context.Get("tenant").(string)
+	request := {{domainCamelCase}}Get.NewRequest(data)
+	ctx := requestContext.NewPrepareContext(tenant)
+	ctx.SetContext(request.Domain)
 	s.Execute(
-		{{domainCamelCase}}Get.NewRequest(data),
+		request,
 	)
 
 	response, err := s.GetResponse()
@@ -73,6 +78,7 @@ func (hs *{{domainPascalCase}}Handlers) HandleGet{{domainPascalCase}}(context ec
 // @Accept       json
 // @Produce      json
 // @Param        request body {{domainCamelCase}}Create.Data true "body model"
+// @Param        Tenant header string false "tenant name"
 // @Success      200  {object}  {{domainCamelCase}}Create.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error
@@ -85,9 +91,12 @@ func (hs *{{domainPascalCase}}Handlers) HandleCreate{{domainPascalCase}}(context
 	if errors := context.Bind(data); errors != nil {
 		return context.JSON(http.StatusBadRequest, errors)
 	}
-
+	tenant := context.Get("tenant").(string)
+	request := {{domainCamelCase}}Create.NewRequest(data, hs.validator)
+	ctx := requestContext.NewPrepareContext(tenant)
+	ctx.SetContext(request.Domain)
 	s.Execute(
-		{{domainCamelCase}}Create.NewRequest(data, hs.validator),
+		request,
 	)
 
 	response, err := s.GetResponse()
@@ -104,6 +113,7 @@ func (hs *{{domainPascalCase}}Handlers) HandleCreate{{domainPascalCase}}(context
 // @Produce      json
 // @Param        {{domainCamelCase}}_id path string true "{{domainPascalCase}} ID"
 // @Param        request body {{domainCamelCase}}Edit.Data true "body model"
+// @Param        Tenant header string false "tenant name"
 // @Success      200  {object}  {{domainCamelCase}}Edit.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error
@@ -118,8 +128,12 @@ func (hs *{{domainPascalCase}}Handlers) HandleEdit{{domainPascalCase}}(context e
 		return context.JSON(http.StatusBadRequest, errors)
 	}
 
+	tenant := context.Get("tenant").(string)
+	request := {{domainCamelCase}}Edit.NewRequest(id, data, hs.validator)
+	ctx := requestContext.NewPrepareContext(tenant)
+	ctx.SetContext(request.Domain)
 	s.Execute(
-		{{domainCamelCase}}Edit.NewRequest(id, data, hs.validator),
+		request,
 	)
 
 	response, err := s.GetResponse()
@@ -135,6 +149,7 @@ func (hs *{{domainPascalCase}}Handlers) HandleEdit{{domainPascalCase}}(context e
 // @Accept       json
 // @Produce      json
 // @Param        page  query   int  true  "valid int"
+// @Param        Tenant header string false "tenant name"
 // @Success      200  {object}  {{domainCamelCase}}List.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error
@@ -159,8 +174,12 @@ func (hs *{{domainPascalCase}}Handlers) HandleList{{domainPascalCase}}(context e
 
 	f := filters.NewFilters()
 
+	tenant := context.Get("tenant").(string)
+	request := {{domainCamelCase}}List.NewRequest(data, f)
+	ctx := requestContext.NewPrepareContext(tenant)
+	ctx.SetContext(request.Domain)
 	s.Execute(
-		{{domainCamelCase}}List.NewRequest(data, *f),
+		request,
 	)
 
 	response, err := s.GetResponse()
@@ -175,6 +194,7 @@ func (hs *{{domainPascalCase}}Handlers) HandleList{{domainPascalCase}}(context e
 // @Tags         {{domainPascalCase}}
 // @Accept       json
 // @Produce      json
+// @Param        Tenant header string false "tenant name"
 // @Param        {{domainCamelCase}}_id path string true "{{domainPascalCase}} ID"
 // @Success      200  {object}  {{domainCamelCase}}Delete.Response
 // @Failure      400  {object}  services.Error
@@ -189,8 +209,12 @@ func (hs *{{domainPascalCase}}Handlers) HandleDelete{{domainPascalCase}}(context
 		return context.JSON(http.StatusBadRequest, errors)
 	}
 
+	tenant := context.Get("tenant").(string)
+	request := {{domainCamelCase}}Delete.NewRequest(data)
+	ctx := requestContext.NewPrepareContext(tenant)
+	ctx.SetContext(request.Domain)
 	s.Execute(
-		{{domainCamelCase}}Delete.NewRequest(data),
+		request,
 	)
 
 	response, err := s.GetResponse()

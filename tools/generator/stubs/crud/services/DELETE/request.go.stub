@@ -1,21 +1,26 @@
 package {{domain}}
 
+import "go-skeleton/internal/application/domain/{{domainCamelCase}}"
+
 type Data struct {
     {{pkType}}
 }
 
 type Request struct {
 	Data *Data
+	Domain *{{domainCamelCase}}.{{domainPascalCase}}
 	err error
 }
 
 func NewRequest(data *Data) Request {
+	domain := &{{domainCamelCase}}.{{domainPascalCase}}{}
 	return Request{
 		Data: data,
+		Domain: domain,
 	}
 }
 
 func (r *Request) Validate() error {
-    // Add request validations
+	// Add request validations
 	return nil
 }

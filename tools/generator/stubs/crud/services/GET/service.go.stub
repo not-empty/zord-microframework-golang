@@ -25,26 +25,26 @@ func (s *Service) Execute(request Request) {
 		s.BadRequest(err.Error())
 		return
 	}
-	s.produceResponseRule(request.Data)
+	s.produceResponseRule(request.Data, request.Domain)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(data *Data) {
-	{{domainCamelCase}}, err := s.repository.Get("{{pkDbName}}", data.{{pkName}})
+func (s *Service) produceResponseRule(data *Data, domain *{{domainCamelCase}}.{{domainPascalCase}}) {
+	dom, err := s.repository.Get(*domain, "{{pkDbName}}", data.{{pkName}})
 
 	if err != nil {
-	    if err.Error() == "sql: no rows in result set" {
-            s.NotFound("data not found")
-            return
-        }
-        s.InternalServerError("error on get", err)
-        return
+		if err.Error() == "sql: no rows in result set" {
+			s.NotFound("data not found")
+			return
+		}
+		s.InternalServerError("error on get", err)
+		return
 	}
 
 	s.response = &Response{
-			Data: {{domainCamelCase}},
+			Data: dom,
 	}
 }

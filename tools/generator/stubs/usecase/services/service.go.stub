@@ -24,14 +24,14 @@ func (s *Service) Execute(request Request) {
 		return
 	}
 
-	s.produceResponseRule(request.Data)
+	s.produceResponseRule(request.Data, request.Domain)
 }
 
 func (s *Service) GetResponse() (*Response, *services.Error) {
 	return s.response, s.Error
 }
 
-func (s *Service) produceResponseRule(data *Data) {
+func (s *Service) produceResponseRule(data *Data, domain *{{domainCamelCase}}.{{domainPascalCase}}) {
 	s.response = &Response{
 		Data: "",
 	}

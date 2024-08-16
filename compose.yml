@@ -8,7 +8,6 @@ services:
       - .env
     ports:
       - "9000:9000"
-      - "6060:6060"
     depends_on:
       zord-mysql:
         condition: service_healthy

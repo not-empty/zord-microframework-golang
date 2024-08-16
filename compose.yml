@@ -8,12 +8,20 @@ services:
       - .env
     ports:
       - "9000:9000"
-    command: air http
+      - "6060:6060"
     depends_on:
       zord-mysql:
         condition: service_healthy
     volumes:
       - ./:/app
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '1'
+          memory: 512M
 
   zord-mysql:
     image: mysql:latest
@@ -31,6 +39,14 @@ services:
         - "3307:3306"
     volumes:
         - storage:/var/lib/mysql
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1024M
+        reservations:
+          cpus: '2'
+          memory: 1024M
 
 volumes:
   storage:

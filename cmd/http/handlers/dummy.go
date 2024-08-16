@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/labstack/echo/v4"
 	requestContext "go-skeleton/internal/application/context"
 	"go-skeleton/internal/application/domain/dummy"
 	"go-skeleton/internal/application/providers/filters"
@@ -17,8 +18,6 @@ import (
 	"go-skeleton/pkg/registry"
 	"go-skeleton/pkg/validator"
 	"net/http"
-
-	"github.com/labstack/echo/v4"
 )
 
 type DummyHandlers struct {
@@ -44,7 +43,7 @@ func NewDummyHandlers(reg *registry.Registry) *DummyHandlers {
 // @Accept       json
 // @Produce      json
 // @Param        dummy_id path string true "Dummy ID"
-// @Param        Tenant header string true "tenant name"
+// @Param        Tenant header string false "tenant name"
 // @Success      200  {object}  dummyGet.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error
@@ -78,7 +77,7 @@ func (hs *DummyHandlers) HandleGetDummy(context echo.Context) error {
 // @Accept       json
 // @Produce      json
 // @Param        request body dummyCreate.Data true "body model"
-// @Param        Tenant header string true "tenant name"
+// @Param        Tenant header string false "tenant name"
 // @Success      200  {object}  dummyCreate.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error
@@ -114,7 +113,7 @@ func (hs *DummyHandlers) HandleCreateDummy(context echo.Context) error {
 // @Produce      json
 // @Param        dummy_id path string true "Dummy ID"
 // @Param        request body dummyEdit.Data true "body model"
-// @Param        Tenant header string true "tenant name"
+// @Param        Tenant header string false "tenant name"
 // @Success      200  {object}  dummyEdit.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error
@@ -152,7 +151,7 @@ func (hs *DummyHandlers) HandleEditDummy(context echo.Context) error {
 // @Param        page  query   int  true  "valid int"
 // @Param        name  query   string  false  "value example: eql|lik,value"
 // @Param        email  query   string  false  "value example: lik,value"
-// @Param        Tenant header string true "tenant name"
+// @Param        Tenant header string false "tenant name"
 // @Success      200  {object}  dummyList.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error
@@ -199,7 +198,7 @@ func (hs *DummyHandlers) HandleListDummy(context echo.Context) error {
 // @Accept       json
 // @Produce      json
 // @Param        dummy_id path string true "Dummy ID"
-// @Param        Tenant header string true "tenant name"
+// @Param        Tenant header string false "tenant name"
 // @Success      200  {object}  dummyDelete.Response
 // @Failure      400  {object}  services.Error
 // @Failure      404  {object}  services.Error

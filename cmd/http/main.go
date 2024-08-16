@@ -1,10 +1,9 @@
 package main
 
 import (
+	_ "github.com/go-sql-driver/mysql"
 	"go-skeleton/cmd"
 	"go-skeleton/cmd/http/server"
-
-	_ "github.com/go-sql-driver/mysql"
 	"go-skeleton/pkg/registry"
 )
 

@@ -51,8 +51,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "tenant name",
                         "name": "Tenant",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     }
                 ],
                 "responses": {
@@ -107,8 +106,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "tenant name",
                         "name": "Tenant",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     }
                 ],
                 "responses": {
@@ -163,8 +161,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "tenant name",
                         "name": "Tenant",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     }
                 ],
                 "responses": {
@@ -226,8 +223,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "tenant name",
                         "name": "Tenant",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     }
                 ],
                 "responses": {
@@ -280,8 +276,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "tenant name",
                         "name": "Tenant",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     }
                 ],
                 "responses": {

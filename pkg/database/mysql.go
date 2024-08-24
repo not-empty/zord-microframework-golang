@@ -43,11 +43,12 @@ func (m *MySql) Connect() {
 		Addr:      m.DbUrl + ":" + m.DbPort,
 		Net:       "tcp",
 		ParseTime: true,
+		DBName:    m.Database,
 	}
 
 	conn, err := sqlx.Open("mysql", config.FormatDSN())
-	conn.SetMaxOpenConns(30)
-	conn.SetMaxIdleConns(20)
+	conn.SetMaxOpenConns(5)
+	conn.SetMaxIdleConns(3)
 	if err != nil {
 		log.Fatalln(err)
 	}

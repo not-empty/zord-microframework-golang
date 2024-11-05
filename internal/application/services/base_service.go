@@ -12,16 +12,6 @@ type Logger interface {
 	Critical(Error error, Context ...string)
 }
 
-type ICrypt interface {
-	GenerateHash(target string) (string, error)
-	CompareHash(hashed string, target string) bool
-}
-
-type Signer interface {
-	Sign(signingString string) (string, error)
-	Verify(jwtStr string) (bool, error)
-}
-
 type IdCreator interface {
 	Create() string
 }

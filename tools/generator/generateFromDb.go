@@ -46,7 +46,8 @@ func (cg *CodeGenerator) handleHclBlock(block *hclwrite.Block) error {
 	}
 
 	tableName := CamelCase(block.Labels()[0])
-	replacers := cg.generateDomainFromHclBlock(block, tableName)
+	rawTableName := block.Labels()[0]
+	replacers := cg.generateDomainFromHclBlock(block, tableName, rawTableName)
 	validateErr := cg.validateFiles(tableName)
 	if validateErr != nil {
 		return validateErr
@@ -56,7 +57,7 @@ func (cg *CodeGenerator) handleHclBlock(block *hclwrite.Block) error {
 	return nil
 }
 
-func (cg *CodeGenerator) generateDomainFromHclBlock(block *hclwrite.Block, tableName string) map[string]string {
+func (cg *CodeGenerator) generateDomainFromHclBlock(block *hclwrite.Block, tableName string, rawTableName string) map[string]string {
 	cg.needImportTime = new(bool)
 	cg.primaryKey = new(string)
 	cg.pkType = new(string)
@@ -67,7 +68,7 @@ func (cg *CodeGenerator) generateDomainFromHclBlock(block *hclwrite.Block, table
 	dataType := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateDeclarationLine)
 	createAttrData := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateAttributionLine)
 	editAttrData := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateAttributionLine)
-	replacers := GetReplacersConfig(cg.config, cg.domainType, []string{tableName})
+	replacers := GetReplacersConfig(cg.config, cg.domainType, []string{tableName, rawTableName})
 	replacers["{{domainType}}"] = domain
 	replacers["{{dataType}}"] = dataType
 	replacers["{{pkDbName}}"] = *cg.primaryKey

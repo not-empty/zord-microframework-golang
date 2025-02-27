@@ -1,6 +1,7 @@
 [replacers.crud]
 ".stub" = ""
 crud = "{{domain}}"
+tableName = "{{domain}}"
 crudCamelCase = "{{domainCamelCase}}"
 crudPascalCase = "{{domainPascalCase}}"
 "{{validatorImport}}" = "\"go-skeleton/internal/application/services\""
@@ -139,3 +140,21 @@ deleteLinePatterns = [
 	"New{{usecasePascalCase}}Routes",
 	"\"{{usecase}}\": "
 ]
+
+[replacers.domain]
+".stub" = ""
+domain = "{{domain}}"
+tableName = "{{tableName}}"
+domainCamelCase = "{{domainCamelCase}}"
+domainPascalCase = "{{domainPascalCase}}"
+"{{domainType}}" = """type {{domainPascalCase}} struct {
+  ID   string `db:"id"`
+  client    string
+  filters   *filters.Filters
+}"""
+"{{optionalImports}}" = ""
+
+[stubs.domain.domain]
+toPath = "internal/application/domain/{{domain}}/"
+fromPath = "tools/generator/stubs/domain/"
+isGenerated = true

@@ -129,10 +129,17 @@ func GetReplacersConfig(c *Config, domainType string, args []string) map[string]
 		return map[string]string{}
 	}
 
+	tableName := args[0]
+
+	if len(args) > 1 {
+		tableName = args[1]
+	}
+
 	vars := map[string]string{
 		domainType:                args[0],
 		domainType + "PascalCase": PascalCase(args[0]),
 		domainType + "CamelCase":  CamelCase(args[0]),
+		"tableName":               tableName,
 	}
 
 	replacers = DefineFromToReplaceVariables(vars, args, replacers)

@@ -1,0 +1,105 @@
+{
+  "name": "zord-mcp",
+  "description": "Zord Microframework MCP Server for code generation and database management",
+  "command": ["/home/levy/Documents/opensource/zord-microframework-golang/mcp"],
+  "transport": "stdio",
+  "tools": [
+    {
+      "name": "create-domain",
+      "description": "Create a new domain service",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the domain to create"
+          },
+          "validator": {
+            "type": "boolean",
+            "description": "Whether to create domain with validation"
+          },
+          "domainType": {
+            "type": "string",
+            "description": "Type of domain to create (default: crud)"
+          }
+        },
+        "required": ["name"]
+      }
+    },
+    {
+      "name": "destroy-domain",
+      "description": "Destroy a domain service",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the domain to destroy"
+          },
+          "domainType": {
+            "type": "string",
+            "description": "Type of domain to destroy (default: crud)"
+          }
+        },
+        "required": ["name"]
+      }
+    },
+    {
+      "name": "create-domain-from-schema",
+      "description": "Create domain from database schema",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "schemaName": {
+            "type": "string",
+            "description": "Name of the schema to use"
+          },
+          "tableName": {
+            "type": "string",
+            "description": "Optional specific table to generate"
+          }
+        },
+        "required": ["schemaName"]
+      }
+    },
+    {
+      "name": "migrate",
+      "description": "Migrate database schema",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tenant": {
+            "type": "string",
+            "description": "Optional tenant name for migration"
+          }
+        }
+      }
+    },
+    {
+      "name": "inspect",
+      "description": "Inspect database schema",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "generate-schema-from-db",
+      "description": "Generate schema from database",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "schemaName": {
+            "type": "string",
+            "description": "Name for the generated schema"
+          },
+          "databaseName": {
+            "type": "string",
+            "description": "Optional specific database to generate from"
+          }
+        },
+        "required": ["schemaName"]
+      }
+    }
+  ]
+} 

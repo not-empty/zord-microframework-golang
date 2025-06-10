@@ -12,7 +12,7 @@ RUN go mod download
 COPY . .
 
 # Build the MCP server
-RUN CGO_ENABLED=0 GOOS=linux go build -o /usr/local/bin/mcp cmd/mcp/main.go
+RUN go build -o /app/mcp cmd/mcp/main.go
 
 # Set the entrypoint to run the MCP server
-ENTRYPOINT ["/usr/local/bin/mcp"] 
+ENTRYPOINT ["/app/mcp"] 

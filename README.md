@@ -150,12 +150,61 @@ To use the MCP server with Claude Desktop, you need to configure it in your Clau
 {
   "name": "zord-mcp",
   "description": "Zord Microframework MCP Server",
-  "command": "/home/levy/Documents/opensource/zord-microframework-golang/mcp",
+  "command": "path/to/project/mcp",
   "transport": "stdio"
 }
 ```
 
-Replace `/home/levy/Documents/opensource/zord-microframework-golang/mcp` with the actual path to your MCP server binary.
+Replace `path/to/project/mcp` with the actual path to your MCP server binary.
+
+#### Example: Running MCP Server via Docker
+
+To build the MCP Docker image, run:
+
+```sh
+docker build -t zord-mcp -f docker/mcp/Dockerfile .
+```
+
+To use the MCP server with Claude Desktop via Docker, add the following configuration to your Claude Desktop tools:
+
+```json
+{
+  "mcpServers": {
+    "zord-mcp": {
+      "name": "zord-mcp-docker",
+      "description": "Zord MCP Server via Docker",
+      "command": "docker run -i zord-mcp",
+      "transport": "stdio",
+      "tools": []
+    }
+  }
+}
+```
+
+Note: if you have another mcp server add it inside the mcpServers key with another name, like this: 
+
+```json
+{
+  "mcpServers": {
+    "zord-mcp": {
+      "name": "zord-mcp-docker",
+      "description": "Zord MCP Server via Docker",
+      "command": "docker run -i zord-mcp",
+      "transport": "stdio",
+      "tools": []
+    },
+    "zord-mcp2": {
+      "name": "zord-mcp-docker",
+      "description": "Zord MCP Server via Docker",
+      "command": "docker run -i zord-mcp",
+      "transport": "stdio",
+      "tools": []
+    },
+  }
+}
+```
+
+This will run the MCP server inside a Docker container and connect it to Claude Desktop using stdio transport.
 
 #### Available Tools
 

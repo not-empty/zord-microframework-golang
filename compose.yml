@@ -22,25 +22,6 @@ services:
           cpus: '1'
           memory: 512M
 
-  mcp:
-    build:
-      context: .
-      dockerfile: docker/mcp/Dockerfile
-    environment:
-      - ENVIRONMENT=development
-      - APP=zord
-      - VERSION=1.0.0
-      - DB_USER=root
-      - DB_PASS=root
-      - DB_URL=mysql
-      - DB_PORT=3306
-      - DB_DATABASE=zord
-      - DB_TEST_DATABASE=zord_test
-    volumes:
-      - ./:/app
-    networks:
-      - default
-
   zord-mysql:
     image: mysql:latest
     container_name: zord-mysql

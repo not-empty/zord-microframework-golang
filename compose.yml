@@ -51,5 +51,6 @@ volumes:
   storage:
 
 networks:
-    default:
-        name: go-skeleton-network
+  default:
+    name: go-skeleton-network
+    external: true

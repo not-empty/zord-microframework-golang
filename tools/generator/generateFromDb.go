@@ -2,10 +2,11 @@ package generator
 
 import (
 	"fmt"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclwrite"
 	"os"
 	"strings"
+
+	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
 func (cg *CodeGenerator) ReadFromSchema(schema string, table string) {
@@ -47,6 +48,7 @@ func (cg *CodeGenerator) handleHclBlock(block *hclwrite.Block) error {
 
 	tableName := CamelCase(block.Labels()[0])
 	rawTableName := block.Labels()[0]
+
 	replacers := cg.generateDomainFromHclBlock(block, tableName, rawTableName)
 	validateErr := cg.validateFiles(tableName)
 	if validateErr != nil {
@@ -64,29 +66,37 @@ func (cg *CodeGenerator) generateDomainFromHclBlock(block *hclwrite.Block, table
 	cg.isIntId = new(bool)
 	*cg.needImportTime = false
 	*cg.isIntId = false
+
+	dbPk, structPk := cg.findPkOnBlocks(block.Body().Blocks())
+	*cg.primaryKey = structPk
+
 	domain := cg.generateDomainStruct(block.Body().Blocks(), tableName, cg.primaryKey, cg.pkType)
-	dataType := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateDeclarationLine)
-	createAttrData := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateAttributionLine)
-	editAttrData := cg.generateStruct(block.Body().Blocks(), nil, nil, cg.generateAttributionLine)
+
+	// For GET Data struct, set pk and pkType so {{pkType}} is set
+	getPk := dbPk
+	getPkType := ""
+	getDataType := cg.generateStruct(block.Body().Blocks(), &getPk, &getPkType, cg.generateDeclarationLine)
+
+	createAttrData := cg.generateStruct(block.Body().Blocks(), &dbPk, nil, cg.generateAttributionLine)
+	editAttrData := cg.generateStruct(block.Body().Blocks(), &dbPk, nil, cg.generateAttributionLine)
 	replacers := GetReplacersConfig(cg.config, cg.domainType, []string{tableName, rawTableName})
 	replacers["{{domainType}}"] = domain
-	replacers["{{dataType}}"] = dataType
-	replacers["{{pkDbName}}"] = *cg.primaryKey
-	replacers["{{pkName}}"] = *cg.primaryKey
-	replacers["{{pkType}}"] = *cg.pkType
+	replacers["{{dataType}}"] = getDataType
+	replacers["{{pkDbName}}"] = dbPk
+	replacers["{{pkName}}"] = structPk
+	replacers["{{pkType}}"] = getPkType
 	replacers["{{createServiceData}}"] = createAttrData
 	replacers["{{editServiceData}}"] = editAttrData
 	if *cg.needImportTime {
 		replacers["{{optionalImports}}"] = "\"time\""
 	}
-	if !*cg.isIntId {
-		replacers["{{idVar}}"] = "domain." + PascalCase(*cg.primaryKey) + " = s.idCreator.Create()"
-	}
+	replacers["{{idVar}}"] = "domain." + structPk + " = s.idCreator.Create()"
 	return replacers
 }
 
 func (cg *CodeGenerator) generateDomainStruct(blocks []*hclwrite.Block, tableName string, pk, pkType *string) string {
-	*pk = cg.findPkOnBlocks(blocks)
+	_, structPk := cg.findPkOnBlocks(blocks)
+	*pk = structPk
 	structString := "type " + PascalCase(tableName) + " struct {\n"
 	structString += cg.generateStruct(blocks, pk, pkType, cg.generateDeclarationLine)
 	structString += "\tclient string\n\tfilters *filters.Filters\n"
@@ -111,7 +121,10 @@ func (cg *CodeGenerator) generateStruct(blocks []*hclwrite.Block, pk, pkType *st
 			}
 
 			if pk != nil && block.Labels()[0] == *pk {
-				*pkType = fmt.Sprintf("%s string `param:\"id\"`\n", PascalCase(*pk))
+				if pkType != nil {
+					*pkType = fmt.Sprintf("%s string `param:\"id\"`\n", PascalCase(*pk))
+				}
+				continue
 			}
 
 			declarationString = strFormationFunc(
@@ -149,33 +162,46 @@ func (cg *CodeGenerator) generateAttributionLine(str, name, _, _ string) string 
 		return str
 	}
 	return fmt.Sprintf(
-		"%s	domain.%s = data.%s\n",
+		"%s\tdomain.%s = data.%s\n",
 		str,
 		name,
 		name,
 	)
 }
 
-func (cg *CodeGenerator) findPkOnBlocks(blocks []*hclwrite.Block) string {
-	str := ""
-	for _, block := range blocks {
-		if block.Type() == "primary_key" {
-			token, ok := block.Body().Attributes()["columns"]
-			if !ok {
-				return ""
-			}
-			pkAttr := string(token.Expr().BuildTokens(nil).Bytes())
-			str = cg.getColumnFromAttrString(pkAttr)
-		}
+// Utility function to strip 'column.' prefix
+func stripColumnPrefix(col string) string {
+	if strings.HasPrefix(col, "column.") {
+		return strings.TrimPrefix(col, "column.")
 	}
-	return PascalCase(str)
+	return col
 }
 
-func (cg *CodeGenerator) getColumnFromAttrString(attrStr string) string {
-	str := strings.Replace(attrStr, "[", "", -1)
-	str = strings.Replace(str, "]", "", -1)
-	str = strings.Split(str, ".")[1]
-	return str
+// Update findPkOnBlocks to use a sliding window over the tokens
+func (cg *CodeGenerator) findPkOnBlocks(blocks []*hclwrite.Block) (string, string) {
+	for _, block := range blocks {
+		if block.Type() == "primary_key" {
+			attr, ok := block.Body().Attributes()["columns"]
+			if !ok {
+				return "", ""
+			}
+			expr := attr.Expr()
+			traversal := expr.BuildTokens(nil)
+			var columns []string
+			for i := 0; i < len(traversal)-2; i++ {
+				if traversal[i].Type.String() == "TokenIdent" && string(traversal[i].Bytes) == "column" &&
+					traversal[i+1].Type.String() == "TokenDot" &&
+					traversal[i+2].Type.String() == "TokenIdent" {
+					columns = append(columns, string(traversal[i+2].Bytes))
+				}
+			}
+			if len(columns) > 0 {
+				col := columns[0]
+				return col, PascalCase(col)
+			}
+		}
+	}
+	return "", ""
 }
 
 func (cg *CodeGenerator) dbTypesToGoTypes(typo string) string {
@@ -235,8 +261,5 @@ func (cg *CodeGenerator) verifyIsNullable(token *hclwrite.Attribute, ok bool) bo
 		return false
 	}
 	value := token.Expr().BuildTokens(nil).Bytes()
-	if string(value) == "true" {
-		return true
-	}
-	return false
+	return string(value) == "true"
 }

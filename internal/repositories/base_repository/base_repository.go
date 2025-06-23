@@ -27,6 +27,7 @@ type BaseRepository[dom Domain] interface {
 type Domain interface {
 	Schema() string
 	GetFilters() filters.Filters
+	SoftDelete() string
 }
 
 type BaseRepo[dom Domain] struct {
@@ -227,6 +228,30 @@ func (repo *BaseRepo[Domain]) Edit(Data Domain, field string, value string) (int
 }
 
 func (repo *BaseRepo[Domain]) Delete(Data Domain, field string, value string) error {
+	softDelete := Data.SoftDelete()
+	if softDelete != "" {
+		query, args, bindErr := repo.Mysql.BindNamed(
+			fmt.Sprintf(
+				`UPDATE %s SET %s = NOW() WHERE %s = ?`,
+				Data.Schema(),
+				softDelete,
+				field,
+			),
+			&Data,
+		)
+		if bindErr != nil {
+			return bindErr
+		}
+		exec, err := repo.Mysql.Exec(query, args...)
+		if err != nil {
+			return err
+		}
+		rowsAffected, err := exec.RowsAffected()
+		if rowsAffected < 1 {
+			return errors.New("nothing deleted")
+		}
+		return err
+	}
 	exec, err := repo.Mysql.Exec(
 		fmt.Sprintf(
 			`DELETE FROM %s WHERE %s = '%s'`,

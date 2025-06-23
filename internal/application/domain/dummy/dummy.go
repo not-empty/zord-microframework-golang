@@ -10,6 +10,7 @@ type Dummy struct {
 	ID        string `db:"id"`
 	DummyName string `db:"name"`
 	Email     string `db:"email"`
+	DeletedAt string `db:"deleted_at"`
 	client    string
 	filters   *filters.Filters
 }
@@ -20,6 +21,10 @@ func (d *Dummy) SetClient(client string) {
 
 func (d *Dummy) SetFilters(filters *filters.Filters) {
 	d.filters = filters
+}
+
+func (d Dummy) SoftDelete() string {
+	return "deleted_at"
 }
 
 func (d Dummy) GetFilters() filters.Filters {

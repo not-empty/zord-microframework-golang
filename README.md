@@ -173,7 +173,7 @@ To use the MCP server with Claude Desktop via Docker, add the following configur
     "zord-mcp": {
       "name": "zord-mcp-docker",
       "description": "Zord MCP Server via Docker",
-      "command": "docker run -i zord-mcp",
+      "command": "docker run -i --rm --env-file /your/project/.env -v /your/project:/app zord-mcp",
       "transport": "stdio",
       "tools": []
     }
@@ -189,14 +189,14 @@ Note: if you have another mcp server add it inside the mcpServers key with anoth
     "zord-mcp": {
       "name": "zord-mcp-docker",
       "description": "Zord MCP Server via Docker",
-      "command": "docker run -i zord-mcp",
+      "command": "docker run -i --rm --env-file /your/project/.env -v /your/project:/app zord-mcp",
       "transport": "stdio",
       "tools": []
     },
     "zord-mcp2": {
       "name": "zord-mcp-docker",
       "description": "Zord MCP Server via Docker",
-      "command": "docker run -i zord-mcp",
+      "command": "docker run -i --rm --env-file /your/project/.env -v /your/project:/app zord-mcp",
       "transport": "stdio",
       "tools": []
     },
@@ -270,5 +270,5 @@ Make sure to set these variables in your `.env` file before running the MCP serv
 
 To test the MCP server directly, you can run:
 ```sh
-docker compose -f docker/mcp/docker-compose.yml run --rm mcp
+docker run -i zord-mcp
 ```

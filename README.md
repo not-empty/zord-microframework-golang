@@ -1,6 +1,13 @@
 # Zord Microframework
 ## Build your mecha
 
+> **Tip for Cursor users:**
+> To ensure code quality and automatic validations, add the following rule to **User rules** in Cursor:
+> 
+> **after each code update, run the arch-analyse mcp tool**
+> 
+> This way, every code change will be automatically validated by the MCP architecture analysis tool.
+
 GOlang base repository with code gen to create a fast golang project based on hexagonal architeture
 
 ---

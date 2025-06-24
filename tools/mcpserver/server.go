@@ -1,10 +1,12 @@
 package mcpserver
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"go-skeleton/pkg/config"
 	"go-skeleton/pkg/logger"
+	"go-skeleton/tools/arch_analyser"
 	"go-skeleton/tools/generator"
 	"go-skeleton/tools/migrator"
 	"os"
@@ -51,6 +53,8 @@ type GenerateSchemaArgs struct {
 type InspectArgs struct{}
 type ListOfferingsArgs struct{}
 type ProjectContextArgs struct{}
+
+type ArchAnalyseArgs struct{}
 
 func getEnvOrDefault(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
@@ -132,6 +136,9 @@ func (s *Server) RegisterTools() error {
 	}
 	if err := s.server.RegisterTool("ListOfferings", "List available tools", s.handleListOfferings); err != nil {
 		return fmt.Errorf("failed to register ListOfferings tool: %v", err)
+	}
+	if err := s.server.RegisterTool("arch-analyse", "Executa a análise de arquitetura do projeto", s.handleArchAnalyse); err != nil {
+		return fmt.Errorf("failed to register arch-analyse tool: %v", err)
 	}
 	return nil
 }
@@ -428,6 +435,46 @@ func (s *Server) handleListOfferings(args ListOfferingsArgs) (*mcp.ToolResponse,
 	}
 
 	return mcp.NewToolResponse(mcp.NewTextContent(string(content))), nil
+}
+
+func (s *Server) handleArchAnalyse(args ArchAnalyseArgs) (*mcp.ToolResponse, error) {
+	root, _ := os.Getwd()
+	var buf bytes.Buffer
+
+	// Chama as validações principais e captura o output
+	validations := []struct {
+		name string
+		fn   func(string) error
+	}{
+		{"Validação de importações", arch_analyser.ValidateImports},
+		{"Validação dos parâmetros de NewService", arch_analyser.ValidateNewServiceParams},
+		{"Validação de queries no banco", arch_analyser.ValidateDbQueriesInRepositories},
+		{"Validação de dependências entre camadas", arch_analyser.ValidateLayerDependencies},
+		{"Validação de circularidade de dependências", arch_analyser.ValidateNoCircularDependencies},
+		{"Validação de uso correto de context", arch_analyser.ValidateContextUsage},
+		{"Validação de pureza dos providers", arch_analyser.ValidateProvidersArePure},
+		{"Validação de implementação de interfaces de repositório", arch_analyser.ValidateRepositoryInterfacesImplemented},
+		{"Validação de variáveis globais mutáveis", arch_analyser.ValidateNoGlobalVars},
+		{"Validação de orquestração", arch_analyser.ValidateOrchestrationOnlyInServices},
+		{"Validação de nomenclatura e localização", arch_analyser.ValidateNamingAndLocation},
+		{"Validação de uso de pacotes externos", arch_analyser.ValidateExternalPackagesUsage},
+		{"Validação de uso de reflection", arch_analyser.ValidateReflectionUsage},
+		{"Validação de type assertions", arch_analyser.ValidateTypeAssertions},
+	}
+	allOk := true
+	for _, v := range validations {
+		err := v.fn(root)
+		if err != nil {
+			buf.WriteString("[ERRO] " + v.name + ":\n" + err.Error() + "\n")
+			allOk = false
+		} else {
+			buf.WriteString(v.name + " concluída com sucesso!\n")
+		}
+	}
+	if allOk {
+		return mcp.NewToolResponse(mcp.NewTextContent(buf.String())), nil
+	}
+	return mcp.NewToolResponse(mcp.NewTextContent(buf.String())), fmt.Errorf("Uma ou mais validações falharam")
 }
 
 // Run inicializa e executa o servidor MCP

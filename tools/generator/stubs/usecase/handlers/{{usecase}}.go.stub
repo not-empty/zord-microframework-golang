@@ -37,13 +37,8 @@ func (hs *{{usecasePascalCase}}Handlers) Handle{{usecasePascalCase}}(context ech
 		return context.JSON(422, errors)
 	}
 
-	tenant := context.Get("tenant").(string)
 	request := {{usecase}}.NewRequest(data)
-	ctx := requestContext.NewPrepareContext(tenant)
-	ctx.SetContext(request.Domain)
-	s.Execute(
-		request,
-	)
+	s.Execute(request)
 
 	response, err := s.GetResponse()
 	if err != nil {

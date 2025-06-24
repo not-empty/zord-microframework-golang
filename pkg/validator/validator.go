@@ -71,14 +71,19 @@ func (v *Validator) ValidateStruct(modelData any) []error {
 
 	err := v.validate.Struct(modelData)
 	if err != nil {
-		for _, err := range err.(validator.ValidationErrors) {
-			var element ErrorResponse
-			element.FailedField = err.Field()
-			element.Tag = err.Tag()
-			element.Value = err.Param()
+		if validationErrors, ok := err.(validator.ValidationErrors); ok {
+			for _, err := range validationErrors {
+				var element ErrorResponse
+				element.FailedField = err.Field()
+				element.Tag = err.Tag()
+				element.Value = err.Param()
 
-			message := v.translateError(&element)
-			errorsList = append(errorsList, message)
+				message := v.translateError(&element)
+				errorsList = append(errorsList, message)
+			}
+		} else {
+			// Trate outros tipos de erro, se necessário
+			errorsList = append(errorsList, err)
 		}
 	}
 

@@ -3,6 +3,7 @@ package dummy
 import (
 	"go-skeleton/internal/application/domain/dummy"
 	"go-skeleton/internal/application/services"
+	"net/http"
 )
 
 type Service struct {
@@ -43,7 +44,7 @@ func (s *Service) GetResponse() (*Response, *services.Error) {
 func (s *Service) produceResponseRule(page int, limit int, domain *dummy.Dummy) {
 	err, pagination := s.pagProv.PaginationHandler(*domain, page, limit)
 	if err != nil {
-		s.CustomError(err.Status, err)
+		s.CustomError(http.StatusInternalServerError, err.Error())
 		return
 	}
 

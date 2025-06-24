@@ -1,0 +1,25 @@
+# Configuração de allowed imports por camada para validação de dependências
+
+[services]
+allowed = [
+  "internal/application/domain",
+  "internal/repositories",
+  "internal/application/providers",
+  "internal/application/context"
+]
+
+[domain]
+allowed = [] # Apenas stdlib
+
+[repositories]
+allowed = [
+  "internal/application/domain",
+  "github.com/fatih/structs",
+  "github.com/jmoiron/sqlx"
+]
+
+[providers]
+allowed = [] # Apenas stdlib
+
+[context]
+allowed = [] # Apenas stdlib 

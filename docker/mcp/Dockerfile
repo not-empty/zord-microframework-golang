@@ -1,6 +1,13 @@
-FROM golang:1.22-alpine
+FROM golang:1.22-alpine AS builder
 
-WORKDIR /app
+WORKDIR /build
+
+# Install required packages
+RUN apk add --no-cache \
+    git \
+    curl \
+    bash \
+    sudo
 
 # Copy go mod and sum files
 COPY go.mod go.sum ./
@@ -12,7 +19,29 @@ RUN go mod download
 COPY . .
 
 # Build the MCP server
-RUN go build -o /app/mcp cmd/mcp/main.go
+RUN go build -o /build/mcp cmd/mcp/main.go
 
-# Set the entrypoint to run the MCP server
-ENTRYPOINT ["/app/mcp"] 
+# Final stage
+FROM golang:1.22-alpine
+
+WORKDIR /app
+
+# Install required packages
+RUN apk add --no-cache \
+    git \
+    curl \
+    bash \
+    sudo
+
+# Set up Atlas
+ENV ATLAS_VERSION=v0.29.0
+RUN curl -sSf https://atlasgo.sh | sh
+
+# Copy the binary from builder
+COPY --from=builder /build/mcp /usr/local/bin/mcp
+
+# Create data directory for mounted volumes
+RUN mkdir -p /app/data
+
+# Set the entrypoint
+ENTRYPOINT ["/usr/local/bin/mcp"] 

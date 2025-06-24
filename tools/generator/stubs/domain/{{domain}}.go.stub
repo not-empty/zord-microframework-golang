@@ -28,6 +28,11 @@ func (d {{domainPascalCase}}) Schema() string {
 	return "{{tableName}}"
 }
 
+func (d {{domainPascalCase}}) SoftDelete() string {
+	// Adjust this logic if your schema uses a different soft delete field name
+	return "deleted_at"
+}
+
 type Repository interface {
 	base_repository.BaseRepository[{{domainPascalCase}}]
 }

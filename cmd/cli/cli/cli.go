@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"go-skeleton/cmd/cli/archanalyser"
 	"go-skeleton/cmd/cli/generator"
 	"go-skeleton/cmd/cli/migrator"
 
@@ -23,4 +24,6 @@ func (c *Cli) Start() {
 	generatorInstance.DeclareDomainCreatorFromSchema(c.Cmd)
 	migratorInstance := migrator.NewMigrator()
 	migratorInstance.DeclareCommands(c.Cmd)
+	archAnalyserInstance := archanalyser.NewArchAnalyser()
+	archAnalyserInstance.DeclareCommands(c.Cmd)
 }

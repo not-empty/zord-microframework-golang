@@ -6,27 +6,23 @@ type Data struct {
 
 type Request struct {
 	Data *Data
-	Domain *{{domainCamelCase}}.{{domainPascalCase}}
 	Err error
 }
 
 func NewRequest(data *Data) Request {
-	domain := &{{domainCamelCase}}.{{domainPascalCase}}{}
 	return Request{
 		Data: data,
-		Domain: domain,
 	}
 }
 
 func (r *Request) Validate() error {
-	if err := r.{{usecase}}CreateRule(); err != nil {
+	if err := r.TestusecaseCreateRule(); err != nil {
 		return err
 	}
-
 	return nil
 }
 
-func (r *Request) {{usecase}}CreateRule() error {
+func (r *Request) TestusecaseCreateRule() error {
 	// Add validation...
 	return nil
 }

@@ -8,6 +8,7 @@ import (
 
 type Filters struct {
 	ParsedData []Filter
+	FiltersMap map[string]string
 }
 
 type Filter struct {
@@ -22,18 +23,18 @@ type FilterData struct {
 	IsString bool
 }
 
-var FiltersMap = map[string]string{
-	"eql": "=",
-	"neq": "!=",
-	"lik": "LIKE",
-	"gt":  ">",
-	"gte": ">=",
-	"lt":  "<",
-	"lte": "<=",
-}
-
 func NewFilters() *Filters {
-	return &Filters{}
+	return &Filters{
+		FiltersMap: map[string]string{
+			"eql": "=",
+			"neq": "!=",
+			"lik": "LIKE",
+			"gt":  ">",
+			"gte": ">=",
+			"lt":  "<",
+			"lte": "<=",
+		},
+	}
 }
 
 func (f *Filters) Parse(config map[string]string, data map[string]FilterData) error {
@@ -54,7 +55,7 @@ func (f *Filters) Parse(config map[string]string, data map[string]FilterData) er
 
 		filtersData = append(filtersData, Filter{
 			Field:    field,
-			Operator: FiltersMap[vl[0]],
+			Operator: f.FiltersMap[vl[0]],
 			Value:    vl[1],
 			IsString: value.IsString,
 		})

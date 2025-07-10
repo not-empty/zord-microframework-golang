@@ -1,14 +1,13 @@
 package pagination
 
 import (
-	"go-skeleton/internal/application/services"
-	"go-skeleton/internal/repositories/base_repository"
+	"errors"
+	"go-skeleton/internal/application/providers/filters"
 	"math"
-	"net/http"
 )
 
 type IPaginationProvider[Row any] interface {
-	PaginationHandler(row Row, page int, limit int) (*services.Error, *Pagination[Row])
+	PaginationHandler(row Row, page int, limit int) (error, *Pagination[Row])
 }
 
 type Pagination[Row any] struct {
@@ -17,30 +16,33 @@ type Pagination[Row any] struct {
 	Data        *[]Row
 }
 
+type Domain interface {
+	Schema() string
+	GetFilters() filters.Filters
+	SoftDelete() string
+}
+
 type IPaginationRepository[Row any] interface {
 	List(domain Row, limit int, offset int) (*[]Row, error)
 	Count(domain Row) (int64, error)
 }
 
-type Provider[Row base_repository.Domain] struct {
+type Provider[Row Domain] struct {
 	repo IPaginationRepository[Row]
 }
 
-func NewPaginationProvider[Row base_repository.Domain](repo IPaginationRepository[Row]) *Provider[Row] {
+func NewPaginationProvider[Row Domain](repo IPaginationRepository[Row]) *Provider[Row] {
 	return &Provider[Row]{
 		repo: repo,
 	}
 }
 
-func (pp *Provider[Row]) PaginationHandler(row Row, page int, limit int) (*services.Error, *Pagination[Row]) {
+func (pp *Provider[Row]) PaginationHandler(row Row, page int, limit int) (error, *Pagination[Row]) {
 	listData := &[]Row{}
 	offset := (page - 1) * limit
 	total, err := pp.repo.Count(row)
 	if err != nil {
-		return &services.Error{
-			Status:  http.StatusInternalServerError,
-			Message: "error on pagination count",
-		}, nil
+		return errors.New("error on pagination count"), nil
 	}
 
 	if total == 0 {
@@ -55,10 +57,7 @@ func (pp *Provider[Row]) PaginationHandler(row Row, page int, limit int) (*servi
 	if page <= int(totalPages) {
 		listData, err = pp.repo.List(row, limit, offset)
 		if err != nil {
-			return &services.Error{
-				Status:  http.StatusInternalServerError,
-				Message: "error on data list",
-			}, nil
+			return errors.New("error on data list"), nil
 		}
 	}
 
